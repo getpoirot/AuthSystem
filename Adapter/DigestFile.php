@@ -1,10 +1,17 @@
 <?php
-namespace Poirot\Authentication\Interfaces;
+namespace Poirot\Authentication\Adapter;
 
+use Poirot\Authentication\Interfaces\iAuthorize;
+use Poirot\Authentication\Interfaces\iIdentity;
 use Poirot\Core\AbstractOptions;
 
-interface iAuthorize
+class DigestFile implements iAuthorize
 {
+    /**
+     * @var DigestFileCredential
+     */
+    protected $credential;
+
     /**
      * Change Authorization Namespace
      *
@@ -15,14 +22,20 @@ interface iAuthorize
      *
      * @return $this
      */
-    function toNamespace($namespace);
+    function toNamespace($namespace)
+    {
+        // TODO: Implement toNamespace() method.
+    }
 
     /**
      * Get Namespace
      *
      * @return string
      */
-    function getCurrNamespace();
+    function getCurrNamespace()
+    {
+        // TODO: Implement getCurrNamespace() method.
+    }
 
     /**
      * Credential
@@ -37,9 +50,22 @@ interface iAuthorize
      *
      * @param null|array|AbstractOptions $options Builder Options
      *
-     * @return iCredential
+     * @return $this|DigestFileCredential
      */
-    function credential($options = null);
+    function credential($options = null)
+    {
+        if (!$this->credential)
+            $this->credential = new DigestFileCredential;
+
+        if ($options !== null) {
+            $this->credential->from($options);
+            // $auth->credential(['usr' => 'payam', 'psw' => '***'])
+            //    ->authorize();
+            return $this;
+        }
+
+        return $this->credential;
+    }
 
     /**
      * Authorize
@@ -58,7 +84,10 @@ interface iAuthorize
      * @throw \Exception
      * @return $this
      */
-    function authorize();
+    function authorize()
+    {
+        // TODO: Implement authorize() method.
+    }
 
     /**
      * Authorized User Identity
@@ -68,5 +97,9 @@ interface iAuthorize
      *
      * @return iIdentity
      */
-    function identity();
+    function identity()
+    {
+        // TODO: Implement identity() method.
+    }
 }
+ 
