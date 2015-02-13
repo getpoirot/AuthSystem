@@ -55,7 +55,7 @@ interface iAuthorize
      *   note: for iAuthorizeUserDataAware
      *         it used user data model to retrieve data
      *
-     * @throw \Exception
+     * @throws \Exception
      * @return $this
      */
     function authorize();

@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\Authentication;
 
+use Poirot\Authentication\Interfaces\iAuthorize;
 use Poirot\Authentication\Interfaces\iIdentity;
 use Poirot\Storage\Interfaces\iStorage;
 
@@ -10,6 +11,24 @@ class AbstractIdentity implements iIdentity
      * @var iStorage
      */
     protected $storage;
+
+    /**
+     * @var $authorize
+     */
+    protected $authorize;
+
+    /**
+     * Construct
+     *
+     * @param iAuthorize $authorize
+     * @param iStorage $storage
+     */
+    function __construct(iAuthorize $authorize, iStorage $storage)
+    {
+       $this
+           ->injectAuthAdapter($authorize)
+           ->injectStorage($storage);
+    }
 
     /**
      * Login Authorized User
@@ -39,11 +58,27 @@ class AbstractIdentity implements iIdentity
     /**
      * Is Identity Storage Empty
      *
+     * -
+     *
      * @return boolean
      */
     function isEmpty()
     {
-        return (count($this->storage()->keys()) > 0);
+        return ( count($this->storage()->keys()) == 0 );
+    }
+
+    /**
+     * Inject Authorize Adapter
+     *
+     * @param iAuthorize $authorize
+     *
+     * @return $this
+     */
+    function injectAuthAdapter(iAuthorize $authorize)
+    {
+        $this->authorize = $authorize;
+
+        return $this;
     }
 
     /**

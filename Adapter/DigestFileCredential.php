@@ -33,6 +33,9 @@ class DigestFileCredential extends AbstractCredential
      */
     public function getFilename()
     {
+        if (!$this->filename)
+            $this->filename = dirname(__FILE__).'/../data/digest.pws';
+
         return $this->filename;
     }
 

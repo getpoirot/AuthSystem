@@ -1,9 +1,12 @@
 <?php
 namespace Poirot\Authentication\Adapter;
 
+use Poirot\Authentication\AbstractIdentity;
+use Poirot\Authentication\Authorize\Exceptions\WrongCredentialException;
 use Poirot\Authentication\Interfaces\iAuthorize;
 use Poirot\Authentication\Interfaces\iIdentity;
 use Poirot\Core\AbstractOptions;
+use Poirot\Storage\Adapter\SessionStorage;
 
 class DigestFile implements iAuthorize
 {
@@ -11,6 +14,16 @@ class DigestFile implements iAuthorize
      * @var DigestFileCredential
      */
     protected $credential;
+
+    /**
+     * @var AbstractIdentity
+     */
+    protected $identity;
+
+    /**
+     * @var string default get_class
+     */
+    protected $namespace;
 
     /**
      * Change Authorization Namespace
@@ -24,7 +37,9 @@ class DigestFile implements iAuthorize
      */
     function toNamespace($namespace)
     {
-        // TODO: Implement toNamespace() method.
+        $this->namespace = $namespace;
+
+        return $this;
     }
 
     /**
@@ -34,7 +49,10 @@ class DigestFile implements iAuthorize
      */
     function getCurrNamespace()
     {
-        // TODO: Implement getCurrNamespace() method.
+        if (!$this->namespace)
+            $this->toNamespace(get_class($this));
+
+        return $this->namespace;
     }
 
     /**
@@ -81,12 +99,51 @@ class DigestFile implements iAuthorize
      *   note: for iAuthorizeUserDataAware
      *         it used user data model to retrieve data
      *
-     * @throw \Exception
+     * @throws \Exception
      * @return $this
      */
     function authorize()
     {
-        // TODO: Implement authorize() method.
+        foreach ($this->credential()->props()->readable as $option) {
+            // All Options must be set
+            if ($this->credential()->{$option} == ''
+                ||
+                $this->credential()->{$option} == null
+            ) {
+                throw new \InvalidArgumentException(
+                    "'$option' required and must be set before authentication."
+                );
+            }
+        }
+
+        $hFile = @fopen($this->credential()->getFilename(), 'r');
+        if ($hFile === false)
+            throw new \RuntimeException(
+                "Cannot open '{$this->credential()->getFilename()}' for reading"
+            );
+
+        $realm    = $this->credential()->getRealm();
+        $username = $this->credential()->getUsername();
+        $password = $this->credential()->getPassword();
+
+        $id       = "$username:$realm";
+        $result   = false;
+        while (($line = fgets($hFile)) !== false) {
+            $line = trim($line);
+            if (substr($line, 0, strlen($id)) !== $id)
+                continue;
+
+            if (substr($line, -32) === md5("$username:$realm:$password")) {
+                $result = true;
+
+                break;
+            }
+        }
+
+        if (!$result)
+            throw new WrongCredentialException('Invalid Username or password.');
+
+        return $this;
     }
 
     /**
@@ -99,7 +156,12 @@ class DigestFile implements iAuthorize
      */
     function identity()
     {
-        // TODO: Implement identity() method.
+        if (!$this->identity)
+            $this->identity = new AbstractIdentity($this,
+                new SessionStorage(['ident' => $this->getCurrNamespace()])
+            );
+
+        return $this->identity;
     }
 }
  

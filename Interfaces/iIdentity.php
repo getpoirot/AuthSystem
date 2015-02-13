@@ -23,11 +23,13 @@ interface iIdentity
     function logout();
 
     /**
-     * Is Identity Storage Empty
+     * Inject Authorize Adapter
      *
-     * @return boolean
+     * @param iAuthorize $authorize
+     *
+     * @return $this
      */
-    function isEmpty();
+    function injectAuthAdapter(iAuthorize $authorize);
 
     /**
      * Inject Storage Used For Authorized User Data
@@ -41,6 +43,13 @@ interface iIdentity
      * @return $this
      */
     function injectStorage(iStorage $storage);
+
+    /**
+     * Is Identity Storage Empty
+     *
+     * @return boolean
+     */
+    function isEmpty();
 
     /**
      * Authorized User Data Storage
