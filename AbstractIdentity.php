@@ -1,33 +1,126 @@
 <?php
 namespace Poirot\Authentication;
 
-use Poirot\Authentication\Interfaces\iAuthorize;
 use Poirot\Authentication\Interfaces\iIdentity;
-use Poirot\Storage\Interfaces\iStorage;
+use Poirot\Storage\Adapter\SessionStorage;
 
 class AbstractIdentity implements iIdentity
 {
-    /**
-     * @var iStorage
-     */
-    protected $storage;
-
     /**
      * @var $authorize
      */
     protected $authorize;
 
     /**
+     * @var SessionStorage
+     */
+    protected $session;
+
+    protected $cookie;
+
+    /**
+     * Authorize Service Namespace
+     *
+     * @var string
+     */
+    protected $namespace;
+
+    /**
+     * User Identity bu Authorize Service
+     * ! it given from credential
+     * @var string
+     */
+    protected $userIdentity;
+
+    /**
      * Construct
      *
-     * @param iAuthorize $authorize
-     * @param iStorage $storage
+     * @param string $namespace
      */
-    function __construct(iAuthorize $authorize, iStorage $storage)
+    function __construct($namespace)
     {
-       $this
-           ->injectAuthAdapter($authorize)
-           ->injectStorage($storage);
+        $this->setNamespace($namespace);
+    }
+
+    /**
+     * Get Session Storage
+     *
+     * @return SessionStorage
+     */
+    protected function getSession()
+    {
+        if (!$this->session)
+            $this->session = new SessionStorage(['ident' => $this->getNamespace()]);
+
+        // insane but always used latest namespace
+        $this->session->options()->setIdent(
+            $this->getNamespace()
+        );
+
+        return $this->session;
+    }
+
+    /**
+     * Set Namespace
+     *
+     * @param string $namespace
+     *
+     * @return $this
+     */
+    function setNamespace($namespace)
+    {
+        $this->namespace = $namespace;
+
+        return $this;
+    }
+
+    /**
+     * Get Namespace
+     *
+     * @return string
+     */
+    function getNamespace()
+    {
+        return $this->namespace;
+    }
+
+    /**
+     * Set User Identity
+     *
+     * - it always set from AuthService::authorize
+     *   found with AuthService::credential::getUserIdentity
+     *
+     * @param string $identity User Identity
+     *
+     * @return $this
+     */
+    function setUserIdentity($identity)
+    {
+        $this->userIdentity = $identity;
+
+        return $this;
+    }
+
+    /**
+     * Get User Identity
+     *
+     * @return string
+     */
+    function getUserIdentity()
+    {
+        return $this->userIdentity;
+    }
+
+    /**
+     * Remember Me Feature!
+     *
+     * @param bool $flag
+     *
+     * @return $this
+     */
+    function setRemember($flag = true)
+    {
+        // TODO: Implement setRemember() method.
     }
 
     /**
@@ -37,7 +130,15 @@ class AbstractIdentity implements iIdentity
      */
     function login()
     {
-        // TODO: Implement login() method.
+        // TODO: Implement Remember Me
+
+        if ($this->getSession()->get('user') !== $this->getUserIdentity())
+            $this->getSession()->set(
+                'user',
+                $this->getUserIdentity()
+            );
+
+        return $this;
     }
 
     /**
@@ -50,71 +151,24 @@ class AbstractIdentity implements iIdentity
      */
     function logout()
     {
-        $this->storage()->destroy();
+        $this->getSession()->destroy();
 
         return $this;
     }
 
     /**
-     * Is Identity Storage Empty
+     * Has Authenticated User?
      *
-     * -
+     * - if has authenticated user return identity
+     *   else return false
      *
-     * @return boolean
+     * @return false|mixed
      */
-    function isEmpty()
+    function hasAuthenticated()
     {
-        return ( count($this->storage()->keys()) == 0 );
-    }
+        if (!$this->getSession()->has('user'))
+            return false;
 
-    /**
-     * Inject Authorize Adapter
-     *
-     * @param iAuthorize $authorize
-     *
-     * @return $this
-     */
-    function injectAuthAdapter(iAuthorize $authorize)
-    {
-        $this->authorize = $authorize;
-
-        return $this;
-    }
-
-    /**
-     * Inject Storage Used For Authorized User Data
-     *
-     * - with changing storage type we can
-     *   implement Remember Me feature.
-     *   Session, File, NonePersist, ...
-     *
-     * @param iStorage $storage
-     *
-     * @return $this
-     */
-    function injectStorage(iStorage $storage)
-    {
-        $this->storage = $storage;
-
-        return $this;
-    }
-
-    /**
-     * Authorized User Data Storage
-     *
-     * ! storage Identity must be override
-     *   that storage only be valid on this credential
-     *   namespace
-     *
-     * @throws \Exception
-     * @return iStorage
-     */
-    function storage()
-    {
-        if (!$this->storage)
-            throw new \Exception('Storage Not Injected.');
-
-        return $this->storage;
+        return $this->getSession()->get('user');
     }
 }
- 

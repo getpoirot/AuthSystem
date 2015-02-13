@@ -1,16 +1,58 @@
 <?php
 namespace Poirot\Authentication\Interfaces;
 
-use Poirot\Storage\Interfaces\iStorage;
-
 interface iIdentity
 {
+    /**
+     * Set Namespace
+     *
+     * @param string $namespace
+     *
+     * @return $this
+     */
+    function setNamespace($namespace);
+
+    /**
+     * Get Namespace
+     *
+     * @return string
+     */
+    function getNamespace();
+
+    /**
+     * Set User Identity
+     *
+     * - it always set from AuthService::authorize
+     *   found with AuthService::credential::getUserIdentity
+     *
+     * @param mixed $identity User Identity
+     *
+     * @return $this
+     */
+    function setUserIdentity($identity);
+
+    /**
+     * Get User Identity
+     *
+     * @return mixed
+     */
+    function getUserIdentity();
+
     /**
      * Login Authorized User
      *
      * @return $this
      */
     function login();
+
+    /**
+     * Remember Me Feature!
+     *
+     * @param bool $flag
+     *
+     * @return $this
+     */
+    function setRemember($flag = true);
 
     /**
      * Clear Credential Entry
@@ -23,42 +65,9 @@ interface iIdentity
     function logout();
 
     /**
-     * Inject Authorize Adapter
-     *
-     * @param iAuthorize $authorize
-     *
-     * @return $this
-     */
-    function injectAuthAdapter(iAuthorize $authorize);
-
-    /**
-     * Inject Storage Used For Authorized User Data
-     *
-     * - with changing storage type we can
-     *   implement Remember Me feature.
-     *   Session, File, NonePersist, ...
-     *
-     * @param iStorage $storage
-     *
-     * @return $this
-     */
-    function injectStorage(iStorage $storage);
-
-    /**
-     * Is Identity Storage Empty
+     * Has Authenticated User?
      *
      * @return boolean
      */
-    function isEmpty();
-
-    /**
-     * Authorized User Data Storage
-     *
-     * ! storage Identity must be override
-     *   that storage only be valid on this credential
-     *   namespace
-     *
-     * @return iStorage
-     */
-    function storage();
+    function hasAuthenticated();
 }
