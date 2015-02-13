@@ -102,8 +102,13 @@ class DigestFile implements iAuthorize
      * @throws \Exception
      * @return $this
      */
-    function authorize()
+    function authenticate()
     {
+        // Clear Old Authenticated User(if has it):
+        $this->identity()->logout();
+
+        // Authorize User:
+
         foreach ($this->credential()->props()->readable as $option) {
             // All Options must be set
             if ($this->credential()->{$option} == ''
@@ -135,13 +140,18 @@ class DigestFile implements iAuthorize
 
             if (substr($line, -32) === md5("$username:$realm:$password")) {
                 $result = true;
-
                 break;
             }
         }
 
         if (!$result)
             throw new WrongCredentialException('Invalid Username or password.');
+
+        // Set Identified User:
+
+        $this->identity()->setUserIdentity(
+            $this->credential()->getUserIdentity()
+        );
 
         return $this;
     }
@@ -157,11 +167,10 @@ class DigestFile implements iAuthorize
     function identity()
     {
         if (!$this->identity)
-            $this->identity = new AbstractIdentity($this,
-                new SessionStorage(['ident' => $this->getCurrNamespace()])
-            );
+            $this->identity = new AbstractIdentity($this->getCurrNamespace());
+
+        $this->identity->setNamespace($this->getCurrNamespace());
 
         return $this->identity;
     }
 }
- 

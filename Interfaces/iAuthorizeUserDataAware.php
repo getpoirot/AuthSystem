@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\Authentication\Interfaces;
 
-interface iAuthorizeUserDataAware 
+interface iAuthorizeUserDataAware
 {
     /**
      * Set User Data Model

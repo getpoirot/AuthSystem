@@ -58,7 +58,7 @@ interface iAuthorize
      * @throws \Exception
      * @return $this
      */
-    function authorize();
+    function authenticate();
 
     /**
      * Authorized User Identity
