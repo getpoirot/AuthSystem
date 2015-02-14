@@ -127,9 +127,11 @@ class DigestFile implements iAuthorize
                 "Cannot open '{$this->credential()->getFilename()}' for reading"
             );
 
-        $realm    = $this->credential()->getRealm();
-        $username = $this->credential()->getUsername();
-        $password = $this->credential()->getPassword();
+        /** @var string $realm */
+        /** @var string $username */
+        /** @var string $password */
+        /** @var string $user_identity */
+        extract($this->credential()->toArray());
 
         $id       = "$username:$realm";
         $result   = false;
@@ -149,9 +151,7 @@ class DigestFile implements iAuthorize
 
         // Set Identified User:
 
-        $this->identity()->setUserIdentity(
-            $this->credential()->getUserIdentity()
-        );
+        $this->identity()->setUserIdentity($user_identity);
 
         return $this;
     }
