@@ -2,20 +2,19 @@
 namespace Poirot\Authentication;
 
 use Poirot\Authentication\Interfaces\iIdentity;
+use Poirot\Storage\Adapter\CookieStorage;
 use Poirot\Storage\Adapter\SessionStorage;
 
-class AbstractIdentity implements iIdentity
+class BaseIdentity implements iIdentity
 {
-    /**
-     * @var $authorize
-     */
-    protected $authorize;
-
     /**
      * @var SessionStorage
      */
     protected $session;
 
+    /**
+     * @var CookieStorage
+     */
     protected $cookie;
 
     /**
@@ -33,6 +32,11 @@ class AbstractIdentity implements iIdentity
     protected $userIdentity;
 
     /**
+     * @var boolean
+     */
+    protected $remember;
+
+    /**
      * Construct
      *
      * @param string $namespace
@@ -40,24 +44,6 @@ class AbstractIdentity implements iIdentity
     function __construct($namespace)
     {
         $this->setNamespace($namespace);
-    }
-
-    /**
-     * Get Session Storage
-     *
-     * @return SessionStorage
-     */
-    protected function getSession()
-    {
-        if (!$this->session)
-            $this->session = new SessionStorage(['ident' => $this->getNamespace()]);
-
-        // insane but always used latest namespace
-        $this->session->options()->setIdent(
-            $this->getNamespace()
-        );
-
-        return $this->session;
     }
 
     /**
@@ -120,7 +106,9 @@ class AbstractIdentity implements iIdentity
      */
     function setRemember($flag = true)
     {
-        // TODO: Implement setRemember() method.
+        $this->remember = $flag;
+
+        return $this;
     }
 
     /**
@@ -130,13 +118,10 @@ class AbstractIdentity implements iIdentity
      */
     function login()
     {
-        // TODO: Implement Remember Me
+        if ($this->remember)
+            $this->getCookie()->set('user', $this->getUserIdentity());
 
-        if ($this->getSession()->get('user') !== $this->getUserIdentity())
-            $this->getSession()->set(
-                'user',
-                $this->getUserIdentity()
-            );
+        $this->getSession()->set('user', $this->getUserIdentity());
 
         return $this;
     }
@@ -152,6 +137,7 @@ class AbstractIdentity implements iIdentity
     function logout()
     {
         $this->getSession()->destroy();
+        $this->getCookie()->destroy();
 
         return $this;
     }
@@ -162,13 +148,62 @@ class AbstractIdentity implements iIdentity
      * - if has authenticated user return identity
      *   else return false
      *
+     * - never check remember flag
+     *   the user that authenticated with
+     *   Remember Me must recognized when
+     *   exists.
+     *
      * @return false|mixed
      */
     function hasAuthenticated()
     {
-        if (!$this->getSession()->has('user'))
-            return false;
+        if (!$user = $this->getSession()->get('user', false))
+//            if ($this->remember) {
+                // it's maybe found on cookie
+                if ($user = $this->getCookie()->get('user', false)) {
+                    $curUsr = $this->getUserIdentity();
+                    $this->setUserIdentity($user);
+                    $this->login(); // log knowing user in
+                    $this->setUserIdentity($curUsr);
+                }
+//            }
 
-        return $this->getSession()->get('user');
+        return $user;
+    }
+
+    /**
+     * Get Session Storage
+     *
+     * @return SessionStorage
+     */
+    protected function getSession()
+    {
+        if (!$this->session)
+            $this->session = new SessionStorage(['ident' => $this->getNamespace()]);
+
+        // insane but always used latest namespace
+        $this->session->options()->setIdent(
+            $this->getNamespace()
+        );
+
+        return $this->session;
+    }
+
+    /**
+     * Get Cookie Storage
+     *
+     * @return SessionStorage
+     */
+    protected function getCookie()
+    {
+        if (!$this->cookie)
+            $this->cookie = new CookieStorage(['ident' => $this->getNamespace()]);
+
+        // insane but always used latest namespace
+        $this->cookie->options()->setIdent(
+            $this->getNamespace()
+        );
+
+        return $this->cookie;
     }
 }
