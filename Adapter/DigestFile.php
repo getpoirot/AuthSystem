@@ -1,12 +1,11 @@
 <?php
 namespace Poirot\Authentication\Adapter;
 
-use Poirot\Authentication\AbstractIdentity;
+use Poirot\Authentication\BaseIdentity;
 use Poirot\Authentication\Authorize\Exceptions\WrongCredentialException;
 use Poirot\Authentication\Interfaces\iAuthorize;
 use Poirot\Authentication\Interfaces\iIdentity;
 use Poirot\Core\AbstractOptions;
-use Poirot\Storage\Adapter\SessionStorage;
 
 class DigestFile implements iAuthorize
 {
@@ -16,7 +15,7 @@ class DigestFile implements iAuthorize
     protected $credential;
 
     /**
-     * @var AbstractIdentity
+     * @var BaseIdentity
      */
     protected $identity;
 
@@ -53,36 +52,6 @@ class DigestFile implements iAuthorize
             $this->toNamespace(get_class($this));
 
         return $this->namespace;
-    }
-
-    /**
-     * Credential
-     *
-     * - it`s contains credential fields used by
-     *   authorize() to authorize user.
-     *   maybe, user/pass or ip address in some case
-     *   that we want auth. user by ip
-     *
-     * - it may be vary from within different Authorize
-     *   services
-     *
-     * @param null|array|AbstractOptions $options Builder Options
-     *
-     * @return $this|DigestFileCredential
-     */
-    function credential($options = null)
-    {
-        if (!$this->credential)
-            $this->credential = new DigestFileCredential;
-
-        if ($options !== null) {
-            $this->credential->from($options);
-            // $auth->credential(['usr' => 'payam', 'psw' => '***'])
-            //    ->authorize();
-            return $this;
-        }
-
-        return $this->credential;
     }
 
     /**
@@ -167,10 +136,40 @@ class DigestFile implements iAuthorize
     function identity()
     {
         if (!$this->identity)
-            $this->identity = new AbstractIdentity($this->getCurrNamespace());
+            $this->identity = new BaseIdentity($this->getCurrNamespace());
 
         $this->identity->setNamespace($this->getCurrNamespace());
 
         return $this->identity;
+    }
+
+    /**
+     * Credential
+     *
+     * - it`s contains credential fields used by
+     *   authorize() to authorize user.
+     *   maybe, user/pass or ip address in some case
+     *   that we want auth. user by ip
+     *
+     * - it may be vary from within different Authorize
+     *   services
+     *
+     * @param null|array|AbstractOptions $options Builder Options
+     *
+     * @return $this|DigestFileCredential
+     */
+    function credential($options = null)
+    {
+        if (!$this->credential)
+            $this->credential = new DigestFileCredential;
+
+        if ($options !== null) {
+            $this->credential->from($options);
+            // $auth->credential(['usr' => 'payam', 'psw' => '***'])
+            //    ->authorize();
+            return $this;
+        }
+
+        return $this->credential;
     }
 }

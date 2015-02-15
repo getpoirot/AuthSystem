@@ -25,23 +25,6 @@ interface iAuthorize
     function getCurrNamespace();
 
     /**
-     * Credential
-     *
-     * - it`s contains credential fields used by
-     *   authorize() to authorize user.
-     *   maybe, user/pass or ip address in some case
-     *   that we want auth. user by ip
-     *
-     * - it may be vary from within different Authorize
-     *   services
-     *
-     * @param null|array|AbstractOptions $options Builder Options
-     *
-     * @return iCredential
-     */
-    function credential($options = null);
-
-    /**
      * Authorize
      *
      * - throw exception from Authorize\Exceptions
@@ -69,4 +52,21 @@ interface iAuthorize
      * @return iIdentity
      */
     function identity();
+
+    /**
+     * Credential
+     *
+     * - it`s contains credential fields used by
+     *   authorize() to authorize user.
+     *   maybe, user/pass or ip address in some case
+     *   that we want auth. user by ip
+     *
+     * - it may be vary from within different Authorize
+     *   services
+     *
+     * @param null|array|AbstractOptions $options Builder Options
+     *
+     * @return $this|iCredential
+     */
+    function credential($options = null);
 }
