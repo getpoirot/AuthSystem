@@ -5,11 +5,18 @@ authentication & authorization system.
 ## Overview usage sample
 
 ```php
-$auth = new DigestFile;
+# used with AuthService aggregator
+$auth = new AuthService();
+$auth->addAuthentication(new DigestFile);
+# or with direct adapter
+# $auth = new DigestFile; // same action as above
 if (!$auth->identity()->hasAuthenticated()) {
     try {
-        $auth->credential(['username' => 'payam', 'password' => '123456', 'realm' => 'admin'])
-            ->authenticate();
+        $auth->credential([
+            'username' => 'payam'
+            , 'password' => '123456'
+            , 'realm' => 'admin'
+        ])->authenticate();
     } catch (WrongCredentialException $e) {
         throw new \Exception('Invalid Username or Password.');
     } catch (UserNotFoundException $e) {
@@ -22,7 +29,12 @@ if (!$auth->identity()->hasAuthenticated()) {
     $auth->identity()
         ->setRemember()
         ->login();
-} else {
+
     echo ('Hello, Dear '.$auth->identity()->hasAuthenticated().' You are authorized ...');
+
+} else {
+    echo ('Hello, Dear '.$auth->identity()->hasAuthenticated());
 }
+
+die('>_');
 ```
