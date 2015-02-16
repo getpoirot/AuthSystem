@@ -3,11 +3,15 @@ namespace Poirot\Authentication\Adapter;
 
 use Poirot\Authentication\AbstractAdapter;
 use Poirot\Authentication\Authorize\Exceptions\WrongCredentialException;
-use Poirot\Authentication\Interfaces\iCredential;
 use Poirot\Core\AbstractOptions;
 
 class DigestFile extends AbstractAdapter
 {
+    /**
+     * @var DigestFileCredential
+     */
+    protected $credential;
+
     /**
      * Authorize
      *
@@ -44,10 +48,10 @@ class DigestFile extends AbstractAdapter
             }
         }
 
-        $hFile = @fopen($this->credential()->getFilename(), 'r');
+        $hFile = @fopen($this->credential()->getFilePathname(), 'r');
         if ($hFile === false)
             throw new \RuntimeException(
-                "Cannot open '{$this->credential()->getFilename()}' for reading"
+                "Cannot open '{$this->credential()->getFilePathname()}' for reading"
             );
 
         /** @var string $realm */
@@ -80,9 +84,23 @@ class DigestFile extends AbstractAdapter
     }
 
     /**
+     * note: just for IDE Completion Fix
+     *
+     * @inheritdoc
+     *
+     * @param null $options
+     *
+     * @return $this|DigestFileCredential
+     */
+    function credential($options = null)
+    {
+        return parent::credential($options);
+    }
+
+    /**
      * Get Instance of credential Object
      *
-     * @return iCredential
+     * @return $this::credential
      */
     protected function insCredential()
     {

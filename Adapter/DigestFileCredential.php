@@ -31,7 +31,7 @@ class DigestFileCredential extends AbstractCredential
     /**
      * @return mixed
      */
-    public function getFilename()
+    public function getFilePathname()
     {
         if (!$this->filename)
             $this->filename = dirname(__FILE__).'/../data/digest.pws';
@@ -43,7 +43,7 @@ class DigestFileCredential extends AbstractCredential
      * @param mixed $filename
      * @return $this
      */
-    public function setFilename($filename)
+    public function setFilePathname($filename)
     {
         $this->filename = $filename;
 
