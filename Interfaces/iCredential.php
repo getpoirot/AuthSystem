@@ -2,9 +2,9 @@
 namespace Poirot\Authentication\Interfaces;
 
 use Poirot\Core\AbstractOptions;
-use Poirot\Core\Interfaces\iMagicalFields;
+use Poirot\Core\Interfaces\iPoirotOptions;
 
-interface iCredential extends iMagicalFields
+interface iCredential extends iPoirotOptions
 {
     /**
      * If Authorization was successful identity

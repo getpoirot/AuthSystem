@@ -32,14 +32,19 @@ interface iAuthorize
      *   like: \App\Auth\UserBannedException
      *   to catch behaves
      *
-     * - each time called will clean current storage
-     * - after successful authentication, you must call
-     *   login() to save identified user
+     * - set authenticated user identity
+     *   $this->identity()->setUserIdentity($user_identity)
      *
-     *   note: for iAuthorizeUserDataAware
-     *         it used user data model to retrieve data
-     *         on authentication in case of user isActive
-     *         and so on ...
+     * note: each time called will clean current storage
+     *       can happen with $this->identity()->logout()
+     *
+     * note: after successful authentication, you must call
+     *       login() outside of method to store identified user
+     *
+     * note: for iAuthorizeUserDataAware
+     *       it used user data model to retrieve data
+     *       on authentication in case of user isActive
+     *       and so on ...
      *
      * @throws \Exception
      * @return $this
