@@ -15,7 +15,7 @@ interface iAuthorize
      *
      * @return $this
      */
-    function toNamespace($namespace);
+    function setNamespace($namespace);
 
     /**
      * Get Namespace
@@ -33,10 +33,13 @@ interface iAuthorize
      *   to catch behaves
      *
      * - each time called will clean current storage
-     * - after successful authentication it will fill
-     *   the identity
+     * - after successful authentication, you must call
+     *   login() to save identified user
+     *
      *   note: for iAuthorizeUserDataAware
      *         it used user data model to retrieve data
+     *         on authentication in case of user isActive
+     *         and so on ...
      *
      * @throws \Exception
      * @return $this
@@ -48,6 +51,9 @@ interface iAuthorize
      *
      * - when ew have empty identity
      *   it means we have not authorized yet
+     *
+     * note: make sure namespace on identity always match
+     *       with this
      *
      * @return iIdentity
      */
