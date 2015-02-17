@@ -145,13 +145,16 @@ class BaseIdentity implements iIdentity
     /**
      * Has Authenticated User?
      *
-     * - if has authenticated user return identity
+     * - if has authenticated user
+     *   return identity
      *   else return false
      *
      * - never check remember flag
      *   the user that authenticated with
      *   Remember Me must recognized when
      *   exists.
+     *
+     * note: user must be login() to recognize here
      *
      * @return false|mixed
      */

@@ -67,7 +67,18 @@ interface iIdentity
     /**
      * Has Authenticated User?
      *
-     * @return boolean
+     * - if has authenticated user
+     *   return identity
+     *   else return false
+     *
+     * - never check remember flag
+     *   the user that authenticated with
+     *   Remember Me must recognized when
+     *   exists.
+     *
+     * note: user must be login() to recognize here
+     *
+     * @return false|mixed
      */
     function hasAuthenticated();
 }
