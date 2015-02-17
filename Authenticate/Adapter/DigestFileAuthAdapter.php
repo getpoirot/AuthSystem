@@ -1,8 +1,6 @@
 <?php
-namespace Poirot\AuthSystem\Adapter;
+namespace Poirot\AuthSystem\Authenticate\Adapter;
 
-use Poirot\AuthSystem\AbstractAdapter;
-use Poirot\AuthSystem\Authorize\Exceptions\WrongCredentialException;
 use Poirot\Core\AbstractOptions;
 
 class DigestFileAuthAdapter extends AbstractAdapter
@@ -82,7 +80,7 @@ class DigestFileAuthAdapter extends AbstractAdapter
         }
 
         if (!$result)
-            throw new WrongCredentialException('Invalid Username or password.');
+            throw new Exceptions\WrongCredentialException('Invalid Username or password.');
 
         // Set Identified User:
 

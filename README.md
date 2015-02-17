@@ -6,8 +6,8 @@ authentication & authorization system.
 
 ```php
 # used with AuthService aggregator
-$auth = new AuthService();
-$auth->addAuthentication(new DigestFile);
+$auth = new AggrAuthAdapter();
+$auth->addAuthentication(new DigestFileAuthAdapter);
 # or with direct adapter
 # $auth = new DigestFile; // same action as above
 if (!$auth->identity()->hasAuthenticated()) {

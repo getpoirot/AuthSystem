@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\AuthSystem\Authorize\Exceptions;
+namespace Poirot\AuthSystem\Authenticate\Adapter\Exceptions;
 
 class UserNotFoundException extends \RuntimeException
 {

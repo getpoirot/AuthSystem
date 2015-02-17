@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\AuthSystem\Interfaces;
+namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
 interface iUserDataModelProvider
 {

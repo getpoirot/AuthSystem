@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\AuthSystem\Adapter;
+namespace Poirot\AuthSystem\Authenticate\Adapter;
 
 use Poirot\AuthSystem\AbstractCredential;
 
@@ -34,7 +34,7 @@ class DigestFileAuthCredential extends AbstractCredential
     public function getFilePathname()
     {
         if (!$this->filename)
-            $this->filename = dirname(__FILE__).'/../data/digest.pws';
+            $this->filename = dirname(__FILE__).'/../../data/digest.pws';
 
         return $this->filename;
     }

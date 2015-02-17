@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\AuthSystem;
 
-use Poirot\AuthSystem\Interfaces\iIdentity;
+use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Storage\Adapter\CookieStorage;
 use Poirot\Storage\Adapter\SessionStorage;
 

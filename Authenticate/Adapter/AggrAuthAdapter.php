@@ -1,8 +1,8 @@
 <?php
-namespace Poirot\AuthSystem;
+namespace Poirot\AuthSystem\Authenticate\Adapter;
 
-use Poirot\AuthSystem\Interfaces\iAuthenticateAdapter;
-use Poirot\AuthSystem\Interfaces\iCredential;
+use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticateAdapter;
+use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\Core\AbstractOptions;
 
 /**

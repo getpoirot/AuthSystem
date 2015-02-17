@@ -1,9 +1,10 @@
 <?php
-namespace Poirot\AuthSystem;
+namespace Poirot\AuthSystem\Authenticate\Adapter;
 
-use Poirot\AuthSystem\Interfaces\iAuthenticateAdapter;
-use Poirot\AuthSystem\Interfaces\iCredential;
-use Poirot\AuthSystem\Interfaces\iIdentity;
+use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticateAdapter;
+use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
+use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
+use Poirot\AuthSystem\BaseIdentity;
 use Poirot\Core\AbstractOptions;
 
 abstract class AbstractAdapter implements iAuthenticateAdapter

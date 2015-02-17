@@ -1,8 +1,8 @@
 <?php
-namespace Poirot\AuthSystem\Interfaces;
+namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
+use Poirot\AuthSystem\Authenticate\Adapter\Exceptions\UserNotFoundException;
 use Poirot\Core\Entity;
-use Poirot\AuthSystem\Authorize\Exceptions\UserNotFoundException;
 
 /**
  * Data Model Used Within Authorize Services
