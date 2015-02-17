@@ -1,7 +1,7 @@
 <?php
-namespace Poirot\Authentication;
+namespace Poirot\AuthSystem;
 
-use Poirot\Authentication\Interfaces\iCredential;
+use Poirot\AuthSystem\Interfaces\iCredential;
 use Poirot\Core\AbstractOptions;
 
 abstract class AbstractCredential extends AbstractOptions

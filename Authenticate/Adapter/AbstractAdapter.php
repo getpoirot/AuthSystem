@@ -1,12 +1,12 @@
 <?php
-namespace Poirot\Authentication;
+namespace Poirot\AuthSystem;
 
-use Poirot\Authentication\Interfaces\iAuthorize;
-use Poirot\Authentication\Interfaces\iCredential;
-use Poirot\Authentication\Interfaces\iIdentity;
+use Poirot\AuthSystem\Interfaces\iAuthenticateAdapter;
+use Poirot\AuthSystem\Interfaces\iCredential;
+use Poirot\AuthSystem\Interfaces\iIdentity;
 use Poirot\Core\AbstractOptions;
 
-abstract class AbstractAdapter implements iAuthorize
+abstract class AbstractAdapter implements iAuthenticateAdapter
 {
     /**
      * @var iCredential

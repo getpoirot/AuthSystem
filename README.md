@@ -1,4 +1,4 @@
-# Poirot\Authentication
+# Poirot\AuthSystem
 
 authentication & authorization system.
 

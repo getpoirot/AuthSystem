@@ -1,9 +1,9 @@
 <?php
-namespace Poirot\Authentication\Adapter;
+namespace Poirot\AuthSystem\Adapter;
 
-use Poirot\Authentication\AbstractCredential;
+use Poirot\AuthSystem\AbstractCredential;
 
-class DigestFileCredential extends AbstractCredential
+class DigestFileAuthCredential extends AbstractCredential
 {
     protected $filename;
 

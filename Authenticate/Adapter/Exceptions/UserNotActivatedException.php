@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\Authentication\Authorize\Exceptions;
+namespace Poirot\AuthSystem\Authorize\Exceptions;
 
 class UserNotActivatedException extends \RuntimeException
 {

@@ -1,15 +1,15 @@
 <?php
-namespace Poirot\Authentication;
+namespace Poirot\AuthSystem;
 
-use Poirot\Authentication\Interfaces\iAuthorize;
-use Poirot\Authentication\Interfaces\iCredential;
+use Poirot\AuthSystem\Interfaces\iAuthenticateAdapter;
+use Poirot\AuthSystem\Interfaces\iCredential;
 use Poirot\Core\AbstractOptions;
 
 /**
  * Authentication Aggregate Service
  *
  */
-class AuthService extends AbstractAdapter
+class AggrAuthAdapter extends AbstractAdapter
 {
     /**
      * @var \SplPriorityQueue
@@ -19,12 +19,12 @@ class AuthService extends AbstractAdapter
     /**
      * Insert Authentication Service
      *
-     * @param iAuthorize $auth
+     * @param iAuthenticateAdapter $auth
      * @param int $priority
      *
      * @return $this
      */
-    function addAuthentication(iAuthorize $auth, $priority = 10)
+    function addAuthentication(iAuthenticateAdapter $auth, $priority = 10)
     {
         $this->__queue()
             ->insert($auth, $priority);
@@ -68,7 +68,7 @@ class AuthService extends AbstractAdapter
      */
     function setNamespace($namespace)
     {
-        /** @var iAuthorize $auth */
+        /** @var iAuthenticateAdapter $auth */
         foreach(clone $this->__queue() as $auth)
             $auth->setNamespace($namespace);
 
@@ -97,7 +97,7 @@ class AuthService extends AbstractAdapter
      */
     function authenticate()
     {
-        /** @var iAuthorize $auth */
+        /** @var iAuthenticateAdapter $auth */
         $oldIdentity = '___notSetYet!___';
         foreach($this->getServices() as $auth) {
             $auth->authenticate();
@@ -124,7 +124,7 @@ class AuthService extends AbstractAdapter
      */
     protected function insCredential()
     {
-        $insCredential = new AuthServiceCredential();
+        $insCredential = new AggrAuthCredential();
         $insCredential->injectAuthService($this);
 
         return $insCredential;

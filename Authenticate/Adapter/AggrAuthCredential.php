@@ -1,16 +1,16 @@
 <?php
-namespace Poirot\Authentication;
+namespace Poirot\AuthSystem;
 
-use Poirot\Authentication\Interfaces\iAuthorize;
-use Poirot\Authentication\Interfaces\iCredential;
+use Poirot\AuthSystem\Interfaces\iAuthenticateAdapter;
+use Poirot\AuthSystem\Interfaces\iCredential;
 use Poirot\Core\OpenOptions;
 
-class AuthServiceCredential extends OpenOptions
+class AggrAuthCredential extends OpenOptions
     implements
     iCredential
 {
     /**
-     * @var AuthService
+     * @var AggrAuthAdapter
      */
     protected $authService;
 
@@ -20,9 +20,9 @@ class AuthServiceCredential extends OpenOptions
      * and set credential option if exists on that
      * service
      *
-     * @param AuthService $auth
+     * @param AggrAuthAdapter $auth
      */
-    function injectAuthService(AuthService $auth)
+    function injectAuthService(AggrAuthAdapter $auth)
     {
         $this->authService = $auth;
     }
@@ -37,7 +37,7 @@ class AuthServiceCredential extends OpenOptions
     function __set($key, $value)
     {
         // Set Option as Credential Option For Nested Services of AuthService
-        /** @var iAuthorize $auth */
+        /** @var iAuthenticateAdapter $auth */
         foreach($this->authService->getServices() as $auth)
         {
             // check Credential Fit:
@@ -66,7 +66,7 @@ class AuthServiceCredential extends OpenOptions
     function getUserIdentity()
     {
         // Get User Identity From Nested Services:
-        /** @var iAuthorize $auth */
+        /** @var iAuthenticateAdapter $auth */
         $userIdentity = false;
         while(
             $auth = $this->authService->getServices()->current()

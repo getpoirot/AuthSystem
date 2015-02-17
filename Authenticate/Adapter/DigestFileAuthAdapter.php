@@ -1,14 +1,14 @@
 <?php
-namespace Poirot\Authentication\Adapter;
+namespace Poirot\AuthSystem\Adapter;
 
-use Poirot\Authentication\AbstractAdapter;
-use Poirot\Authentication\Authorize\Exceptions\WrongCredentialException;
+use Poirot\AuthSystem\AbstractAdapter;
+use Poirot\AuthSystem\Authorize\Exceptions\WrongCredentialException;
 use Poirot\Core\AbstractOptions;
 
-class DigestFile extends AbstractAdapter
+class DigestFileAuthAdapter extends AbstractAdapter
 {
     /**
-     * @var DigestFileCredential
+     * @var DigestFileAuthCredential
      */
     protected $credential;
 
@@ -98,7 +98,7 @@ class DigestFile extends AbstractAdapter
      *
      * @param null $options
      *
-     * @return $this|DigestFileCredential
+     * @return $this|DigestFileAuthCredential
      */
     function credential($options = null)
     {
@@ -112,6 +112,6 @@ class DigestFile extends AbstractAdapter
      */
     protected function insCredential()
     {
-        return new DigestFileCredential();
+        return new DigestFileAuthCredential();
     }
 }

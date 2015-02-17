@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\Authentication\Interfaces;
+namespace Poirot\AuthSystem\Interfaces;
 
 interface iIdentity
 {

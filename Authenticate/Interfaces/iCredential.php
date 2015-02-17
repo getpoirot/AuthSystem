@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\Authentication\Interfaces;
+namespace Poirot\AuthSystem\Interfaces;
 
 use Poirot\Core\AbstractOptions;
 use Poirot\Core\Interfaces\iPoirotOptions;

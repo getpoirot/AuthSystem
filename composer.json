@@ -1,5 +1,5 @@
 {
-    "name": "poirot/authentication",
+    "name": "poirot/authsystem",
     "description": "Service Manager Container.",
     "type"       : "library",
     "authors": [
@@ -9,10 +9,10 @@
             "role": "Developer"
         }
     ],
-    "target-dir": "Poirot/Authentication",
+    "target-dir": "Poirot/AuthSystem",
     "autoload"  : {
         "psr-0": {
-            "Poirot\\Authentication": "."
+            "Poirot\\AuthSystem": "."
         }
     }
 }

@@ -1,9 +1,9 @@
 <?php
-namespace Poirot\Authentication\Interfaces;
+namespace Poirot\AuthSystem\Interfaces;
 
 use Poirot\Core\AbstractOptions;
 
-interface iAuthorize
+interface iAuthenticateAdapter
 {
     /**
      * Change Authorization Namespace
