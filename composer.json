@@ -9,6 +9,9 @@
             "role": "Developer"
         }
     ],
+    "require": {
+        "poirot/storage": "dev-master"
+    },
     "target-dir": "Poirot/AuthSystem",
     "autoload"  : {
         "psr-0": {
