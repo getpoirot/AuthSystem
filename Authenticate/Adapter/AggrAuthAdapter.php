@@ -26,6 +26,8 @@ class AggrAuthAdapter extends AbstractAdapter
      */
     function addAuthentication(iAuthenticateAdapter $auth, $priority = 10)
     {
+        $auth->setNamespace($this->getCurrNamespace());
+
         $this->__queue()
             ->insert($auth, $priority);
 

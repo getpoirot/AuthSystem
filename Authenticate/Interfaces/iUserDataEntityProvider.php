@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
-use Poirot\AuthSystem\Authenticate\Adapter\Exceptions\UserNotFoundException;
+use Poirot\AuthSystem\Authenticate\Exceptions\UserNotFoundException;
 use Poirot\Core\Entity;
 
 /**
