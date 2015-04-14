@@ -14,10 +14,10 @@ interface iAuthPermission
      *   on other route names, and only AdminUser has access on
      *   admin route
      *
-     * @param null|iIdentity     $role
      * @param null|iAuthResource $resource
+     * @param null|iIdentity     $role
      *
      * @return boolean
      */
-    public function isAllowed(iIdentity $role = null, iAuthResource $resource = null);
+    public function isAllowed(iAuthResource $resource = null, iIdentity $role = null);
 }
