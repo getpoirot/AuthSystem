@@ -76,4 +76,12 @@ interface iIdentity
      * @return false|mixed
      */
     function hasAuthenticated();
+
+    /**
+     * Usually when a user recognized as Authenticated
+     * user we want to know was session or cookie remember!!
+     *
+     * @return boolean
+     */
+    function isRemembered();
 }

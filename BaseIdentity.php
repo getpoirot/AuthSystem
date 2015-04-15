@@ -154,15 +154,29 @@ class BaseIdentity implements iIdentity
     {
         if (!$user = $this->getSession()->get('user', false)) {
             // it's maybe found on cookie
-            if ($user = $this->getCookie()->get('user', false)) {
-                $curUsr = $this->userIdentity;
+            if ($this->isRemembered()) {
+                $user = $this->getCookie()->get('user', false);
                 $this->setUserIdent($user);
                 $this->login(); // log knowing user in
-                $this->setUserIdent($curUsr);
             }
         }
 
         return $user;
+    }
+
+    /**
+     * Usually when a user recognized as Authenticated
+     * user we want to know was session or cookie remember!!
+     *
+     * @return boolean
+     */
+    function isRemembered()
+    {
+        $return = ($this->getCookie()->get('user', false) !== false)
+            ? true
+            : false;
+
+        return $return;
     }
 
     /**
