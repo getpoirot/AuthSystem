@@ -20,23 +20,18 @@ interface iIdentity
     function getNamespace();
 
     /**
-     * Set User Identity
+     * Set Identified User Id.
      *
-     * - it always set from AuthService::authorize
-     *   found with AuthService::credential::getUserIdentity
+     * - it always set from AuthAdapter::authenticate
+     * - to complete authorize user login() must call
+     *   after each setUserIdent to take effect,
+     *   and knowing from hasAuthenticate method.
      *
      * @param mixed $identity User Identity
      *
      * @return $this
      */
-    function setUserIdentity($identity);
-
-    /**
-     * Get User Identity
-     *
-     * @return mixed
-     */
-    function getUserIdentity();
+    function setUserIdent($identity);
 
     /**
      * Login Authorized User

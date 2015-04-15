@@ -64,7 +64,6 @@ class DigestFileAuthAdapter extends AbstractAdapter
         /** @var string $realm */
         /** @var string $username */
         /** @var string $password */
-        /** @var string $user_identity */
         extract($this->credential()->toArray());
 
         $id       = "$username:$realm";
@@ -85,7 +84,7 @@ class DigestFileAuthAdapter extends AbstractAdapter
 
         // Set Identified User:
 
-        $this->identity()->setUserIdentity($user_identity);
+        $this->identity()->setUserIdent($username);
 
         return $this;
     }

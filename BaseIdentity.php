@@ -71,30 +71,22 @@ class BaseIdentity implements iIdentity
     }
 
     /**
-     * Set User Identity
+     * Set Identified User Id.
      *
-     * - it always set from AuthService::authorize
-     *   found with AuthService::credential::getUserIdentity
+     * - it always set from AuthAdapter::authenticate
+     * - to complete authorize user login() must call
+     *   after each setUserIdent to take effect,
+     *   and knowing from hasAuthenticate method.
      *
-     * @param string $identity User Identity
+     * @param mixed $identity User Identity
      *
      * @return $this
      */
-    function setUserIdentity($identity)
+    function setUserIdent($identity)
     {
         $this->userIdentity = $identity;
 
         return $this;
-    }
-
-    /**
-     * Get User Identity
-     *
-     * @return string
-     */
-    function getUserIdentity()
-    {
-        return $this->userIdentity;
     }
 
     /**
@@ -119,9 +111,9 @@ class BaseIdentity implements iIdentity
     function login()
     {
         if ($this->remember)
-            $this->getCookie()->set('user', $this->getUserIdentity());
+            $this->getCookie()->set('user', $this->userIdentity);
 
-        $this->getSession()->set('user', $this->getUserIdentity());
+        $this->getSession()->set('user', $this->userIdentity);
 
         return $this;
     }
@@ -160,16 +152,15 @@ class BaseIdentity implements iIdentity
      */
     function hasAuthenticated()
     {
-        if (!$user = $this->getSession()->get('user', false))
-//            if ($this->remember) {
-                // it's maybe found on cookie
-                if ($user = $this->getCookie()->get('user', false)) {
-                    $curUsr = $this->getUserIdentity();
-                    $this->setUserIdentity($user);
-                    $this->login(); // log knowing user in
-                    $this->setUserIdentity($curUsr);
-                }
-//            }
+        if (!$user = $this->getSession()->get('user', false)) {
+            // it's maybe found on cookie
+            if ($user = $this->getCookie()->get('user', false)) {
+                $curUsr = $this->userIdentity;
+                $this->setUserIdent($user);
+                $this->login(); // log knowing user in
+                $this->setUserIdent($curUsr);
+            }
+        }
 
         return $user;
     }
