@@ -26,8 +26,6 @@ class AggrAuthAdapter extends AbstractAdapter
      */
     function addAuthentication(iAuthenticateAdapter $auth, $priority = 10)
     {
-        $auth->setNamespace($this->getCurrNamespace());
-
         $this->__queue()
             ->insert($auth, $priority);
 
@@ -59,25 +57,6 @@ class AggrAuthAdapter extends AbstractAdapter
     }
 
     /**
-     * Change Authorization Namespace
-     *
-     * - isolate the authentication process
-     *   used by storage to determine owned data
-     *
-     * @param string $namespace
-     *
-     * @return $this
-     */
-    function setNamespace($namespace)
-    {
-        /** @var iAuthenticateAdapter $auth */
-        foreach(clone $this->__queue() as $auth)
-            $auth->setNamespace($namespace);
-
-        return parent::setNamespace($namespace);
-    }
-
-    /**
      * Authorize
      *
      * - throw exception from Authorize\Exceptions
@@ -102,19 +81,17 @@ class AggrAuthAdapter extends AbstractAdapter
         /** @var iAuthenticateAdapter $auth */
         $oldIdentity = '___notSetYet!___';
         foreach($this->getServices() as $auth) {
+            // change auth namespaces same as this class
+            // TODO maybe need clone object
+            $namespace = $this->identity()->getNamespace();
+            $auth->identity()->setNamespace($namespace);
+
             $auth->authenticate();
-            $identity = $auth->identity()->getUserIdentity();
-            if ($oldIdentity === '___notSetYet!___')
-                $oldIdentity = $identity;
-            elseif ($oldIdentity !== $identity)
-                throw new \Exception(
-                    'User Identity has changed during authentication. it`s unexpected behavior'
-                );
         }
 
         // No Exception Happens During Authentication:
         // we have to own user identity on this class
-        $this->identity()->setUserIdentity($oldIdentity);
+        $this->identity()->setUserIdent($oldIdentity);
 
         return $this;
     }

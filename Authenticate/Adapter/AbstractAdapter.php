@@ -20,52 +20,16 @@ abstract class AbstractAdapter implements iAuthenticateAdapter
     protected $identity;
 
     /**
-     * use class name if null
-     * @var string
-     */
-    protected $namespace = null;
-
-    /**
      * Construct
      *
      * ! if namespace not set use class name instead
      *
-     * @param null|string $namespace Namespace
+     * @param iIdentity $identity Identity Object
      */
-    function __construct($namespace = null)
+    function __construct(iIdentity $identity = null)
     {
-        if ($namespace !== null)
-            $this->setNamespace($namespace);
-    }
-
-    /**
-     * Change Authorization Namespace
-     *
-     * - isolate the authentication process
-     *   used by storage to determine owned data
-     *
-     * @param string $namespace
-     *
-     * @return $this
-     */
-    function setNamespace($namespace)
-    {
-        $this->namespace = (string) $namespace;
-
-        return $this;
-    }
-
-    /**
-     * Get Namespace
-     *
-     * @return string
-     */
-    function getCurrNamespace()
-    {
-        if ($this->namespace === null)
-            $this->setNamespace(get_class($this));
-
-        return $this->namespace;
+        if ($identity !== null)
+            $this->identity = $identity;
     }
 
     /**
@@ -104,9 +68,7 @@ abstract class AbstractAdapter implements iAuthenticateAdapter
     function identity()
     {
         if (!$this->identity)
-            $this->identity = new BaseIdentity($this->getCurrNamespace());
-
-        $this->identity->setNamespace($this->getCurrNamespace());
+            $this->identity = new BaseIdentity(get_class($this));
 
         return $this->identity;
     }

@@ -6,6 +6,9 @@ interface iIdentity
     /**
      * Set Namespace
      *
+     * - isolate the authentication process
+     *   used by storage to determine owned data
+     *
      * @param string $namespace
      *
      * @return $this
@@ -79,7 +82,7 @@ interface iIdentity
 
     /**
      * Usually when a user recognized as Authenticated
-     * user we want to know was session or cookie remember!!
+     * user we want to know was session or cookie!!
      *
      * @return boolean
      */

@@ -55,7 +55,7 @@ class BaseIdentity implements iIdentity
      */
     function setNamespace($namespace)
     {
-        $this->namespace = $namespace;
+        $this->namespace = (string) $namespace;
 
         return $this;
     }

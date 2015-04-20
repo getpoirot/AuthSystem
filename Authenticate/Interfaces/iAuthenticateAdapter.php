@@ -6,25 +6,6 @@ use Poirot\Core\AbstractOptions;
 interface iAuthenticateAdapter
 {
     /**
-     * Change Authorization Namespace
-     *
-     * - isolate the authentication process
-     *   used by storage to determine owned data
-     *
-     * @param string $namespace
-     *
-     * @return $this
-     */
-    function setNamespace($namespace);
-
-    /**
-     * Get Namespace
-     *
-     * @return string
-     */
-    function getCurrNamespace();
-
-    /**
      * Authorize
      *
      * - throw exception from Authorize\Exceptions
