@@ -6,9 +6,12 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\AuthSystem\BaseIdentity;
 use Poirot\Core\AbstractOptions;
+use Poirot\Core\BuilderSetterTrait;
 
 abstract class AbstractAdapter implements iAuthenticateAdapter
 {
+    use BuilderSetterTrait;
+
     /**
      * @var iCredential
      */
@@ -24,19 +27,23 @@ abstract class AbstractAdapter implements iAuthenticateAdapter
      *
      * ! if namespace not set use class name instead
      *
-     * @param iIdentity $identity Identity Object
+     * @param iIdentity|array $identRoptions Identity Object Or Array Setter Options
      */
-    function __construct(/*iIdentity*/ $identity = null)
+    function __construct(/*iIdentity*/ $identRoptions = null)
     {
-        if ($identity !== null) {
-            if (! $identity instanceof iIdentity)
-                throw new \InvalidArgumentException(sprintf(
-                    'Identity must be instance of iIdentity, "%s" given.'
-                    , is_object($identity) ? get_class($identity) : (gettype($identity).serialize($identity))
-                ));
+        if ($identRoptions === null)
+            return;
 
-            $this->identity = $identity;
-        }
+        if (! $identRoptions instanceof iIdentity || ! is_array($identRoptions))
+            throw new \InvalidArgumentException(sprintf(
+                'Construct argument must be instance of iIdentity or array setter options; "%s" given.'
+                , is_object($identRoptions) ? get_class($identRoptions) : (gettype($identRoptions).serialize($identRoptions))
+            ));
+
+        if (is_array($identRoptions))
+            $this->setupFromArray($identRoptions);
+        else
+            $this->identity = $identRoptions;
     }
 
     /**
@@ -104,7 +111,7 @@ abstract class AbstractAdapter implements iAuthenticateAdapter
             $this->credential->from($options);
             // $auth->credential(['usr' => 'payam', 'psw' => '***'])
             //    ->authorize();
-            return $this;
+            return $this; // <==
         }
 
         return $this->credential;

@@ -7,9 +7,58 @@ use Poirot\Core\AbstractOptions;
 class DigestFileAuthAdapter extends AbstractAdapter
 {
     /**
-     * @var DigestFileAuthCredential
+     * @var UserPassCredential
      */
     protected $credential;
+
+    protected $filePathname;
+    protected $realm;
+
+    // Implement Specific Adapter Methods:
+
+    /**
+     * @return mixed
+     */
+    function getFilePathname()
+    {
+        if (!$this->filePathname)
+            $this->filePathname = dirname(__FILE__).'/../../data/digest.pws';
+
+        return $this->filePathname;
+    }
+
+    /**
+     * @param mixed $filename
+     * @return $this
+     */
+    function setFilePathname($filename)
+    {
+        $this->filePathname = $filename;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    function getRealm()
+    {
+        return $this->realm;
+    }
+
+    /**
+     * @param mixed $realm
+     * @return $this
+     */
+    function setRealm($realm)
+    {
+        $this->realm = $realm;
+
+        return $this;
+    }
+
+
+    // Implement Adapter Interface:
 
     /**
      * Authorize
@@ -55,17 +104,18 @@ class DigestFileAuthAdapter extends AbstractAdapter
             }
         }
 
-        $hFile = @fopen($this->credential()->getFilePathname(), 'r');
+        $hFile = @fopen($this->getFilePathname(), 'r');
         if ($hFile === false)
             throw new \RuntimeException(
                 "Cannot open '{$this->credential()->getFilePathname()}' for reading"
             );
 
-        /** @var string $realm */
+
+        $realm = $this->getRealm();
+
         /** @var string $username */
         /** @var string $password */
         extract($this->credential()->toArray());
-
         $id       = "$username:$realm";
         $result   = false;
         while (($line = fgets($hFile)) !== false) {
@@ -96,7 +146,7 @@ class DigestFileAuthAdapter extends AbstractAdapter
      *
      * @param null $options
      *
-     * @return $this|DigestFileAuthCredential
+     * @return $this|UserPassCredential
      */
     function credential($options = null)
     {
@@ -110,6 +160,6 @@ class DigestFileAuthAdapter extends AbstractAdapter
      */
     protected function insCredential()
     {
-        return new DigestFileAuthCredential();
+        return new UserPassCredential();
     }
 }
