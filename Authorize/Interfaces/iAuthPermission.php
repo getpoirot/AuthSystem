@@ -19,5 +19,5 @@ interface iAuthPermission
      *
      * @return boolean
      */
-    public function isAllowed(iAuthResource $resource = null, iIdentity $role = null);
+    public function isAllowed(/*iAuthResource*/ $resource = null, /*iIdentity*/ $role = null);
 }

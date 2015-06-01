@@ -26,10 +26,17 @@ abstract class AbstractAdapter implements iAuthenticateAdapter
      *
      * @param iIdentity $identity Identity Object
      */
-    function __construct(iIdentity $identity = null)
+    function __construct(/*iIdentity*/ $identity = null)
     {
-        if ($identity !== null)
+        if ($identity !== null) {
+            if (! $identity instanceof iIdentity)
+                throw new \InvalidArgumentException(sprintf(
+                    'Identity must be instance of iIdentity, "%s" given.'
+                    , is_object($identity) ? get_class($identity) : (gettype($identity).serialize($identity))
+                ));
+
             $this->identity = $identity;
+        }
     }
 
     /**
