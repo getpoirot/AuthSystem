@@ -34,7 +34,7 @@ abstract class AbstractAdapter implements iAuthenticateAdapter
         if ($identRoptions === null)
             return;
 
-        if (! $identRoptions instanceof iIdentity || ! is_array($identRoptions))
+        if (! $identRoptions instanceof iIdentity && ! is_array($identRoptions))
             throw new \InvalidArgumentException(sprintf(
                 'Construct argument must be instance of iIdentity or array setter options; "%s" given.'
                 , is_object($identRoptions) ? get_class($identRoptions) : (gettype($identRoptions).serialize($identRoptions))

@@ -20,7 +20,7 @@ interface iUserDataEntityProvider
      * @param mixed $identity
      *
      * @throws UserNotFoundException
-     * @return Entity
+     * @return mixed
      */
     function findByIdentity($identity);
 }

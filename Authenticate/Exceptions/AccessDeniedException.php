@@ -1,17 +1,8 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Exceptions;
 
-class AccessDeniedException extends \RuntimeException
+class AccessDeniedException extends AuthenticationException
 {
-    const EXCEPTION_ACCESS_DENIED_DEF_MESSAGE = 'Access Denied';
-
-    function __construct(
-        $message = self::EXCEPTION_ACCESS_DENIED_DEF_MESSAGE,
-        $code = 403,
-        \Exception $previous = null
-    )
-    {
-        parent::__construct($message, $code, $previous);
-    }
+    const EXCEPTION_DEFAULT_MESSAGE = 'Access Denied';
 }
  
