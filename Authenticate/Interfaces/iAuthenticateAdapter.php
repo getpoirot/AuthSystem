@@ -33,17 +33,29 @@ interface iAuthenticateAdapter
     function authenticate();
 
     /**
-     * Authorized User Identity
+     * Set Authorized User Identity
      *
-     * - when ew have empty identity
+     * @param iIdentity $identity
+     *
+     * @return $this
+     */
+    function setIdentity(iIdentity $identity);
+
+    /**
+     * Get Authorized User Identity
+     *
+     * - when we have empty identity
      *   it means we have not authorized yet
      *
-     * note: make sure namespace on identity always match
-     *       with this
+     * ! don't use default identity creation on get if not
+     *   any identity available
      *
+     *   identities must inject into adapter by auth services
+     *
+     * @throws \Exception Not Identity Available Or Set
      * @return iIdentity
      */
-    function identity();
+    function getIdentity();
 
     /**
      * Credential

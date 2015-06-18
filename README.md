@@ -6,11 +6,11 @@ authentication & authorization system.
 
 ```php
 # used with AuthService aggregator
-$auth = new AggrAuthAdapter();
+$auth = new AggrAuthAdapter(new BaseIdentity('admin.users'));
 $auth->addAuthentication(new DigestFileAuthAdapter);
 # or with direct adapter
 # $auth = new DigestFile; // same action as above
-if (!$auth->identity()->hasAuthenticated()) {
+if (!$auth->getIdentity()->hasAuthenticated()) {
     try {
         $auth->credential([
             'username' => 'payam'
@@ -26,15 +26,19 @@ if (!$auth->identity()->hasAuthenticated()) {
         throw $e;
     }
 
-    $auth->identity()
+    $auth->getIdentity()
         ->setRemember()
         ->login();
 
-    echo ('Hello, Dear '.$auth->identity()->hasAuthenticated().' You are authorized ...');
+    echo ('Hello, Dear '.$auth->getIdentity()->hasAuthenticated().' You are authorized ...');
 
 } else {
-    echo ('Hello, Dear '.$auth->identity()->hasAuthenticated());
+    echo ('Hello, Dear '.$auth->getIdentity()->hasAuthenticated());
 }
 
 die('>_');
 ```
+
+## TODO
+
+- Write Authentication Service Layer On Top Of Adapters For Application Dispatching Control 

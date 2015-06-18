@@ -83,15 +83,15 @@ class AggrAuthAdapter extends AbstractAdapter
         foreach($this->getServices() as $auth) {
             // change auth namespaces same as this class
             // TODO maybe need clone object
-            $namespace = $this->identity()->getNamespace();
-            $auth->identity()->setNamespace($namespace);
+            $namespace = $this->getIdentity()->getNamespace();
+            $auth->getIdentity()->setNamespace($namespace);
 
             $auth->authenticate();
         }
 
         // No Exception Happens During Authentication:
         // we have to own user identity on this class
-        $this->identity()->setUserIdent($oldIdentity);
+        $this->getIdentity()->setUserIdent($oldIdentity);
 
         return $this;
     }

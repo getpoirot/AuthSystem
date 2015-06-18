@@ -88,7 +88,7 @@ class DigestFileAuthAdapter extends AbstractAdapter
     function authenticate()
     {
         // Clear Old Authenticated User(if has it):
-        $this->identity()->logout();
+        $this->getIdentity()->logout();
 
         // Authorize User:
 
@@ -134,7 +134,7 @@ class DigestFileAuthAdapter extends AbstractAdapter
 
         // Set Identified User:
 
-        $this->identity()->setUserIdent($username);
+        $this->getIdentity()->setUserIdent($username);
 
         return $this;
     }

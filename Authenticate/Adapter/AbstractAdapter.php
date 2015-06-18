@@ -4,7 +4,6 @@ namespace Poirot\AuthSystem\Authenticate\Adapter;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticateAdapter;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\AuthSystem\BaseIdentity;
 use Poirot\Core\AbstractOptions;
 use Poirot\Core\BuilderSetterTrait;
 
@@ -18,7 +17,7 @@ abstract class AbstractAdapter implements iAuthenticateAdapter
     protected $credential;
 
     /**
-     * @var BaseIdentity
+     * @var iIdentity
      */
     protected $identity;
 
@@ -43,7 +42,7 @@ abstract class AbstractAdapter implements iAuthenticateAdapter
         if (is_array($identRoptions))
             $this->setupFromArray($identRoptions);
         else
-            $this->identity = $identRoptions;
+            $this->setIdentity($identRoptions);
     }
 
     /**
@@ -69,20 +68,37 @@ abstract class AbstractAdapter implements iAuthenticateAdapter
     abstract function authenticate();
 
     /**
-     * Authorized User Identity
+     * Set Authorized User Identity
      *
-     * - when ew have empty identity
+     * @param iIdentity $identity
+     *
+     * @return $this
+     */
+    function setIdentity(iIdentity $identity)
+    {
+        $this->identity = $identity;
+
+        return $this;
+    }
+
+    /**
+     * Get Authorized User Identity
+     *
+     * - when we have empty identity
      *   it means we have not authorized yet
      *
-     * note: make sure namespace on identity always match
-     *       with this
+     * ! don't use default identity creation on get if not
+     *   any identity available
      *
+     *   identities must inject into adapter by auth services
+     *
+     * @throws \Exception No Identity Available Or Set
      * @return iIdentity
      */
-    function identity()
+    function getIdentity()
     {
         if (!$this->identity)
-            $this->identity = new BaseIdentity(get_class($this));
+            throw new \Exception('No Identity Object Available Or Set.');
 
         return $this->identity;
     }
