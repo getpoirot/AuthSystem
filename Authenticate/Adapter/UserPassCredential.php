@@ -45,5 +45,14 @@ class UserPassCredential extends AbstractCredential
 
         return $this;
     }
+
+
+    /**
+     *
+     */
+    public function authenticate()
+    {
+
+    }
 }
  
