@@ -12,7 +12,6 @@ class BaseIdentity implements iIdentity
 
     protected $uid;
 
-
     /**
      * Construct
      *

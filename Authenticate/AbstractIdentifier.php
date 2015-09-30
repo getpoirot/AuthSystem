@@ -4,6 +4,7 @@ namespace Poirot\AuthSystem\Authenticate;
 
 
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
+use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Storage\Adapter\SessionStorage;
 
 
@@ -16,21 +17,23 @@ use Poirot\Storage\Adapter\SessionStorage;
 abstract class AbstractIdentifier implements iIdentifier
 {
     protected $identity;
-    protected $isLogin;
     protected $storage;
 
 
-    function __construct()
+    function __construct($storage = null)
     {
+        if($storage != null)
+            $this->storage = $storage;
 
+        $this->storage = new SessionStorage(null);
     }
 
-    function login()
+    function login(iIdentity $identity)
     {
-        if($this->isLogin == true)
+        if($this->identity == true)
             throw new \Exception('the Identity is already loggedIn');
 
-        $this->__getStorage()->set('identity' , $this->identity);
+        $this->__getStorage()->set('identity' , $identity);
     }
 
 
@@ -43,7 +46,7 @@ abstract class AbstractIdentifier implements iIdentifier
 
     function isLogin()
     {
-        return $this->isLogin;
+        return $this->identity();
     }
 
     function identity()
