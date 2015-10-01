@@ -1,16 +1,12 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate;
 
-use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Core\AbstractOptions;
-use Poirot\Core\Interfaces\iDataSetConveyor;
 use Poirot\Core\Traits\OptionsTrait;
 
-class BaseIdentity implements iIdentity
+class BaseIdentity extends AbstractIdentity
 {
     use OptionsTrait;
-
-    protected $uid;
 
     /**
      * Construct
@@ -22,19 +18,10 @@ class BaseIdentity implements iIdentity
      */
     function __construct($uid, $options = null)
     {
+        parent::__construct($uid);
+
         if ($options !== null)
             $this->from($options);
-
-        $this->uid = (string) $uid;
     }
 
-    /**
-     * Get user unique identifier
-     *
-     * @return string
-     */
-    function getUid()
-    {
-        return $this->uid;
-    }
 }

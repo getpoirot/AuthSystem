@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Adapter;
 
-use Poirot\AuthSystem\AbstractCredential;
+use Poirot\AuthSystem\Authenticate\AbstractCredential;
 
 class UserPassCredential extends AbstractCredential
 {
@@ -44,15 +44,6 @@ class UserPassCredential extends AbstractCredential
         $this->password = $password;
 
         return $this;
-    }
-
-
-    /**
-     *
-     */
-    public function authenticate()
-    {
-
     }
 }
  

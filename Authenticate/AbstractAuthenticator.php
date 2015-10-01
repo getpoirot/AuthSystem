@@ -31,6 +31,23 @@ abstract class AbstractAuthenticator implements iAuthenticator
         $this->credential = $credential;
     }
 
+
+
+    /**
+     * Proxy Helper To Identifier identity method
+     *
+     * ! identifier()->identity()
+     *
+     * @return null|iIdentity
+     */
+    function getIdentity()
+    {
+        return $this->identifier()->identity();
+    }
+
+
+
+
     /**
      * Authenticate
      *

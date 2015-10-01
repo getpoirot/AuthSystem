@@ -1,32 +1,13 @@
 <?php
-
 namespace Poirot\AuthSystem\Authenticate;
-
 
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\Storage\Adapter\SessionStorage;
-
-
-/**
- * Class AbstractIdentifier
- * @package Poirot\AuthSystem\Authenticate
- *
- */
 
 abstract class AbstractIdentifier implements iIdentifier
 {
     protected $identity;
-    protected $storage;
-
-
-    function __construct($storage = null)
-    {
-        if($storage != null)
-            $this->storage = $storage;
-
-        $this->storage = new SessionStorage(null);
-    }
+    protected static $storage;
 
     function login(iIdentity $identity)
     {
@@ -39,23 +20,34 @@ abstract class AbstractIdentifier implements iIdentifier
 
     function logout()
     {
-        if(!$this->storage)
+        if(!$this->identity)
             throw new \Exception('user already is not loggedIn');
-        $this->storage->destroy();
+        $this->__getStorage()->destroy();
     }
+
+
+    /**
+     * isLogin
+     *
+     * Check is identity loggedIn or not
+     *
+     * @return false|iIdentity
+     */
 
     function isLogin()
     {
         return $this->identity();
     }
 
+
+    /**
+     * This method return identity instance
+     * registered within this class
+     *
+     * @return iIdentity|false
+     */
     function identity()
     {
-        /**
-         * This method return identity instance registered
-         * within this class
-         * @return iIdentity|false
-         */
         if($this->identity)
             return $this->identity;
         return false;
@@ -63,12 +55,15 @@ abstract class AbstractIdentifier implements iIdentifier
 
     protected function __getStorage()
     {
-        if (!$this->storage)
-            $this->storage = $this::insStorage();
+        if (! self::$storage)
+            self::$storage = static::insStorage();
 
-        return $this->storage;
+        return self::$storage;
     }
 
-    protected abstract static function insStorage();
+    protected static function insStorage()
+    {
+
+    }
 
 }

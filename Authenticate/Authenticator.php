@@ -1,12 +1,10 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate;
 
-use Poirot\AuthSystem\Authenticate\AbstractAuthenticator;
-use Poirot\AuthSystem\Authenticate\Abstracts\AbstractOptions;
-use Poirot\AuthSystem\Authenticate\Adapter\UserPassCredential;
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
-use Poirot\AuthSystem\BaseIdentity;
+use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
+use Poirot\AuthSystem\Authenticate\BaseIdentity;
 
 class Authenticator extends AbstractAuthenticator
 {
@@ -29,16 +27,15 @@ class Authenticator extends AbstractAuthenticator
      *         and so on ...
      *
      * @throws AuthenticationException
-     * @return $this
+     * @return iIdentity
      */
     function authenticate()
     {
-        if ($this->credential()->getName() == '127.0.0.1') {
-            // set identity to super admin
-            // ...
+        if($this->credential()->getUsername() == 'johnDoe@yahoo.com' &&
+            $this->credential()->getPassword() == '123456')
+            return new BaseIdentity($this->credential()->getUsername());
 
-            return (new BaseIdentity('*'))->setUid('majid');
-        }
+        throw new AuthenticationException('user authentication failure');
     }
 
     /**
@@ -52,4 +49,5 @@ class Authenticator extends AbstractAuthenticator
     {
         return $options;
     }
+
 }
