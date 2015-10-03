@@ -7,12 +7,9 @@ use Poirot\Storage\Adapter\SessionStorage;
 class BaseIdentifier extends AbstractIdentifier
 {
 
-    function __construct($storage = null)
+    function __construct()
     {
-        if($storage != null)
-            self::$storage = $storage;
 
-        self::$storage = new SessionStorage(['ident'=>'userAuth']);
     }
 
     static function insStorage()

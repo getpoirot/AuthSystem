@@ -41,14 +41,16 @@ Interface iAuthenticator
      *
      * ! identifier()->identity()
      *
-     * @return null|iIdentity
+     * @throws AuthenticationException
+     * @return iIdentity
      */
     function getIdentity();
 
     /**
      * Credential instance
      *
-     * @return iCredential
+     * @param $options
+     * @return $this|iCredential
      */
-    function credential();
+    function credential($options=null);
 }

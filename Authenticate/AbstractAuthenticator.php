@@ -28,7 +28,8 @@ abstract class AbstractAuthenticator implements iAuthenticator
      *
      * ! identifier()->identity()
      *
-     * @return null|iIdentity
+     * @throws AuthenticationException
+     * @return iIdentity
      */
     function getIdentity()
     {
@@ -103,9 +104,9 @@ abstract class AbstractAuthenticator implements iAuthenticator
      * @param null|array|AbstractOptions $options Builder Options
      *
      * @throws \Exception credential object has been set
-     * @return iCredential
+     * @return $this|iCredential
      */
-    function credential($options = null)
+    function credential($options=null)
     {
         if($options !== null && $this->credential)
             throw new \Exception('credential object has been set . if you want to change options reset credential object');
@@ -117,7 +118,8 @@ abstract class AbstractAuthenticator implements iAuthenticator
             $this->credential = $this->insCredential($options);
         }
 
-        return $this->credential;
+        return $this;
+
     }
 
     /**
@@ -129,13 +131,3 @@ abstract class AbstractAuthenticator implements iAuthenticator
      */
     protected abstract function insCredential($options);
 }
-
-
-
-//
-//$auth = (new Authenticator)
-//    ->credental(
-//        AbstrctAuthenticator::insCredential()
-//            ->setUsername('majid')
-//    )
-//    ->authenticate();

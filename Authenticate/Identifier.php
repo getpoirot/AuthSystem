@@ -8,10 +8,4 @@ use Poirot\Storage\Adapter\SessionStorage;
 class Identifier extends AbstractIdentifier
 {
 
-    static function insStorage()
-    {
-
-    }
-
-
 }

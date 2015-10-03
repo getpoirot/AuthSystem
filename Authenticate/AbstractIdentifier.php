@@ -7,7 +7,7 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 abstract class AbstractIdentifier implements iIdentifier
 {
     protected $identity;
-    protected static $storage;
+    protected $storage;
 
 
     /**
@@ -55,22 +55,20 @@ abstract class AbstractIdentifier implements iIdentifier
     {
         if($this->identity)
             return $this->identity;
-        else if($this->insStorage()->get('identity'))
-            $this->identity = $this->insStorage()->get('identity');
+        else if($this->__getStorage()->get('identity'))
+            $this->identity = $this->__getStorage()->get('identity');
         else
             return false;
 
         return $this->identity;
     }
 
-    protected function __getStorage()
+    public function __getStorage()
     {
-        if (! self::$storage)
-            self::$storage = static::insStorage();
+        if (! $this->storage)
+            $this->storage = $this->__getStorage();
 
-        return self::$storage;
+        return $this->storage;
     }
-
-    abstract static function insStorage();
 
 }

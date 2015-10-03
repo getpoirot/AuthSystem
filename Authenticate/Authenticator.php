@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate;
 
+use Poirot\AuthSystem\Authenticate\Adapter\UserPassCredential;
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
@@ -43,11 +44,18 @@ class Authenticator extends AbstractAuthenticator
      *
      * @param null|array|AbstractOptions $options Builder Options
      *
+     *
+     * @throws \Exception
      * @return iCredential
      */
     protected function insCredential($options)
     {
-        return $options;
+        if($this->credential)
+            throw new \Exception('credential Object is already ready to use');
+
+        $this->credential = (new UserPassCredential())->fromArray($options);
+
+        return $this;
     }
 
 }
