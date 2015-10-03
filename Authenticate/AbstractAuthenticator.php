@@ -22,16 +22,6 @@ abstract class AbstractAuthenticator implements iAuthenticator
      */
     protected $identifier;
 
-    /**
-     * @param null|iCredential $credential
-     * Construct
-     */
-    function __construct(iCredential $credential=null)
-    {
-        $this->credential = $credential;
-    }
-
-
 
     /**
      * Proxy Helper To Identifier identity method
@@ -113,7 +103,7 @@ abstract class AbstractAuthenticator implements iAuthenticator
      * @param null|array|AbstractOptions $options Builder Options
      *
      * @throws \Exception credential object has been set
-     * @return $this|iCredential
+     * @return iCredential
      */
     function credential($options = null)
     {

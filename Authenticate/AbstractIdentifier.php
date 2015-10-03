@@ -9,12 +9,15 @@ abstract class AbstractIdentifier implements iIdentifier
     protected $identity;
     protected static $storage;
 
+
+    /**
+     * @param iIdentity $identity
+     * @return $this
+     */
     function login(iIdentity $identity)
     {
-        if($this->identity == true)
-            throw new \Exception('the Identity is already loggedIn');
-
         $this->__getStorage()->set('identity' , $identity);
+        return $this;
     }
 
 
@@ -31,12 +34,14 @@ abstract class AbstractIdentifier implements iIdentifier
      *
      * Check is identity loggedIn or not
      *
-     * @return false|iIdentity
+     * @return boolean
      */
 
     function isLogin()
     {
-        return $this->identity();
+        if($this->identity())
+            return true;
+        return false;
     }
 
 
@@ -50,7 +55,12 @@ abstract class AbstractIdentifier implements iIdentifier
     {
         if($this->identity)
             return $this->identity;
-        return false;
+        else if($this->insStorage()->get('identity'))
+            $this->identity = $this->insStorage()->get('identity');
+        else
+            return false;
+
+        return $this->identity;
     }
 
     protected function __getStorage()
@@ -61,9 +71,6 @@ abstract class AbstractIdentifier implements iIdentifier
         return self::$storage;
     }
 
-    protected static function insStorage()
-    {
-
-    }
+    abstract static function insStorage();
 
 }

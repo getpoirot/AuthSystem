@@ -18,7 +18,7 @@ class BaseIdentifier extends AbstractIdentifier
     static function insStorage()
     {
         if(! self::$storage)
-            throw new \Exception('Storage instance is not accessible');
+            self::$storage = new SessionStorage(['ident'=>'userAuth']);
         return self::$storage;
     }
 
