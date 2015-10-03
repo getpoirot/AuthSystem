@@ -2,18 +2,57 @@
 namespace Poirot\AuthSystem\Authenticate\Adapter;
 
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
-use Poirot\Core\AbstractOptions\PropsObject;
-use Poirot\Core\Interfaces\iOptionImplement;
-use Poirot\Core\Interfaces\iPoirotOptions;
+use Poirot\Core\Traits\OptionsTrait;
 
 class UserPassCredential implements iCredential
 {
+
+    use OptionsTrait;
     protected $username;
     protected $password;
+    protected $name;
+    protected $email;
 
     /**
      * @return mixed
      */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param mixed $email
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param mixed $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return mixed
+     */
+
+    function __construct($options=null)
+    {
+
+    }
     public function getUsername()
     {
         return $this->username;
@@ -49,117 +88,5 @@ class UserPassCredential implements iCredential
         return $this;
     }
 
-    /**
-     * Set Options From Array
-     *
-     * @param array $options Options Array
-     *
-     * @throws \Exception
-     * @return $this
-     */
-    function fromArray(array $options)
-    {
-        // TODO: Implement fromArray() method.
-    }
-
-    /**
-     * Get Properties as array
-     *
-     * @return array
-     */
-    function toArray()
-    {
-        // TODO: Implement toArray() method.
-    }
-
-    /**
-     * @param string $key
-     * @param mixed $value
-     * @return void
-     */
-    function __set($key, $value)
-    {
-        // TODO: Implement __set() method.
-    }
-
-    /**
-     * @param string $key
-     * @return mixed
-     */
-    function __get($key)
-    {
-        // TODO: Implement __get() method.
-    }
-
-    /**
-     * @param string $key
-     * @return bool
-     */
-    function __isset($key)
-    {
-        // TODO: Implement __isset() method.
-    }
-
-    /**
-     * @param string $key
-     * @return void
-     */
-    function __unset($key)
-    {
-        // TODO: Implement __unset() method.
-    }
-
-    /**
-     * Set Options
-     *
-     * @param array|iPoirotOptions|mixed $options
-     *
-     * @return $this
-     */
-    function from($options)
-    {
-        // TODO: Implement from() method.
-    }
-
-    /**
-     * Set Options From Same Option Object
-     *
-     * note: it will take an option object instance of $this
-     *       OpenOptions only take OpenOptions as argument
-     *
-     * - also you can check for private and write_only
-     *   methods inside Options Object to get fully coincident copy
-     *   of Options Class Object
-     *
-     * @param iOptionImplement $options Options Object
-     *
-     * @throws \Exception
-     * @return $this
-     */
-    function fromSimilar(/*iOptionImplement*/
-        $options)
-    {
-        // TODO: Implement fromSimilar() method.
-    }
-
-    /**
-     * Get Options Properties Information
-     *
-     * @return PropsObject
-     */
-    function props()
-    {
-        // TODO: Implement props() method.
-    }
-
-    /**
-     * Construct
-     *
-     * @param array|iOptionImplement|mixed $options Options
-     */
-    function __construct($options = null)
-    {
-        // TODO: Implement __construct() method.
-    }
 }
  

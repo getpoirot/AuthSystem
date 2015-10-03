@@ -63,12 +63,6 @@ abstract class AbstractIdentifier implements iIdentifier
         return $this->identity;
     }
 
-    public function __getStorage()
-    {
-        if (! $this->storage)
-            $this->storage = $this->__getStorage();
-
-        return $this->storage;
-    }
+    public abstract function __getStorage();
 
 }

@@ -129,5 +129,5 @@ abstract class AbstractAuthenticator implements iAuthenticator
      *
      * @return iCredential
      */
-    protected abstract function insCredential($options);
+    abstract function insCredential($options);
 }
