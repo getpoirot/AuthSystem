@@ -20,7 +20,9 @@ abstract class AbstractIdentifier implements iIdentifier
         return $this;
     }
 
-
+    /**
+     * @throws \Exception
+     */
     function logout()
     {
         if(!$this->identity)
