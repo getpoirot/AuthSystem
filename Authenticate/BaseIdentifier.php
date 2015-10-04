@@ -12,11 +12,11 @@ class BaseIdentifier extends AbstractIdentifier
 
     }
 
-    static function insStorage()
+    function __getStorage()
     {
-        if(! self::$storage)
-            self::$storage = new SessionStorage(['ident'=>'userAuth']);
-        return self::$storage;
+        if(! $this->storage)
+            $this->storage = new SessionStorage(['ident'=>'userAuth']);
+        return $this->storage;
     }
 
 }

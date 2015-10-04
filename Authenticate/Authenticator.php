@@ -32,10 +32,10 @@ class Authenticator extends AbstractAuthenticator
      */
     function authenticate()
     {
-        if($this->credential()->getUsername() == 'johnDoe@yahoo.com' &&
+        if($this->credential()->getEmail() == 'johnDoe@yahoo.com' &&
             $this->credential()->getPassword() == '123456')
-            return new BaseIdentity($this->credential()->getUsername());
-
+            //return new BaseIdentity($this->credential()->getUsername());
+            return new BaseIdentifier();
         throw new AuthenticationException('user authentication failure');
     }
 
@@ -48,7 +48,7 @@ class Authenticator extends AbstractAuthenticator
      * @throws \Exception
      * @return iCredential
      */
-    protected function insCredential($options)
+    function insCredential($options)
     {
         if($this->credential)
             throw new \Exception('credential Object is already ready to use');
