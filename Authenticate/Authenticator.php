@@ -5,7 +5,6 @@ use Poirot\AuthSystem\Authenticate\Adapter\UserPassCredential;
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\AuthSystem\Authenticate\BaseIdentity;
 
 class Authenticator extends AbstractAuthenticator
 {

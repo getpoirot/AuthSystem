@@ -8,9 +8,8 @@ class UserPassCredential implements iCredential
 {
 
     use OptionsTrait;
-    protected $username;
+
     protected $password;
-    protected $name;
     protected $email;
 
     /**
@@ -29,46 +28,11 @@ class UserPassCredential implements iCredential
         $this->email = $email;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * @param mixed $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * @return mixed
-     */
 
     function __construct($options=null)
     {
 
     }
-    public function getUsername()
-    {
-        return $this->username;
-    }
-
-    /**
-     * @param mixed $username
-     * @return $this
-     */
-    public function setUsername($username)
-    {
-        $this->username = $username;
-
-        return $this;
-    }
-
     /**
      * @return mixed
      */

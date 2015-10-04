@@ -2,4 +2,4 @@ vendor/**
 
 .idea
 composer.lock
-../index.php
+index.php
