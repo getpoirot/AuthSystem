@@ -1,32 +1,38 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Adapter;
 
-use Poirot\AuthSystem\AbstractCredential;
+use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
+use Poirot\Core\Traits\OptionsTrait;
 
-class UserPassCredential extends AbstractCredential
+class UserPassCredential implements iCredential
 {
-    protected $username;
+
+    use OptionsTrait;
+
     protected $password;
+    protected $email;
 
     /**
      * @return mixed
      */
-    public function getUsername()
+    public function getEmail()
     {
-        return $this->username;
+        return $this->email;
     }
 
     /**
-     * @param mixed $username
-     * @return $this
+     * @param mixed $email
      */
-    public function setUsername($username)
+    public function setEmail($email)
     {
-        $this->username = $username;
-
-        return $this;
+        $this->email = $email;
     }
 
+
+    function __construct($options=null)
+    {
+
+    }
     /**
      * @return mixed
      */
@@ -45,5 +51,6 @@ class UserPassCredential extends AbstractCredential
 
         return $this;
     }
+
 }
  
