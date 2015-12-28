@@ -1,6 +1,11 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
+/**
+ * Log an Identity of User Into Environment
+ *
+ */
+
 interface iIdentifier
 {
     /**

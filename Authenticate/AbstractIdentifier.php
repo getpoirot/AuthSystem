@@ -3,9 +3,11 @@ namespace Poirot\AuthSystem\Authenticate;
 
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
+use Poirot\Storage\Interfaces\iStorageEntity;
 
 abstract class AbstractIdentifier implements iIdentifier
 {
+    /** @var iIdentity */
     protected $identity;
 
     protected $_storage;
@@ -13,12 +15,17 @@ abstract class AbstractIdentifier implements iIdentifier
     /**
      * Get the storage object which identity stored in
      *
-     * @return mixed
+     * @return iStorageEntity
      */
     abstract function __getStorage();
 
     /**
+     * Login Authenticated User
+     *
+     * - store current identity data into storage
+     *
      * @param iIdentity $identity
+     *
      * @return $this
      */
     function login(iIdentity $identity)
@@ -38,6 +45,8 @@ abstract class AbstractIdentifier implements iIdentifier
     }
 
 
+    // ...
+
     /**
      * isLogin
      *
@@ -50,9 +59,9 @@ abstract class AbstractIdentifier implements iIdentifier
     {
         if($this->identity())
             return true;
+
         return false;
     }
-
 
     /**
      * This method return identity instance

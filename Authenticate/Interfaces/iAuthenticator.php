@@ -6,15 +6,6 @@ use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
 Interface iAuthenticator
 {
     /**
-     * Set Identifier
-     *
-     * @param iIdentifier $identifier
-     *
-     * @return $this
-     */
-    function setIdentifier(iIdentifier $identifier);
-
-    /**
      * Authenticate
      *
      * - authenticate user using credential
@@ -30,21 +21,15 @@ Interface iAuthenticator
     function authenticate();
 
     /**
-     * Identifier instance
-     *
-     * @return iIdentifier
-     */
-    function identifier();
-
-    /**
      * Proxy Helper To Identifier identity method
      *
      * ! identifier()->identity()
+     * @see iIdentifier
      *
      * @throws AuthenticationException
-     * @return iIdentity
+     * @return iIdentity|null
      */
-    function getIdentity();
+    function hasAuthenticated();
 
     /**
      * Credential instance

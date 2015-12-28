@@ -1,6 +1,15 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
+/**
+ * Represent User Identity and Data
+ *
+ * [code:]
+ *   $identity->getUid();
+ *   $identity->getUserEmail(); # extra related data
+ * [code]
+ *
+ */
 interface iIdentity
 {
     /**

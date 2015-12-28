@@ -8,8 +8,9 @@ class BaseIdentifier extends AbstractIdentifier
 {
     function __getStorage()
     {
-        if(! $this->_storage)
-            $this->_storage = new SessionStorage(['ident'=>'userAuth']);
+        if(!$this->_storage)
+            $this->_storage = new SessionStorage(['ident' => 'userAuth']);
+
         return $this->_storage;
     }
 }

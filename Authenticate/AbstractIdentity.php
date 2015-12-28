@@ -12,13 +12,12 @@ abstract class AbstractIdentity implements iIdentity
      *
      * - set user unique identifier
      *
-     * @param string                 $uid
+     * @param string $uid
      */
     function __construct($uid)
     {
         $this->uid = (string) $uid;
     }
-
 
     /**
      * Get user unique identifier
@@ -29,5 +28,4 @@ abstract class AbstractIdentity implements iIdentity
     {
         return $this->uid;
     }
-
 }

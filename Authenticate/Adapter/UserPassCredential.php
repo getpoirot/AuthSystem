@@ -6,7 +6,6 @@ use Poirot\Core\Traits\OptionsTrait;
 
 class UserPassCredential implements iCredential
 {
-
     use OptionsTrait;
 
     protected $password;
@@ -51,6 +50,4 @@ class UserPassCredential implements iCredential
 
         return $this;
     }
-
 }
- 

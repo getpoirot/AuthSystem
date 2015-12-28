@@ -2,11 +2,16 @@
 namespace Poirot\AuthSystem\Authenticate;
 
 use Poirot\Core\AbstractOptions;
-use Poirot\Core\Traits\OptionsTrait;
+use Poirot\Core\Interfaces\iDataSetConveyor;
+use Poirot\Core\Traits\OpenOptionsTrait;
 
+/**
+ * Represent User Identity and Data
+ *
+ */
 class BaseIdentity extends AbstractIdentity
 {
-    use OptionsTrait;
+    use OpenOptionsTrait;
 
     /**
      * Construct
@@ -14,7 +19,7 @@ class BaseIdentity extends AbstractIdentity
      * - set user unique identifier
      *
      * @param string                 $uid
-     * @param array|iDataSetConveyor $options
+     * @param array|iDataSetConveyor $options Extra User Data
      */
     function __construct($uid, $options = null)
     {
@@ -23,5 +28,4 @@ class BaseIdentity extends AbstractIdentity
         if ($options !== null)
             $this->from($options);
     }
-
 }

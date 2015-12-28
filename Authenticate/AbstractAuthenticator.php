@@ -6,38 +6,19 @@ use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
+use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
+use Poirot\Core\AbstractOptions;
 use Poirot\Core\BuilderSetterTrait;
 
 abstract class AbstractAuthenticator implements iAuthenticator
 {
     use BuilderSetterTrait;
 
-    /**
-     * @var iCredential
-     */
+    /** @var iCredential */
     protected $credential;
 
-    /**
-     * @var iIdentifier
-     */
+    /** @var iIdentifier */
     protected $identifier;
-
-
-    /**
-     * Proxy Helper To Identifier identity method
-     *
-     * ! identifier()->identity()
-     *
-     * @throws AuthenticationException
-     * @return iIdentity
-     */
-    function getIdentity()
-    {
-        return $this->identifier()->identity();
-    }
-
-
-
 
     /**
      * Authenticate
@@ -62,6 +43,31 @@ abstract class AbstractAuthenticator implements iAuthenticator
     abstract function authenticate();
 
     /**
+     * Get Instance of credential Object
+     *
+     * @param null|array|AbstractOptions $options Builder Options
+     *
+     * @return iCredential
+     */
+    abstract function newCredential($options = null);
+
+    /**
+     * Proxy Helper To Identifier identity method
+     *
+     * ! identifier()->identity()
+     *
+     * @throws AuthenticationException
+     * @return iIdentity
+     */
+    function hasAuthenticated()
+    {
+        return $this->_getIdentifier()->identity();
+    }
+
+
+    // ...
+
+    /**
      * Set Identifier instance which is responsible
      * for user login,logout,... of user
      *
@@ -82,7 +88,7 @@ abstract class AbstractAuthenticator implements iAuthenticator
      * @throws \Exception No Identity Available Or Set
      * @return iIdentifier
      */
-    function identifier()
+    protected function _getIdentifier()
     {
         if (!$this->identifier)
             throw new \Exception('No Identifier Object Available on this instance of AbstractAuthenticator class.');
@@ -91,43 +97,40 @@ abstract class AbstractAuthenticator implements iAuthenticator
     }
 
     /**
-     * Credential
+     * Credential instance
+     *
+     * [code:]
+     * // when options is passed it must init current credential and return
+     * // self instead of credential
+     *
+     * $auth->credential([
+     *   'username' => 'payam'
+     *   , 'password' => '123456'
+     *   , 'realm' => 'admin'
+     *  ])->authenticate()
+     * [code]
      *
      * - it`s contains credential fields used by
-     *   authenticate() to authenticate user.
+     *   authorize() to authorize user.
      *   maybe, user/pass or ip address in some case
      *   that we want auth. user by ip
      *
-     * - it may be vary from within different Authentication
+     * - it may be vary from within different Authorize
      *   services
      *
-     * @param null|array|AbstractOptions $options Builder Options
-     *
-     * @throws \Exception credential object has been set
+     * @param null|array $options
      * @return $this|iCredential
      */
-    function credential($options=null)
+    function credential($options = null)
     {
-        if($options !== null && $this->credential)
-            throw new \Exception('credential object has been set . if you want to change options reset credential object');
-
-        if ($this->credential)
-            return $this->credential;
+        if (!$this->credential)
+            $this->credential = $this->newCredential();
 
         if ($options !== null) {
-            $this->credential = $this->insCredential($options);
+            $this->credential->from($options);
+            return $this;
         }
 
-        return $this;
-
+        return $this->credential;
     }
-
-    /**
-     * Get Instance of credential Object
-     *
-     * @param null|array|AbstractOptions $options Builder Options
-     *
-     * @return iCredential
-     */
-    abstract function insCredential($options);
 }
