@@ -7,6 +7,8 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\Core\AbstractOptions;
 
+// TODO authenticator adapter
+
 class Authenticator extends AbstractAuthenticator
 {
     /**
