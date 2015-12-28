@@ -42,7 +42,7 @@ class Authenticator extends AbstractAuthenticator
 
     /**
      * @inheritdoc
-     * @return UserPassCredential
+     * @return UserPassCredential|$this
      */
     function credential($options = null)
     {
