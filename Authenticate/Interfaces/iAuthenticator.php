@@ -26,7 +26,6 @@ Interface iAuthenticator
      * ! identifier()->identity()
      * @see iIdentifier
      *
-     * @throws AuthenticationException
      * @return iIdentity|null
      */
     function hasAuthenticated();

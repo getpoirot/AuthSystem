@@ -18,27 +18,20 @@ abstract class AbstractAuthenticator implements iAuthenticator
     protected $credential;
 
     /** @var iIdentifier */
-    protected $identifier;
+    protected $authenticated_identifier;
 
     /**
      * Authenticate
      *
-     * - throw exception from Authenticate\Exceptions
-     *   also you can throw your app meaning exception
-     *   like: \App\Auth\UserBannedException
-     *   to catch behaves
+     * - authenticate user using credential
+     * - login into identifier with iIdentity set from recognized
+     *   user data
      *
-     * - each time called will clean current storage
-     * - after successful authentication, you must call
-     *   login() to save identified user
+     * note: after successful authentication, you must call
+     *       login() outside of method to store identified user
      *
-     *   note: for iAuthorizeUserDataAware
-     *         it used user data model to retrieve data
-     *         on authentication in case of user isActive
-     *         and so on ...
-     *
-     * @throws AuthenticationException
-     * @return $this
+     * @throws AuthenticationException Or extend of this
+     * @return iIdentifier
      */
     abstract function authenticate();
 
@@ -55,46 +48,17 @@ abstract class AbstractAuthenticator implements iAuthenticator
      * Proxy Helper To Identifier identity method
      *
      * ! identifier()->identity()
+     * @see iIdentifier
      *
-     * @throws AuthenticationException
-     * @return iIdentity
+     * @return iIdentity|null
      */
     function hasAuthenticated()
     {
-        return $this->_getIdentifier()->identity();
+        return ($this->authenticated_identifier) ? $this->authenticated_identifier : false;
     }
 
 
     // ...
-
-    /**
-     * Set Identifier instance which is responsible
-     * for user login,logout,... of user
-     *
-     * @param iIdentifier $identifier
-     *
-     * @return $this
-     */
-    function setIdentifier(iIdentifier $identifier)
-    {
-        $this->identifier = $identifier;
-
-        return $this;
-    }
-
-    /**
-     * Get identifier object
-     *
-     * @throws \Exception No Identity Available Or Set
-     * @return iIdentifier
-     */
-    protected function _getIdentifier()
-    {
-        if (!$this->identifier)
-            throw new \Exception('No Identifier Object Available on this instance of AbstractAuthenticator class.');
-
-        return $this->identifier;
-    }
 
     /**
      * Credential instance

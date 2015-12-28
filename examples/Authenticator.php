@@ -24,9 +24,16 @@ class Authenticator extends AbstractAuthenticator
      */
     function authenticate()
     {
-        if($this->credential()->getEmail() == 'john@Doe.com'
-            && $this->credential()->getPassword() == '123456')
-            return new BaseIdentifier();
+        if(($email = $this->credential()->getEmail()) == 'john@Doe.com'
+            && ($password = $this->credential()->getPassword()) == '123456') {
+            $uuid = md5($email.':'.$password);
+            return new BaseIdentifier(['identity' =>
+                new BaseIdentity(
+                    $uuid                   ## user uid
+                    , $this->credential()   ## user data as options
+                )
+            ]);
+        }
 
         throw new AuthenticationException('user authentication failure');
     }

@@ -9,15 +9,23 @@ namespace Poirot\AuthSystem\Authenticate\Interfaces;
 interface iIdentifier
 {
     /**
-     * Login Authenticated User
-     *
-     * - store current identity data into storage
+     * Inject Identity
      *
      * @param iIdentity $identity
      *
      * @return $this
      */
-    function login(iIdentity $identity);
+    function setIdentity(iIdentity $identity);
+
+    /**
+     * Login Authenticated User
+     *
+     * - store current identity data into storage
+     *
+     * @throws \Exception no identity defined
+     * @return $this
+     */
+    function login();
 
     /**
      * Logout Authenticated User
@@ -27,6 +35,7 @@ interface iIdentifier
      * @return $this
      */
     function logout();
+
 
     /**
      * Has User Logged in?
@@ -50,5 +59,5 @@ interface iIdentifier
      *
      * @return null|iIdentity
      */
-    function identity();
+    function withIdentity();
 }
