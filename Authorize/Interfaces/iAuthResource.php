@@ -16,4 +16,4 @@ use Poirot\Core\Interfaces\iPoirotOptions;
 interface iAuthResource extends iPoirotOptions
 {
 
-} 
+}

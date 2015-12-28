@@ -46,14 +46,4 @@ interface iIdentifier
      * @return null|iIdentity
      */
     function identity();
-
-
-    /**
-     * __getStorage
-     *
-     * returns the storage object which this identifier
-     * object is working with
-     * @return mixed
-     */
-    function __getStorage();
 }

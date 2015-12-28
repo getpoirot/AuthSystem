@@ -6,17 +6,10 @@ use Poirot\Storage\Adapter\SessionStorage;
 
 class BaseIdentifier extends AbstractIdentifier
 {
-
-    function __construct()
-    {
-
-    }
-
     function __getStorage()
     {
-        if(! $this->storage)
-            $this->storage = new SessionStorage(['ident'=>'userAuth']);
-        return $this->storage;
+        if(! $this->_storage)
+            $this->_storage = new SessionStorage(['ident'=>'userAuth']);
+        return $this->_storage;
     }
-
 }

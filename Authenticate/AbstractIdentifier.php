@@ -7,8 +7,15 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 abstract class AbstractIdentifier implements iIdentifier
 {
     protected $identity;
-    protected $storage;
 
+    protected $_storage;
+
+    /**
+     * Get the storage object which identity stored in
+     *
+     * @return mixed
+     */
+    abstract function __getStorage();
 
     /**
      * @param iIdentity $identity
@@ -64,7 +71,4 @@ abstract class AbstractIdentifier implements iIdentifier
 
         return $this->identity;
     }
-
-    public abstract function __getStorage();
-
 }
