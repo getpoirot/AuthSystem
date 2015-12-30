@@ -9,6 +9,7 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Core\AbstractOptions;
 use Poirot\Core\BuilderSetterTrait;
+use Poirot\Core\Interfaces\iDataSetConveyor;
 
 abstract class AbstractAuthenticator implements iAuthenticator
 {
@@ -18,7 +19,11 @@ abstract class AbstractAuthenticator implements iAuthenticator
     protected $credential;
 
     /** @var iIdentifier */
-    protected $authenticated_identifier;
+    protected $identifier;
+
+    // options:
+    /** @var iIdentifier */
+    protected $default_identifier;
 
     /**
      * Authenticate
@@ -30,10 +35,32 @@ abstract class AbstractAuthenticator implements iAuthenticator
      * note: after successful authentication, you must call
      *       login() outside of method to store identified user
      *
+     * @param iCredential|iDataSetConveyor|array $credential
+     *
      * @throws AuthenticationException Or extend of this
      * @return iIdentifier
      */
-    abstract function authenticate();
+    function authenticate($credential = null)
+    {
+        if ($credential !== null)
+            $this->credential()->from($credential);
+
+        $identity = $this->doAuthenticate();
+        if (!$identity instanceof iIdentity)
+            throw new AuthenticationException('user authentication failure');
+
+        $this->identifier()->setIdentity($identity);
+        return $this->identifier();
+    }
+
+    /**
+     * Authenticate user with Credential Data and return
+     * FullFilled Identity Instance
+     *
+     * @throws AuthenticationException Or extend of this
+     * @return iIdentity|void
+     */
+    abstract protected function doAuthenticate();
 
     /**
      * Get Instance of credential Object
@@ -45,16 +72,63 @@ abstract class AbstractAuthenticator implements iAuthenticator
     abstract function newCredential($options = null);
 
     /**
-     * Proxy Helper To Identifier identity method
+     * Has Authenticated And Identifier Exists
      *
-     * ! identifier()->identity()
-     * @see iIdentifier
+     * - it mean that Identifier has full filled identity
      *
-     * @return iIdentity|null
+     * note: this allow to register this authenticator as a service
+     *       to retrieve authenticate information
+     *
+     * @return boolean
      */
     function hasAuthenticated()
     {
-        return ($this->authenticated_identifier) ? $this->authenticated_identifier : false;
+        return $this->identifier()->identity()->isFullFilled();
+    }
+
+    /**
+     * Get Authenticated User Identifier
+     *
+     * note: this allow to register this authenticator as a service
+     *       to retrieve authenticate information
+     *
+     * @return iIdentifier
+     */
+    function identifier()
+    {
+        if (!$this->identifier)
+            $this->identifier = $this->getDefaultIdentifier();
+
+        return $this->identifier;
+    }
+
+
+    // Options:
+
+    /**
+     * Set Default Identifier Instance
+     *
+     * @param iIdentifier $identifier
+     *
+     * @return $this
+     */
+    function setDefaultIdentifier(iIdentifier $identifier)
+    {
+        $this->default_identifier = $identifier;
+        return $this;
+    }
+
+    /**
+     * Get Default Identifier Instance
+     *
+     * @return iIdentifier|BaseIdentifier
+     */
+    function getDefaultIdentifier()
+    {
+        if (!$this->default_identifier)
+            $this->setDefaultIdentifier(new BaseIdentifier);
+
+        return $this->default_identifier;
     }
 
 

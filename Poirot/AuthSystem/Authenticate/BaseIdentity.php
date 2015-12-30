@@ -18,12 +18,16 @@ class BaseIdentity extends AbstractIdentity
      *
      * - set user unique identifier
      *
-     * @param string                 $uid
+     * @param string|null|array      $uid
      * @param array|iDataSetConveyor $options Extra User Data
      */
-    function __construct($uid, $options = null)
+    function __construct($uid = null, $options = null)
     {
-        parent::__construct($uid);
+        if (is_array($uid) || $uid instanceof iDataSetConveyor)
+            ## options as array or dataSet
+            $options = $uid;
+        else
+            parent::__construct($uid);
 
         if ($options !== null)
             $this->from($options);

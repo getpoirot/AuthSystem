@@ -4,7 +4,7 @@ namespace Poirot\AuthSystem\Authenticate;
 use Poirot\AuthSystem\Authenticate\Adapter\UserPassCredential;
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
-use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
+use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Core\AbstractOptions;
 
 // TODO authenticator adapter
@@ -12,33 +12,22 @@ use Poirot\Core\AbstractOptions;
 class Authenticator extends AbstractAuthenticator
 {
     /**
-     * Authenticate
-     *
-     * - authenticate user using credential
-     * - login into identifier with iIdentity set from recognized
-     *   user data
-     *
-     * note: after successful authentication, you must call
-     *       login() outside of method to store identified user
+     * Authenticate user with Credential Data and return
+     * FullFilled Identity Instance
      *
      * @throws AuthenticationException Or extend of this
-     * @return iIdentifier
+     * @return iIdentity|void
      */
-    function authenticate()
+    protected function doAuthenticate()
     {
         if(($email = $this->credential()->getEmail()) == 'john@Doe.com'
             && ($password = $this->credential()->getPassword()) == '123456') {
             $uuid = md5($email.':'.$password);
-            return new BaseIdentifier(['identity' =>
-                new BaseIdentity(
-                    $uuid                   ## user uid
-                    , $this->credential()   ## user data as options
-                )
-            ]);
-        }
 
-        throw new AuthenticationException('user authentication failure');
+            return new BaseIdentity($uuid, $this->credential()->toArray());
+        }
     }
+
 
     /**
      * @inheritdoc

@@ -13,17 +13,35 @@ namespace Poirot\AuthSystem\Authenticate\Interfaces;
 interface iIdentity
 {
     /**
-     * Construct
-     * Set user unique identifier
+     * Set User Unique Identifier
      *
-     * @param string $uid
+     * - usually full fill this identity when uid set
+     *
+     * @param string $uid User Unique ID
+     *
+     * @return $this
      */
-    function __construct($uid);
+    function setUid($uid);
 
     /**
-     * Get user unique identifier
+     * Get User Unique Identifier
      *
      * @return string
      */
     function getUid();
+
+
+    // ...
+
+    /**
+     * Is Identity Full Filled
+     *
+     * - full filled mean that all needed data
+     *   set for this identity.
+     *
+     *   ! it's usually is enough to have uid
+     *
+     * @return boolean
+     */
+    function isFullFilled();
 }
