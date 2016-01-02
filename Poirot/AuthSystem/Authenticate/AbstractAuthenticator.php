@@ -121,12 +121,12 @@ abstract class AbstractAuthenticator implements iAuthenticator
     /**
      * Get Default Identifier Instance
      *
-     * @return iIdentifier|BaseIdentifier
+     * @return iIdentifier|PhpHttpIdentifier
      */
     function getDefaultIdentifier()
     {
         if (!$this->default_identifier)
-            $this->setDefaultIdentifier(new BaseIdentifier);
+            $this->setDefaultIdentifier(new PhpHttpIdentifier);
 
         return $this->default_identifier;
     }

@@ -38,14 +38,14 @@ abstract class AbstractIdentity implements iIdentity
      *
      * - usually full fill this identity when uid set
      *
-     * @param string $uid User Unique ID
+     * @param string|null $uid User Unique ID
      *
      * @return $this
      */
     function setUid($uid)
     {
         $this->uid = $uid;
-        $this->isFullFilled = true;
+        $this->isFullFilled = ($uid) ? true : false;
         return $this;
     }
 

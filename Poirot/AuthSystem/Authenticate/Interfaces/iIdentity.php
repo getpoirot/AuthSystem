@@ -16,8 +16,9 @@ interface iIdentity
      * Set User Unique Identifier
      *
      * - usually full fill this identity when uid set
+     * - uid null mean clear and unfullfill identity
      *
-     * @param string $uid User Unique ID
+     * @param string|null $uid User Unique ID
      *
      * @return $this
      */

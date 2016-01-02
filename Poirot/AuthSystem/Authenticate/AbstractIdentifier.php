@@ -5,8 +5,6 @@ use Poirot\AuthSystem\Authenticate\Exceptions\NotAuthenticatedException;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Core\BuilderSetterTrait;
-use Poirot\Storage\Adapter\CookieStorage;
-use Poirot\Storage\Interfaces\iStorageEntity;
 
 abstract class AbstractIdentifier implements iIdentifier
 {
@@ -14,12 +12,8 @@ abstract class AbstractIdentifier implements iIdentifier
 
     const REALM = 'Poirot_Auth_Identifier';
 
-
     /** @var iIdentity */
     protected $identity;
-
-    protected $_storage;
-    protected $_cookie;
 
     /** @var boolean Remember user when login */
     protected $_remember = false;
@@ -41,14 +35,6 @@ abstract class AbstractIdentifier implements iIdentifier
     }
 
     /**
-     * Get the storage object which identity stored in
-     *
-     * @return iStorageEntity
-     */
-    abstract function __storage();
-
-
-    /**
      * Inject Identity
      *
      * @param iIdentity $identity Full Filled Identity
@@ -68,7 +54,11 @@ abstract class AbstractIdentifier implements iIdentifier
     /**
      * Get Authenticated User Data
      *
-     * -
+     * - if identity exists use it
+     * - otherwise if signIn extract data from it
+     *   ie. when user exists in session build identity from that
+     *
+     * - not one of above situation return empty identity
      *
      * @return iIdentity
      */
@@ -78,71 +68,22 @@ abstract class AbstractIdentifier implements iIdentifier
             return $this->identity;
 
 
-        $defaultIdentity = $this->getDefaultIdentity();
+        // Attain Identity:
+        if ($this->isSignIn())
+            $identity = $this->attainSignedIdentity();
+        else
+            $identity = $this->getDefaultIdentity();
 
-        if($uid = $this->__storage()->get('uid'))
-            ## if not identity loaded, load it to memory from authenticated user uid
-            $this->setIdentity($defaultIdentity->setUid($uid));
-        elseif ($this->isRemembered() && $uid = $this->__cookie()->get('uid')) {
-            ## it's maybe found on cookie
-            $this->login(); // log knowing user in
-        }
-
-        return $this->identity;
+        return $this->identity = $identity;
     }
+
 
     /**
-     * Login Authenticated User
-     *
-     * - store current identity data into storage
-     * - logout current user if has
-     *
-     * @throws \Exception no identity defined
-     * @return $this
+     * Attain Identity Object From Signed Sign
+     * @see identity()
+     * @return iIdentity
      */
-    function login()
-    {
-        if (!($identity = $this->identity))
-            throw new \Exception('No Identity Injected.');
-
-        if ($this->_remember)
-            $this->__cookie()->set('user', $identity->getUid());
-
-        $this->__storage()->set('identity' , $identity);
-        return $this;
-    }
-
-    /**
-     * Logout Authenticated User
-     *
-     * - it must destroy storage data
-     *
-     * @return void
-     */
-    function logout()
-    {
-        $this->__storage()->destroy();
-    }
-
-
-    // ...
-
-    /**
-     * Has User Logged in?
-     *
-     * - login mean that user uid exists in the storage
-     * - user that recognized in remember storage must
-     *   has logged in to recognize here
-     *
-     * @return boolean
-     */
-    function isLogin()
-    {
-        if($this->__storage()->get('uid'))
-            return true;
-
-        return false;
-    }
+    abstract function attainSignedIdentity();
 
 
     // ...
@@ -158,18 +99,6 @@ abstract class AbstractIdentifier implements iIdentifier
     {
         $this->_remember = $flag;
         return $this;
-    }
-
-    /**
-     * Has any user data exists in storage and
-     * can be recognized as any identified user?
-     *
-     * @return boolean
-     */
-    function isRemembered()
-    {
-        $return = ($this->__cookie()->get('uid', false) !== false) ? true : false;
-        return $return;
     }
 
 
@@ -221,25 +150,9 @@ abstract class AbstractIdentifier implements iIdentifier
      */
     function getDefaultIdentity()
     {
+        if (!$this->defaultIdentity)
+            $this->defaultIdentity = new BaseIdentity;
+
         return $this->defaultIdentity;
-    }
-
-
-    // ...
-
-    /**
-     * Get Cookie Storage
-     *
-     * @return CookieStorage
-     */
-    protected function __cookie()
-    {
-        if (!$this->_cookie)
-            $this->_cookie = new CookieStorage(['ident' => $this->getRealm()]);
-
-        // insane but always used latest namespace
-        $this->_cookie->options()->setIdent($this->getRealm());
-
-        return $this->_cookie;
     }
 }

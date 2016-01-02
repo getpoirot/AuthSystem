@@ -3,7 +3,7 @@ namespace Poirot\AuthSystem\Authenticate\Interfaces;
 use Poirot\AuthSystem\Authenticate\Exceptions\NotAuthenticatedException;
 
 /**
- * Sign In/Out User as Identity into Storage
+ * Sign In/Out User as Identity into Environment
  *
  */
 interface iIdentifier
@@ -19,7 +19,13 @@ interface iIdentifier
     function setIdentity(iIdentity $identity);
 
     /**
-     * Get User Identity
+     * Get Authenticated User Data
+     *
+     * - if identity exists use it
+     * - otherwise if signIn extract data from it
+     *   ie. when user exists in session build identity from that
+     *
+     * - not one of above situation return empty identity
      *
      * @return iIdentity
      */
@@ -29,22 +35,27 @@ interface iIdentifier
     /**
      * Login Authenticated User
      *
-     * - store current identity data into storage
+     * - Sign user in environment and server
+     *   exp. store in session
+     *
      * - logout current user if has
      *
      * @throws \Exception no identity defined
      * @return $this
      */
-    function login();
+    function signIn();
 
     /**
      * Logout Authenticated User
      *
-     * - it must destroy storage data
+     * - it must destroy sign
+     *   ie. destroy session or invalidate token in storage
+     *
+     * - clear identity
      *
      * @return void
      */
-    function logout();
+    function signOut();
 
     /**
      * Has User Logged in?
@@ -60,5 +71,5 @@ interface iIdentifier
      *
      * @return boolean
      */
-    function isLogin();
+    function isSignIn();
 }
