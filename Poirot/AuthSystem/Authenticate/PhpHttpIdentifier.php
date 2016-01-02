@@ -3,7 +3,6 @@
 namespace Poirot\AuthSystem\Authenticate;
 
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\Storage\Gateway\CookieData;
 use Poirot\Storage\Gateway\SessionData;
 
 class PhpHttpIdentifier extends AbstractIdentifier
@@ -26,9 +25,6 @@ class PhpHttpIdentifier extends AbstractIdentifier
     {
         if (!($identity = $this->identity) && !$identity->isFullFilled())
             throw new \Exception('Identity not exists or not fullfilled');
-
-/*        if ($this->_remember)
-            $this->__cookie()->set('user', $identity->getUid());*/
 
         $this->__session()->set('uid' , $identity->getUid());
         return $this;
@@ -84,21 +80,6 @@ class PhpHttpIdentifier extends AbstractIdentifier
 
 
     // ...
-
-    /**
-     * Get Cookie Storage
-     * @return CookieData
-     */
-    protected function __cookie()
-    {
-        if (!$this->_cookie)
-            $this->_cookie = new CookieData(['realm' => $this->getRealm()]);
-
-        // insane but always used latest namespace
-        $this->_cookie->setRealm($this->getRealm());
-
-        return $this->_cookie;
-    }
 
     /**
      * Get Session Storage

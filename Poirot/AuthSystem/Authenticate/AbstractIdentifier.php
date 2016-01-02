@@ -15,9 +15,6 @@ abstract class AbstractIdentifier implements iIdentifier
     /** @var iIdentity */
     protected $identity;
 
-    /** @var boolean Remember user when login */
-    protected $_remember = false;
-
     // options:
     /** @var iIdentity */
     protected $defaultIdentity;
@@ -84,22 +81,6 @@ abstract class AbstractIdentifier implements iIdentifier
      * @return iIdentity
      */
     abstract function attainSignedIdentity();
-
-
-    // ...
-
-    /**
-     * Remember Me Feature!
-     *
-     * @param bool $flag
-     *
-     * @return $this
-     */
-    function setRemember($flag = true)
-    {
-        $this->_remember = $flag;
-        return $this;
-    }
 
 
     // Options:
