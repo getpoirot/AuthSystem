@@ -1,5 +1,4 @@
 <?php
-
 namespace Poirot\AuthSystem\Authenticate;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
@@ -8,13 +7,12 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Core\AbstractOptions;
-use Poirot\Core\BuilderSetterTrait;
+use Poirot\Core\BuilderSetter;
 use Poirot\Core\Interfaces\iDataSetConveyor;
 
-abstract class AbstractAuthenticator implements iAuthenticator
+abstract class AbstractAuthenticator extends BuilderSetter
+    implements iAuthenticator
 {
-    use BuilderSetterTrait;
-
     /** @var iCredential */
     protected $credential;
 
@@ -24,6 +22,24 @@ abstract class AbstractAuthenticator implements iAuthenticator
     // options:
     /** @var iIdentifier */
     protected $default_identifier;
+
+
+    /**
+     * @var array List Setters By Priority
+     * [
+     *  'service_config',
+     *  'listeners',
+     *  // ...
+     * ]
+     *
+     * application calls setter methods from top ...
+     *
+     */
+    protected $__setup_array_priority = [
+        'default_identifier',
+        'identity'
+    ];
+
 
     /**
      * Authenticate
@@ -37,7 +53,7 @@ abstract class AbstractAuthenticator implements iAuthenticator
      *
      * @param iCredential|iDataSetConveyor|array $credential
      *
-     * @throws AuthenticationException Or extend of this
+     * @throws AuthenticationException|\Exception Or extend of this
      * @return iIdentifier
      */
     function authenticate($credential = null)
@@ -46,10 +62,16 @@ abstract class AbstractAuthenticator implements iAuthenticator
             $this->credential()->from($credential);
 
         $identity = $this->doAuthenticate();
-        if (!$identity instanceof iIdentity)
-            throw new AuthenticationException('user authentication failure');
+        if (!$identity instanceof iIdentity && !$identity->isFullFilled())
+            throw new AuthenticationException('user authentication failure.');
 
-        $this->identifier()->setIdentity($identity);
+        $this->identifier()->identity()->from($identity);
+        if (!$this->identifier()->identity()->isFullFilled())
+            throw new \Exception(
+                'User Authenticated Successfully But Identifier Identity Not'
+                .' FullFilled Satisfy with That Result.'
+            );
+
         return $this->identifier();
     }
 
@@ -131,6 +153,16 @@ abstract class AbstractAuthenticator implements iAuthenticator
         return $this->default_identifier;
     }
 
+    /**
+     * Helper To Set Default Identity
+     * @param iIdentity $identity
+     * @return $this
+     */
+    function setIdentity(iIdentity $identity)
+    {
+        $this->identifier()->setIdentity($identity);
+        return $this;
+    }
 
     // ...
 
@@ -144,7 +176,6 @@ abstract class AbstractAuthenticator implements iAuthenticator
      * $auth->credential([
      *   'username' => 'payam'
      *   , 'password' => '123456'
-     *   , 'realm' => 'admin'
      *  ])->authenticate()
      * [code]
      *

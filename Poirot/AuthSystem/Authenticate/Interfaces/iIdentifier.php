@@ -10,9 +10,28 @@ use Poirot\AuthSystem\Authenticate\Exceptions\NotAuthenticatedException;
 interface iIdentifier
 {
     /**
+     * Set Realm To Limit Authentication
+     *
+     * ! mostly used as storage namespace to have
+     *   multiple area for each different Authenticate system
+     *
+     * @param string $realm
+     *
+     * @return $this
+     */
+    function setRealm($realm);
+
+    /**
+    * Get Realm Area
+    *
+    * @return string
+    */
+    function getRealm();
+
+    /**
      * Inject Identity
      *
-     * @param iIdentity $identity Full Filled Identity
+     * @param iIdentity $identity
      *
      * @throws NotAuthenticatedException Identity not full filled
      * @return $this

@@ -2,7 +2,6 @@
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
-use Poirot\AuthSystem\Authenticate\Exceptions\NotAuthenticatedException;
 use Poirot\Core\Interfaces\iDataSetConveyor;
 
 Interface iAuthenticator
@@ -56,7 +55,6 @@ Interface iAuthenticator
      * $auth->credential([
      *   'username' => 'payam'
      *   , 'password' => '123456'
-     *   , 'realm' => 'admin'
      *  ])->authenticate()
      * [code]
      *

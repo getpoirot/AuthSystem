@@ -2,6 +2,7 @@
 namespace Poirot\AuthSystem\Authenticate;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\NotAuthenticatedException;
+use Poirot\AuthSystem\Authenticate\Identity\BaseIdentity;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Core\BuilderSetterTrait;
@@ -10,7 +11,8 @@ abstract class AbstractIdentifier implements iIdentifier
 {
     use BuilderSetterTrait;
 
-    const REALM = 'Poirot_Auth_Identifier';
+    const STORAGE_REALM          = 'Default_Auth';
+    const STORAGE_IDENTITY_KEY   = 'identity';
 
     /** @var iIdentity */
     protected $identity;
@@ -34,16 +36,13 @@ abstract class AbstractIdentifier implements iIdentifier
     /**
      * Inject Identity
      *
-     * @param iIdentity $identity Full Filled Identity
+     * @param iIdentity $identity
      *
      * @throws NotAuthenticatedException Identity not full filled
      * @return $this
      */
     function setIdentity(iIdentity $identity)
     {
-        if (!$identity->isFullFilled())
-            throw new NotAuthenticatedException;
-
         $this->identity = $identity;
         return $this;
     }
@@ -61,17 +60,20 @@ abstract class AbstractIdentifier implements iIdentifier
      */
     function identity()
     {
-        if($this->identity)
+        if (!$this->identity)
+            $this->identity = $this->getDefaultIdentity();
+
+        if($this->identity->isFullFilled())
             return $this->identity;
 
 
         // Attain Identity:
-        if ($this->isSignIn())
+        if ($this->isSignIn()) {
             $identity = $this->attainSignedIdentity();
-        else
-            $identity = $this->getDefaultIdentity();
+            $this->identity->from($identity);
+        }
 
-        return $this->identity = $identity;
+        return $this->identity;
     }
 
 
@@ -109,7 +111,7 @@ abstract class AbstractIdentifier implements iIdentifier
     function getRealm()
     {
         if (!$this->realm)
-            $this->realm = self::REALM;
+            $this->realm = self::STORAGE_REALM;
 
         return $this->realm;
     }

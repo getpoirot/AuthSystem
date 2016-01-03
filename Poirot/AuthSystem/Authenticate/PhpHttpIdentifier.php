@@ -26,7 +26,7 @@ class PhpHttpIdentifier extends AbstractIdentifier
         if (!($identity = $this->identity) && !$identity->isFullFilled())
             throw new \Exception('Identity not exists or not fullfilled');
 
-        $this->__session()->set('uid' , $identity->getUid());
+        $this->__session()->set(self::STORAGE_IDENTITY_KEY , $identity);
         return $this;
     }
 
@@ -37,8 +37,8 @@ class PhpHttpIdentifier extends AbstractIdentifier
     function attainSignedIdentity()
     {
         $defaultIdentity = $this->getDefaultIdentity();
-        if ($this->__session()->has('uid'))
-            $defaultIdentity->setUid($this->__session()->get('uid'));
+        if ($this->__session()->has(self::STORAGE_IDENTITY_KEY))
+            $defaultIdentity->from($this->__session()->get(self::STORAGE_IDENTITY_KEY));
 
         return $defaultIdentity;
     }
@@ -55,14 +55,14 @@ class PhpHttpIdentifier extends AbstractIdentifier
      */
     function signOut()
     {
-        $this->identity()->setUid(null);
+        $this->identity()->clean();
         $this->__session()->destroy();
     }
 
     /**
      * Has User Logged in?
      *
-     * - login mean that user uid signed with signIn method
+     * - login mean that user identity signed with signIn method
      *   exp. Exists in Session or as a header in Request Http or etc..
      *
      * - validate sign
@@ -72,7 +72,7 @@ class PhpHttpIdentifier extends AbstractIdentifier
      */
     function isSignIn()
     {
-        if($this->__session()->has('uid'))
+        if($this->__session()->has(self::STORAGE_IDENTITY_KEY))
             return true;
 
         return false;
