@@ -54,13 +54,31 @@ class LazyFulfillmentIdentity extends FulfillmentIdentity
      *
      * @return $this
      */
-    function setDataProvider(iIdentityDataProvider $provider)
+    function setDataProvider($provider)
     {
+        if (!$provider instanceof iIdentityDataProvider)
+            throw new \InvalidArgumentException;
+
         $this->_data_provider = $provider;
         return $this;
     }
 
     // ...
+
+    /**
+     * Clean Identity Data
+     *
+     * @return void
+     */
+    function clean()
+    {
+        foreach($this->props()->writable as $p) {
+            if ($p == 'data_provider')
+                continue;
+
+            $this->__unset($p);
+        }
+    }
 
     /**
      * Get Options Properties Information
@@ -130,5 +148,10 @@ class LazyFulfillmentIdentity extends FulfillmentIdentity
     protected function __isDataLoaded()
     {
         return ($this->_c__loaded_data !== null) ? true : false;
+    }
+
+    function __wakeup()
+    {
+        $this->_c__loaded_data = false;
     }
 }

@@ -27,6 +27,6 @@ abstract class AbstractIdentity extends OpenOptions
     function clean()
     {
         foreach($this->props()->writable as $p)
-            $this->__set($p, null);
+            $this->__unset($p);
     }
 }
