@@ -3,35 +3,14 @@ namespace Poirot\AuthSystem\Authenticate\Identity;
 
 use Poirot\AuthSystem\Authenticate\AbstractIdentity;
 use Poirot\Core\AbstractOptions;
-use Poirot\Core\Interfaces\iDataSetConveyor;
 
 /**
  * Represent User Identity and Data
  *
  */
-class BaseIdentity extends AbstractIdentity
+class FulfillmentIdentity extends AbstractIdentity
 {
     protected $uid;
-
-    /**
-     * Construct
-     *
-     * - set user unique identifier
-     *
-     * @param string|null|array      $uid
-     * @param array|iDataSetConveyor $options Extra User Data
-     */
-    function __construct($uid = null, $options = null)
-    {
-        if (is_array($uid) || $uid instanceof iDataSetConveyor)
-            ## options as array or dataSet
-            $options = $uid;
-        else
-            parent::__construct($uid);
-
-        if ($options !== null)
-            $this->from($options);
-    }
 
     /**
      * Get user unique identifier
@@ -68,7 +47,7 @@ class BaseIdentity extends AbstractIdentity
      *
      * @return boolean
      */
-    function isFullFilled()
+    function isFulfilled()
     {
         return ($this->getUid()) ? true : false;
     }
