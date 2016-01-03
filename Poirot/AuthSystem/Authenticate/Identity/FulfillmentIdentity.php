@@ -4,36 +4,28 @@ namespace Poirot\AuthSystem\Authenticate\Identity;
 use Poirot\AuthSystem\Authenticate\AbstractIdentity;
 use Poirot\Core\AbstractOptions;
 
-/**
- * Represent User Identity and Data
- *
- */
+/*
+## this mean authenticator need at least username to satisfy by identifier
+new Authenticator(['identity' => new FulfillmentIdentity(['fulfillment_by' => 'username'])]);
+*/
+
 class FulfillmentIdentity extends AbstractIdentity
 {
-    protected $uid;
+    /** @var string 'property_underscore_format' */
+    protected $__fulfillment_property;
 
     /**
-     * Get user unique identifier
+     * Set Fulfillment Property
      *
-     * @return string|null
-     */
-    function getUid()
-    {
-        return $this->uid;
-    }
-
-    /**
-     * Set User Unique Identifier
+     * ! this property must set available to fulfillment
      *
-     * - usually full fill this identity when uid set
-     *
-     * @param string|null $uid User Unique ID
+     * @param string $property
      *
      * @return $this
      */
-    function setUid($uid)
+    function setFulfillmentBy($property)
     {
-        $this->uid = $uid;
+        $this->__fulfillment_property = \Poirot\Core\sanitize_underscore($property);
         return $this;
     }
 
@@ -43,12 +35,11 @@ class FulfillmentIdentity extends AbstractIdentity
      * - full filled mean that all needed data
      *   set for this identity.
      *
-     *   ! it's usually is enough to have uid
-     *
      * @return boolean
      */
     function isFulfilled()
     {
-        return ($this->getUid()) ? true : false;
+        return ($this->__isset($this->__fulfillment_property) && $this->__get($this->__fulfillment_property))
+            ? true : false;
     }
 }

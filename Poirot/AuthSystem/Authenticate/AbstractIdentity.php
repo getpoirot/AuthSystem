@@ -17,7 +17,7 @@ abstract class AbstractIdentity extends OpenOptions
      *
      * @return boolean
      */
-    abstract function isFullFilled();
+    abstract function isFulfilled();
 
     /**
      * Clean Identity Data

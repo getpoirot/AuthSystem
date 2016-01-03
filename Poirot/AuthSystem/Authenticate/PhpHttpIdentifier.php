@@ -23,7 +23,7 @@ class PhpHttpIdentifier extends AbstractIdentifier
      */
     function signIn()
     {
-        if (!($identity = $this->identity) && !$identity->isFullFilled())
+        if (!($identity = $this->identity) && !$identity->isFulfilled())
             throw new \Exception('Identity not exists or not fullfilled');
 
         $this->__session()->set(self::STORAGE_IDENTITY_KEY , $identity);

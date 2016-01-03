@@ -33,7 +33,7 @@ class UsernameIdentity extends AbstractIdentity
      *
      * @return boolean
      */
-    function isFullFilled()
+    function isFulfilled()
     {
         return ($this->getUsername() !== null) ? true : false;
     }

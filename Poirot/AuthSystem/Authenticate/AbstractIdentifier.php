@@ -2,7 +2,7 @@
 namespace Poirot\AuthSystem\Authenticate;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\NotAuthenticatedException;
-use Poirot\AuthSystem\Authenticate\Identity\BaseIdentity;
+use Poirot\AuthSystem\Authenticate\Identity\FulfillmentIdentity;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Core\BuilderSetterTrait;
@@ -63,7 +63,7 @@ abstract class AbstractIdentifier implements iIdentifier
         if (!$this->identity)
             $this->identity = $this->getDefaultIdentity();
 
-        if($this->identity->isFullFilled())
+        if($this->identity->isFulfilled())
             return $this->identity;
 
 
@@ -134,7 +134,7 @@ abstract class AbstractIdentifier implements iIdentifier
     function getDefaultIdentity()
     {
         if (!$this->defaultIdentity)
-            $this->defaultIdentity = new BaseIdentity;
+            $this->defaultIdentity = new FulfillmentIdentity;
 
         return $this->defaultIdentity;
     }

@@ -62,11 +62,11 @@ abstract class AbstractAuthenticator extends BuilderSetter
             $this->credential()->from($credential);
 
         $identity = $this->doAuthenticate();
-        if (!$identity instanceof iIdentity && !$identity->isFullFilled())
+        if (!$identity instanceof iIdentity && !$identity->isFulfilled())
             throw new AuthenticationException('user authentication failure.');
 
         $this->identifier()->identity()->from($identity);
-        if (!$this->identifier()->identity()->isFullFilled())
+        if (!$this->identifier()->identity()->isFulfilled())
             throw new \Exception(
                 'User Authenticated Successfully But Identifier Identity Not'
                 .' FullFilled Satisfy with That Result.'
@@ -105,7 +105,7 @@ abstract class AbstractAuthenticator extends BuilderSetter
      */
     function hasAuthenticated()
     {
-        return $this->identifier()->identity()->isFullFilled();
+        return $this->identifier()->identity()->isFulfilled();
     }
 
     /**

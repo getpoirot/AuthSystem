@@ -19,11 +19,9 @@ interface iIdentity extends iOptionImplement
      * - full filled mean that all needed data
      *   set for this identity.
      *
-     *   ! it's usually is enough to have uid
-     *
      * @return boolean
      */
-    function isFullFilled();
+    function isFulfilled();
 
     /**
      * Clean Identity Data
