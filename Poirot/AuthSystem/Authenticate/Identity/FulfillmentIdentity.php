@@ -11,6 +11,12 @@ new Authenticator(['identity' => new FulfillmentIdentity(['fulfillment_by' => 'u
 
 class FulfillmentIdentity extends AbstractIdentity
 {
+    protected $_t_options__internal = [
+        // this method will ignore as option in prop
+        'getFulfillmentBy',
+        'isFulfilled',
+    ];
+
     /** @var string 'property_underscore_format' */
     protected $__fulfillment_property;
 
