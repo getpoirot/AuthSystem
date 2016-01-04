@@ -1,7 +1,8 @@
 <?php
 
-namespace Poirot\AuthSystem\Authenticate;
+namespace Poirot\AuthSystem\Authenticate\Identifier;
 
+use Poirot\AuthSystem\Authenticate\AbstractIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Storage\Gateway\SessionData;
 
