@@ -1,10 +1,12 @@
 <?php
-namespace Poirot\AuthSystem\Authenticate\Interfaces;
+namespace Poirot\AuthSystem\Authenticate\Interfaces\HttpMessageAware;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
-use Poirot\Core\Interfaces\iDataSetConveyor;
+use Poirot\Http\Interfaces\Message\iHttpRequest;
+use Poirot\Http\Interfaces\Respec\iRequestAware;
 
-Interface iAuthenticator
+interface iAuthenticator extends \Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator
+    , iRequestAware
 {
     /**
      * Authenticate
@@ -16,24 +18,13 @@ Interface iAuthenticator
      * note: after successful authentication, you must call
      *       login() outside of method to store identified user
      *
-     * @param iCredential|iDataSetConveyor|array $credential
+     * @param iHttpRequest $request
      *
      * @throws AuthenticationException Or extend of this
+     * @throws \Exception request invalid or etc.
      * @return iIdentifier
      */
-    function authenticate($credential = null);
-
-    /**
-     * Has Authenticated And Identifier Exists
-     *
-     * - it mean that Identifier has full filled identity
-     *
-     * note: this allow to register this authenticator as a service
-     *       to retrieve authenticate information
-     *
-     * @return boolean
-     */
-    function hasAuthenticated();
+    function authenticate(/* iHttpRequest */ $request = null);
 
     /**
      * Get Authenticated User Identifier

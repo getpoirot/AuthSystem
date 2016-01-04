@@ -1,12 +1,11 @@
 <?php
-
 namespace Poirot\AuthSystem\Authenticate\Identifier;
 
 use Poirot\AuthSystem\Authenticate\AbstractIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Storage\Gateway\SessionData;
 
-class PhpHttpIdentifier extends AbstractIdentifier
+class GeneralSessionIdentifier extends AbstractIdentifier
 {
     protected $_session;
     protected $_cookie;

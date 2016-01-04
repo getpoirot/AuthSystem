@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\AuthSystem\Authenticate\Adapter;
+namespace Poirot\AuthSystem\Authenticate\Authenticator\Adapter;
 
 use Poirot\AuthSystem\Authenticate\Credential\UserPassCredential;
 use Poirot\AuthSystem\Authenticate\Exceptions\WrongCredentialException;

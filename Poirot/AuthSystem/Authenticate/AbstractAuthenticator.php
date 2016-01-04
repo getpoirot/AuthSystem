@@ -1,27 +1,28 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate;
 
+use Poirot\AuthSystem\Authenticate\Authenticator\Adapter\DigestAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
-use Poirot\AuthSystem\Authenticate\Identifier\PhpHttpIdentifier;
-use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
+use Poirot\AuthSystem\Authenticate\Interfaces\HttpMessageAware\iIdentifier as HttpMessageIdentifier;
+use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
+use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Core\AbstractOptions;
 use Poirot\Core\BuilderSetter;
-use Poirot\Core\Interfaces\iDataSetConveyor;
 
 abstract class AbstractAuthenticator extends BuilderSetter
     implements iAuthenticator
 {
-    /** @var iCredential */
-    protected $credential;
+    /** @var iAuthAdapter Credential Authenticate Match Adapter (check usr/pas) */
+    protected $adapter;
 
-    /** @var iIdentifier */
+    /** @var iIdentifier|HttpMessageIdentifier */
     protected $identifier;
 
     // options:
-    /** @var iIdentifier */
+    /** @var iIdentifier|HttpMessageIdentifier */
     protected $default_identifier;
 
 
@@ -52,17 +53,15 @@ abstract class AbstractAuthenticator extends BuilderSetter
      * note: after successful authentication, you must call
      *       login() outside of method to store identified user
      *
-     * @param iCredential|iDataSetConveyor|array $credential
+     * @param mixed $credential \
+     * Credential can be extracted from this
      *
      * @throws AuthenticationException|\Exception Or extend of this
-     * @return iIdentifier
+     * @return iIdentifier|HttpMessageIdentifier
      */
     function authenticate($credential = null)
     {
-        if ($credential !== null)
-            $this->credential()->from($credential);
-
-        $identity = $this->doAuthenticate();
+        $identity = $this->doAuthenticate($credential);
         if (!$identity instanceof iIdentity && !$identity->isFulfilled())
             throw new AuthenticationException('user authentication failure.');
 
@@ -80,19 +79,20 @@ abstract class AbstractAuthenticator extends BuilderSetter
      * Authenticate user with Credential Data and return
      * FullFilled Identity Instance
      *
+     * @param iCredential|mixed $credential \
+     * Credential can be extracted from this
+     *
      * @throws AuthenticationException Or extend of this
      * @return iIdentity|void
      */
-    abstract protected function doAuthenticate();
+    protected function doAuthenticate($credential = null)
+    {
+        // do credential extraction on extended
+        // ...
 
-    /**
-     * Get Instance of credential Object
-     *
-     * @param null|array|AbstractOptions $options Builder Options
-     *
-     * @return iCredential
-     */
-    abstract function newCredential($options = null);
+        $identity = $this->getAdapter()->doIdentityMatch($credential);
+        return $identity;
+    }
 
     /**
      * Has Authenticated And Identifier Exists
@@ -115,7 +115,7 @@ abstract class AbstractAuthenticator extends BuilderSetter
      * note: this allow to register this authenticator as a service
      *       to retrieve authenticate information
      *
-     * @return iIdentifier
+     * @return iIdentifier|HttpMessageIdentifier
      */
     function identifier()
     {
@@ -129,9 +129,36 @@ abstract class AbstractAuthenticator extends BuilderSetter
     // Options:
 
     /**
+     * Set Authentication Adapter
+     *
+     * @param iAuthAdapter $adapter
+     *
+     * @return $this
+     */
+    function setAdapter(iAuthAdapter $adapter)
+    {
+        $this->adapter = $adapter;
+        return $this;
+    }
+
+    /**
+     * Get Authentication Adapter
+     *
+     * @return iAuthAdapter
+     */
+    function getAdapter()
+    {
+        if (!$this->adapter)
+            $this->adapter = new DigestAuthAdapter;
+
+        $this->adapter->setRealm($this->identifier()->getRealm());
+        return $this->adapter;
+    }
+
+    /**
      * Set Default Identifier Instance
      *
-     * @param iIdentifier $identifier
+     * @param iIdentifier|HttpMessageIdentifier $identifier
      *
      * @return $this
      */
@@ -144,15 +171,9 @@ abstract class AbstractAuthenticator extends BuilderSetter
     /**
      * Get Default Identifier Instance
      *
-     * @return iIdentifier|PhpHttpIdentifier
+     * @return iIdentifier|HttpMessageIdentifier
      */
-    function getDefaultIdentifier()
-    {
-        if (!$this->default_identifier)
-            $this->setDefaultIdentifier(new PhpHttpIdentifier);
-
-        return $this->default_identifier;
-    }
+    abstract function getDefaultIdentifier();
 
     /**
      * Helper To Set Default Identity
@@ -163,44 +184,5 @@ abstract class AbstractAuthenticator extends BuilderSetter
     {
         $this->identifier()->setIdentity($identity);
         return $this;
-    }
-
-    // ...
-
-    /**
-     * Credential instance
-     *
-     * [code:]
-     * // when options is passed it must init current credential and return
-     * // self instead of credential
-     *
-     * $auth->credential([
-     *   'username' => 'payam'
-     *   , 'password' => '123456'
-     *  ])->authenticate()
-     * [code]
-     *
-     * - it`s contains credential fields used by
-     *   authorize() to authorize user.
-     *   maybe, user/pass or ip address in some case
-     *   that we want auth. user by ip
-     *
-     * - it may be vary from within different Authorize
-     *   services
-     *
-     * @param null|array $options
-     * @return $this|iCredential
-     */
-    function credential($options = null)
-    {
-        if (!$this->credential)
-            $this->credential = $this->newCredential();
-
-        if ($options !== null) {
-            $this->credential->from($options);
-            return $this;
-        }
-
-        return $this->credential;
     }
 }

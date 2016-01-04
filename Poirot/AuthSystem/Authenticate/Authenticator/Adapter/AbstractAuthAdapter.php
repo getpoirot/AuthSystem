@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\AuthSystem\Authenticate\Adapter;
+namespace Poirot\AuthSystem\Authenticate\Authenticator\Adapter;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;

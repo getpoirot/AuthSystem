@@ -1,10 +1,14 @@
 <?php
-namespace Poirot\AuthSystem\Authenticate;
+namespace Poirot\AuthSystem\Authenticate\Authenticator;
 
-use Poirot\AuthSystem\Authenticate\Adapter\DigestAuthAdapter;
+use Poirot\AuthSystem\Authenticate\AbstractAuthenticator;
+use Poirot\AuthSystem\Authenticate\Authenticator\Adapter\DigestAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
+use Poirot\AuthSystem\Authenticate\Identifier\GeneralSessionIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
+use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
+use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\AuthSystem\Credential\OpenCredential;
 use Poirot\Core\AbstractOptions;
@@ -57,61 +61,48 @@ echo "<h1>Hello User {$auth->identifier()->identity()->getUsername()}</h1>";
 die('>_');
 */
 
-class Authenticator extends AbstractAuthenticator
+class GeneralAuth extends AbstractAuthenticator
+    implements iAuthenticator
 {
-    /** @var iAuthAdapter */
-    protected $adapter;
+    /** @var iCredential */
+    protected $credential;
 
     /**
-     * Authenticate user with Credential Data and return
-     * FullFilled Identity Instance
+     * Get Default Identifier Instance
      *
-     * @throws AuthenticationException Or extend of this
-     * @return iIdentity|void
+     * @return iIdentifier|GeneralSessionIdentifier
      */
-    protected function doAuthenticate()
+    function getDefaultIdentifier()
     {
-        $identity = $this->getAdapter()->doIdentityMatch($this->credential());
+        if (!$this->default_identifier)
+            $this->setDefaultIdentifier(new GeneralSessionIdentifier);
 
-        return $identity;
-    }
-
-
-    // Options:
-
-    /**
-     * Set Authentication Adapter
-     *
-     * @param iAuthAdapter $adapter
-     *
-     * @return $this
-     */
-    function setAdapter(iAuthAdapter $adapter)
-    {
-        $this->adapter = $adapter;
-        return $this;
+        return $this->default_identifier;
     }
 
     /**
-     * Get Authentication Adapter
+     * Credential instance
      *
-     * @return iAuthAdapter
-     */
-    function getAdapter()
-    {
-        if (!$this->adapter)
-            $this->adapter = new DigestAuthAdapter;
-
-        $this->adapter->setRealm($this->identifier()->getRealm());
-        return $this->adapter;
-    }
-
-
-    // ...
-
-    /**
-     * @inheritdoc
-     * @return OpenCredential|$this
+     * [code:]
+     * // when options is passed it must init current credential and return
+     * // self instead of credential
+     *
+     * $auth->credential([
+     *   'username' => 'payam'
+     *   , 'password' => '123456'
+     *  ])->authenticate()
+     * [code]
+     *
+     * - it`s contains credential fields used by
+     *   authorize() to authorize user.
+     *   maybe, user/pass or ip address in some case
+     *   that we want auth. user by ip
+     *
+     * - it may be vary from within different Authorize
+     *   services
+     *
+     * @param null|array $options
+     * @return $this|OpenCredential|iCredential
      */
     function credential($options = null)
     {
