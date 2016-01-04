@@ -36,11 +36,8 @@ class PhpHttpIdentifier extends AbstractIdentifier
      */
     function attainSignedIdentity()
     {
-        $defaultIdentity = $this->getDefaultIdentity();
-        if ($this->__session()->has(self::STORAGE_IDENTITY_KEY))
-            $defaultIdentity->from($this->__session()->get(self::STORAGE_IDENTITY_KEY));
-
-        return $defaultIdentity;
+        $identity = $this->__session()->get(self::STORAGE_IDENTITY_KEY);
+        return $identity;
     }
 
     /**
@@ -55,8 +52,8 @@ class PhpHttpIdentifier extends AbstractIdentifier
      */
     function signOut()
     {
-        $this->identity()->clean();
         $this->__session()->destroy();
+        $this->identity()->clean();
     }
 
     /**

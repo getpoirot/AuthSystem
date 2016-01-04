@@ -18,10 +18,15 @@ class UserData implements iIdentityDataProvider
      #
     function findBy($property, $value)
     {
-        return new Entity([
-            'email' => 'naderi.payam@gmail.com',
-            'phone' => '+989354323345'
-        ]);
+        $entity = new Entity;
+        if ($property == 'username' && $value == 'admin')
+            ## find by user name
+            $entity->from([
+                'email' => 'naderi.payam@gmail.com',
+                'phone' => '+989354323345'
+            ]);
+
+        return $entity;
     }
 }
 
@@ -74,6 +79,7 @@ class LazyFulfillmentIdentity extends FulfillmentIdentity
     {
         foreach($this->props()->writable as $p) {
             if ($p == 'data_provider')
+                ## we don`t want to clean setter properties
                 continue;
 
             $this->__unset($p);
@@ -147,11 +153,13 @@ class LazyFulfillmentIdentity extends FulfillmentIdentity
 
     protected function __isDataLoaded()
     {
-        return ($this->_c__loaded_data !== null) ? true : false;
+        return ($this->_c__loaded_data) ? true : false;
     }
+
 
     function __wakeup()
     {
+        ## load data again into memory
         $this->_c__loaded_data = false;
     }
 }
