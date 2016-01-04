@@ -36,8 +36,8 @@ abstract class AbstractAuthenticator extends BuilderSetter
      *
      */
     protected $__setup_array_priority = [
-        'default_identifier',
-        'identity'
+        'default_identifier', ## first set identifier
+        'identity'            ## then inject default identity
     ];
 
 
