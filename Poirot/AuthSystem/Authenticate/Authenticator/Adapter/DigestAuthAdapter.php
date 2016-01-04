@@ -24,14 +24,14 @@ class DigestAuthAdapter extends AbstractAuthAdapter
     {
         ErrorStack::handleError(E_WARNING);
         $hFile = fopen($this->getFilename(), 'r');
-        $error      = ErrorStack::handleDone();
+        $error = ErrorStack::handleDone();
         if ($hFile === false)
             throw new \RuntimeException("Cannot open '{$this->getFilename()}' for reading", 0, $error);
 
 
         /** @var string $username */
         /** @var string $password */
-        extract($this->credential()->toArray());
+        extract($credential->toArray());
         $realm = $this->getRealm();
 
         $id       = "$username:$realm";
@@ -57,7 +57,7 @@ class DigestAuthAdapter extends AbstractAuthAdapter
     /**
      * @return iCredential
      */
-    protected function newCredential()
+    static function newCredential()
     {
         return new UserPassCredential;
     }
@@ -66,21 +66,23 @@ class DigestAuthAdapter extends AbstractAuthAdapter
     // Options:
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getFilename()
     {
         if (!$this->filename)
-            $this->filename = realpath(__DIR__.'/../../data/users.pws');
+            $this->filename = realpath(__DIR__.'/../../../data/users.pws');
 
         return $this->filename;
     }
 
     /**
-     * @param mixed $filename
+     * @param string $filename
+     * @return $this
      */
     public function setFilename($filename)
     {
         $this->filename = $filename;
+        return $this;
     }
 }

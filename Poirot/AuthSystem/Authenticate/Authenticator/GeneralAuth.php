@@ -12,6 +12,7 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\AuthSystem\Credential\OpenCredential;
 use Poirot\Core\AbstractOptions;
+use Poirot\Core\Interfaces\iDataSetConveyor;
 
 /*
 $auth       = new Authenticator(['identity' => new UsernameIdentity]);
@@ -68,6 +69,24 @@ class GeneralAuth extends AbstractAuthenticator
     protected $credential;
 
     /**
+     * Authenticate user with Credential Data and return
+     * FullFilled Identity Instance
+     *
+     * @param iCredential|iDataSetConveyor|array $credential \
+     * Credential can be extracted from this
+     *
+     * @throws AuthenticationException Or extend of this
+     * @return iIdentity|void
+     */
+    protected function doAuthenticate($credential = null)
+    {
+        if (!$credential instanceof iCredential && $credential !== null)
+            $credential = $this->getAdapter()->newCredential()->from($credential);
+
+        return parent::doAuthenticate($credential);
+    }
+
+    /**
      * Get Default Identifier Instance
      *
      * @return iIdentifier|GeneralSessionIdentifier
@@ -78,52 +97,5 @@ class GeneralAuth extends AbstractAuthenticator
             $this->setDefaultIdentifier(new GeneralSessionIdentifier);
 
         return $this->default_identifier;
-    }
-
-    /**
-     * Credential instance
-     *
-     * [code:]
-     * // when options is passed it must init current credential and return
-     * // self instead of credential
-     *
-     * $auth->credential([
-     *   'username' => 'payam'
-     *   , 'password' => '123456'
-     *  ])->authenticate()
-     * [code]
-     *
-     * - it`s contains credential fields used by
-     *   authorize() to authorize user.
-     *   maybe, user/pass or ip address in some case
-     *   that we want auth. user by ip
-     *
-     * - it may be vary from within different Authorize
-     *   services
-     *
-     * @param null|array $options
-     * @return $this|OpenCredential|iCredential
-     */
-    function credential($options = null)
-    {
-        $credential = $this->getAdapter()->credential($options);
-        return ($credential instanceof iAuthAdapter) ? $this : $credential;
-    }
-
-    /**
-     * Get Instance of credential Object
-     *
-     * @param null|array|AbstractOptions $options Builder Options
-     *
-     * @return iCredential
-     */
-    function newCredential($options = null)
-    {
-        $credential = new OpenCredential;
-
-        if ($options !== null)
-            $credential->from($options);
-
-        return $credential;
     }
 }

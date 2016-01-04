@@ -19,45 +19,10 @@ abstract class AbstractAuthAdapter extends AbstractOptions
      * @param iCredential $credential
      *
      * @throws AuthenticationException
+     * @throws \Exception credential or etc.
      * @return iIdentity
      */
     abstract function doIdentityMatch($credential);
-
-    /**
-     * Credential Instance
-     *
-     * @param iCredential|array|null $options
-     *
-     * @return iCredential|$this
-     */
-    function credential($options = null)
-    {
-        if (!$this->credential)
-            $this->credential = $this->newCredential();
-
-        if ($options !== null) {
-            $this->credential->from($options);
-            return $this;
-        }
-
-        return $this->credential;
-    }
-
-    /**
-     * @return iCredential
-     */
-    abstract protected function newCredential();
-
-    /**
-     * Set Credential
-     * @param iCredential|array $options
-     * @return $this
-     */
-    function setCredential($options)
-    {
-        $this->credential($options);
-        return $this;
-    }
 
     /**
      * Set Realm

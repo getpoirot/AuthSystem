@@ -12,28 +12,19 @@ interface iAuthAdapter extends iOptionImplement
      * @param iCredential $credential
      *
      * @throws AuthenticationException
+     * @throws \Exception credential or etc.
      * @return iIdentity
      */
     function doIdentityMatch($credential);
 
     /**
-     * Credential Instance
+     * Credential
      *
-     * @param iCredential|array|null $options
-     *
-     * @return iCredential|$this
+     * @return iCredential
      */
-    function credential($options = null);
-
+    static function newCredential();
 
     // Options:
-
-    /**
-     * Set Credential
-     * @param iCredential|array $options
-     * @return $this
-     */
-    function setCredential($options);
 
     /**
      * Set Realm
