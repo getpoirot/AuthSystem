@@ -2,7 +2,6 @@
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
 use Poirot\Core\AbstractOptions;
-use Poirot\Core\Interfaces\iPoirotOptions;
 
 /**
  * Credential used by authenticator to authenticate user
@@ -24,7 +23,7 @@ use Poirot\Core\Interfaces\iPoirotOptions;
  * [code]
  */
 
-interface iCredential extends iPoirotOptions
+interface iCredential extends iIdentity
 {
 
 }

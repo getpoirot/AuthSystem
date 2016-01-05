@@ -18,10 +18,14 @@ class DigestAuthAdapter extends AbstractAuthAdapter
      * @param iCredential $credential
      *
      * @throws WrongCredentialException
+     * @throws \Exception Credential not fulfill
      * @return iIdentity
      */
     function doIdentityMatch($credential)
     {
+        if (!$credential->isFulfilled())
+            throw new \Exception(sprintf('Credential (%s) is not Fulfilled.', get_class($credential)));
+
         ErrorStack::handleError(E_WARNING);
         $hFile = fopen($this->getFilename(), 'r');
         $error = ErrorStack::handleDone();

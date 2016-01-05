@@ -25,14 +25,4 @@ interface iAuthenticator extends \Poirot\AuthSystem\Authenticate\Interfaces\iAut
      * @return iIdentifier
      */
     function authenticate(/* iHttpRequest */ $request = null);
-
-    /**
-     * Get Authenticated User Identifier
-     *
-     * note: this allow to register this authenticator as a service
-     *       to retrieve authenticate information
-     *
-     * @return iIdentifier
-     */
-    function identifier();
 }

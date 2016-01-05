@@ -9,7 +9,7 @@ interface iAuthAdapter extends iOptionImplement
     /**
      * Get Identity Match By Identity
      *
-     * @param iCredential $credential
+     * @param iCredential $credential Fulfilled Credential
      *
      * @throws AuthenticationException
      * @throws \Exception credential or etc.
@@ -23,6 +23,7 @@ interface iAuthAdapter extends iOptionImplement
      * @return iCredential
      */
     static function newCredential();
+
 
     // Options:
 

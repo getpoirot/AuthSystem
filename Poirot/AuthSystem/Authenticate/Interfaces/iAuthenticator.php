@@ -4,7 +4,7 @@ namespace Poirot\AuthSystem\Authenticate\Interfaces;
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
 use Poirot\Core\Interfaces\iDataSetConveyor;
 
-Interface iAuthenticator
+Interface iAuthenticator extends iIdentifier
 {
     /**
      * Authenticate
@@ -34,14 +34,4 @@ Interface iAuthenticator
      * @return boolean
      */
     function hasAuthenticated();
-
-    /**
-     * Get Authenticated User Identifier
-     *
-     * note: this allow to register this authenticator as a service
-     *       to retrieve authenticate information
-     *
-     * @return iIdentifier
-     */
-    function identifier();
 }

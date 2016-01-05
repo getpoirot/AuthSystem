@@ -1,6 +1,6 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
-use Poirot\Core\Interfaces\iOptionImplement;
+use Poirot\Core\Interfaces\iPoirotOptions;
 
 /**
  * Represent User Identity and Data
@@ -11,7 +11,7 @@ use Poirot\Core\Interfaces\iOptionImplement;
  * [code]
  *
  */
-interface iIdentity extends iOptionImplement
+interface iIdentity extends iPoirotOptions
 {
     /**
      * Is Identity Full Filled

@@ -10,38 +10,12 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Core\AbstractOptions;
-use Poirot\Core\BuilderSetter;
 
-abstract class AbstractAuthenticator extends BuilderSetter
+abstract class AbstractAuthenticator extends AbstractIdentifier
     implements iAuthenticator
 {
     /** @var iAuthAdapter Credential Authenticate Match Adapter (check usr/pas) */
     protected $adapter;
-
-    /** @var iIdentifier|HttpMessageIdentifier */
-    protected $identifier;
-
-    // options:
-    /** @var iIdentifier|HttpMessageIdentifier */
-    protected $default_identifier;
-
-
-    /**
-     * @var array List Setters By Priority
-     * [
-     *  'service_config',
-     *  'listeners',
-     *  // ...
-     * ]
-     *
-     * application calls setter methods from top ...
-     *
-     */
-    protected $__setup_array_priority = [
-        'default_identifier', ## first set identifier
-        'identity'            ## then inject default identity
-    ];
-
 
     /**
      * Authenticate
@@ -65,14 +39,14 @@ abstract class AbstractAuthenticator extends BuilderSetter
         if (!$identity instanceof iIdentity && !$identity->isFulfilled())
             throw new AuthenticationException('user authentication failure.');
 
-        $this->identifier()->identity()->from($identity);
-        if (!$this->identifier()->identity()->isFulfilled())
+        $this->identity()->from($identity);
+        if (!$this->identity()->isFulfilled())
             throw new \Exception(
                 'User Authenticated Successfully But Identifier Identity Not'
                 .' FullFilled Satisfy with That Result.'
             );
 
-        return $this->identifier();
+        return $this;
     }
 
     /**
@@ -106,23 +80,7 @@ abstract class AbstractAuthenticator extends BuilderSetter
      */
     function hasAuthenticated()
     {
-        return $this->identifier()->identity()->isFulfilled();
-    }
-
-    /**
-     * Get Authenticated User Identifier
-     *
-     * note: this allow to register this authenticator as a service
-     *       to retrieve authenticate information
-     *
-     * @return iIdentifier|HttpMessageIdentifier
-     */
-    function identifier()
-    {
-        if (!$this->identifier)
-            $this->identifier = $this->getDefaultIdentifier();
-
-        return $this->identifier;
+        return $this->identity()->isFulfilled();
     }
 
 
@@ -151,38 +109,7 @@ abstract class AbstractAuthenticator extends BuilderSetter
         if (!$this->adapter)
             $this->adapter = new DigestAuthAdapter;
 
-        $this->adapter->setRealm($this->identifier()->getRealm());
+        $this->adapter->setRealm($this->getRealm());
         return $this->adapter;
-    }
-
-    /**
-     * Set Default Identifier Instance
-     *
-     * @param iIdentifier|HttpMessageIdentifier $identifier
-     *
-     * @return $this
-     */
-    function setDefaultIdentifier(iIdentifier $identifier)
-    {
-        $this->default_identifier = $identifier;
-        return $this;
-    }
-
-    /**
-     * Get Default Identifier Instance
-     *
-     * @return iIdentifier|HttpMessageIdentifier
-     */
-    abstract function getDefaultIdentifier();
-
-    /**
-     * Helper To Set Default Identity
-     * @param iIdentity $identity
-     * @return $this
-     */
-    function setIdentity(iIdentity $identity)
-    {
-        $this->identifier()->setIdentity($identity);
-        return $this;
     }
 }
