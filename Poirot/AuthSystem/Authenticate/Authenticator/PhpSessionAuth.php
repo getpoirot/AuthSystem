@@ -58,7 +58,7 @@ echo "<h1>Hello User {$auth->identifier()->identity()->getUsername()}</h1>";
 die('>_');
 */
 
-class GeneralAuth extends AbstractAuthenticator
+class PhpSessionAuth extends AbstractAuthenticator
     implements iAuthenticator
 {
     protected $_session;

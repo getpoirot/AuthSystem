@@ -13,12 +13,18 @@ Interface iAuthenticator extends iIdentifier
      * - login into identifier with iIdentity set from recognized
      *   user data
      *
+     * - it can be used to force user for login on each page that
+     *   need access control
+     *   ie. $auth->authenticate()
+     *   if it has authenticated and not new credential passed as
+     *   argument it will return and do nothing
+     *
      * note: after successful authentication, you must call
      *       login() outside of method to store identified user
      *
      * @param iCredential|iDataSetConveyor|array $credential
      *
-     * @throws AuthenticationException Or extend of this
+     * @throws AuthenticationException|\Exception Or extend of this
      * @return iIdentifier
      */
     function authenticate($credential = null);

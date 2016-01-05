@@ -17,12 +17,20 @@ abstract class AbstractAuthenticator extends AbstractIdentifier
     /** @var iAuthAdapter Credential Authenticate Match Adapter (check usr/pas) */
     protected $adapter;
 
+    protected $_c__credential;
+
     /**
      * Authenticate
      *
      * - authenticate user using credential
      * - login into identifier with iIdentity set from recognized
      *   user data
+     *
+     * - it can be used to force user for login on each page that
+     *   need access control
+     *   ie. $auth->authenticate()
+     *   if it has authenticated and not new credential passed as
+     *   argument it will return and do nothing
      *
      * note: after successful authentication, you must call
      *       login() outside of method to store identified user
@@ -35,6 +43,10 @@ abstract class AbstractAuthenticator extends AbstractIdentifier
      */
     function authenticate($credential = null)
     {
+        if ($this->hasAuthenticated() && ($this->_c__credential !== null && $credential === $this->_c__credential))
+            ## authenticated and nothing changes
+            return $this;
+
         $identity = $this->doAuthenticate($credential);
         if (!$identity instanceof iIdentity && !$identity->isFulfilled())
             throw new AuthenticationException('user authentication failure.');
@@ -46,6 +58,7 @@ abstract class AbstractAuthenticator extends AbstractIdentifier
                 .' FullFilled Satisfy with That Result.'
             );
 
+        $this->_c__credential = $credential;
         return $this;
     }
 
