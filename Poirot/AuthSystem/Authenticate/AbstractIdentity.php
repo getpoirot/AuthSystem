@@ -7,6 +7,10 @@ use Poirot\Core\OpenOptions;
 abstract class AbstractIdentity extends OpenOptions
     implements iIdentity
 {
+    protected $_t_options__internal = [
+        'isFulfilled',
+    ];
+
     /**
      * Is Identity Full Filled
      *

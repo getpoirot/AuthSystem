@@ -17,6 +17,8 @@ class OpenIdentity extends AbstractIdentity
      */
     function isFulfilled()
     {
-        return true;
+        ## it's fulfilled if has properties
+        $arr = $this->toArray();
+        return !empty($arr);
     }
 }
