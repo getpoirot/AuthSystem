@@ -11,6 +11,54 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Core\AbstractOptions;
 
+/*
+$auth       = new Authenticator(['identity' => new UsernameIdentity]);
+
+$request = new HttpRequest(new PhpServerRequestBuilder());
+if ($request->plg()->methodType()->isPost()) {
+    try {
+        $POST       = $request->plg()->phpServer()->getPost();
+        $credential = [
+            'username' => $POST->get('email'),
+            'password' => $POST->get('password'),
+        ];
+
+        ## if authenticate successfully user data available
+        ## and authenticated through Identifier
+        $identity = $auth->authenticate($credential);
+        $identity->signIn();
+        header('Location: /');
+        die();
+    } catch (WrongCredentialException $e) {
+        throw new \Exception('Invalid Username or Password.');
+    } catch (UserNotFoundException $e) {
+        throw new \Exception('Invalid Username or Password.');
+    } catch (AuthenticationException $e)
+    {
+        throw $e;
+    }
+}
+
+if (!$auth->hasAuthenticated())
+{
+    echo <<<HTML
+        <form method="post" action="" enctype="application/x-www-form-urlencoded">
+             <input type="text" name="email">
+             <input type="password" name="password">
+
+             <input type="submit" value="send">
+        </form>
+HTML;
+
+    die('> Please Login');
+}
+
+
+echo "<h1>Hello User {$auth->identifier()->identity()->getUsername()}</h1>";
+
+die('>_');
+*/
+
 abstract class AbstractAuthenticator extends AbstractIdentifier
     implements iAuthenticator
 {
@@ -76,6 +124,9 @@ abstract class AbstractAuthenticator extends AbstractIdentifier
     {
         // do credential extraction on extended
         // ...
+
+        if (!$credential instanceof iCredential)
+            throw new \InvalidArgumentException(sprintf('%s Credential can`t be empty.'), get_class($this));
 
         $identity = $this->getAdapter()->doIdentityMatch($credential);
         return $identity;

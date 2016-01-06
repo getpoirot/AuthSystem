@@ -2,6 +2,7 @@
 namespace Poirot\AuthSystem\Authenticate\Authenticator\Adapter;
 
 use Poirot\AuthSystem\Authenticate\Credential\UserPassCredential;
+use Poirot\AuthSystem\Authenticate\Exceptions\MissingCredentialException;
 use Poirot\AuthSystem\Authenticate\Exceptions\WrongCredentialException;
 use Poirot\AuthSystem\Authenticate\Identity\UsernameIdentity;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
@@ -36,6 +37,11 @@ class DigestAuthAdapter extends AbstractAuthAdapter
         /** @var string $username */
         /** @var string $password */
         extract($credential->toArray());
+        if (!isset($username) || !isset($password))
+            throw new MissingCredentialException(sprintf(
+                'Credential (%s) not contains Username or Password.', get_class($credential)
+            ));
+
         $realm = $this->getRealm();
 
         $id       = "$username:$realm";

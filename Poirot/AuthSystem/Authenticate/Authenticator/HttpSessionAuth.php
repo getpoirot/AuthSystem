@@ -1,49 +1,39 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Authenticator;
 
-use Poirot\AuthSystem\Authenticate\AbstractAuthenticator;
+use Poirot\AuthSystem\Authenticate\AbstractHttpAuthenticator;
+use Poirot\AuthSystem\Authenticate\Credential\UserPassCredential;
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
-use Poirot\AuthSystem\Authenticate\Interfaces\HttpMessageAware\iAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\Http\Interfaces\Message\iHttpRequest;
+use Poirot\Http\Message\HttpRequest;
 
-class HttpSessionAuth extends AbstractAuthenticator
-    implements iAuthenticator
+class HttpSessionAuth extends AbstractHttpAuthenticator
 {
-    /** @var iHttpRequest */
-    protected $request;
-
     /**
-     * Authenticate user with Credential Data and return
-     * FullFilled Identity Instance
+     * Do Extract Credential From Request Object
+     * ie. post form data or token
      *
-     * @param iCredential|mixed $credential \
-     * Credential can be extracted from this
+     * @param HttpRequest $request
      *
-     * @throws AuthenticationException Or extend of this
-     * @return iIdentity|void
+     * @throws AuthenticationException if auth credential not available
+     *         it cause user get authorize require response
+     *
+     * @return iCredential
      */
-    protected function doAuthenticate($credential = null)
+    function doExtractCredentialFromRequest(HttpRequest $request)
     {
-        // do credential extraction on extended
-        // ...
+        if ($request->plg()->methodType()->isPost()) {
+            $POST       = $request->plg()->phpServer()->getPost();
+            $credential = new UserPassCredential([
+                'username' => $POST->get('email'),
+                'password' => $POST->get('password'),
+            ]);
 
-        $identity = $this->getAdapter()->doIdentityMatch($credential);
-        return $identity;
-    }
+            return $credential;
+        }
 
-    /**
-     * Set Request
-     *
-     * @param iHttpRequest $request
-     *
-     * @return $this
-     */
-    function setRequest(iHttpRequest $request)
-    {
-        $this->request = $request;
-        return $this;
+        $this->riseException(new AuthenticationException);
     }
 
     /**

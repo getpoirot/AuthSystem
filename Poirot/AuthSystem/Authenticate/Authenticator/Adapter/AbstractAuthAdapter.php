@@ -24,6 +24,9 @@ abstract class AbstractAuthAdapter extends AbstractOptions
      */
     abstract function doIdentityMatch($credential);
 
+
+    // ...
+
     /**
      * Set Realm
      * @param string $realm

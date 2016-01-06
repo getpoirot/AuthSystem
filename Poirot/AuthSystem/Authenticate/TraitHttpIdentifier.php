@@ -1,17 +1,16 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate;
 
-use Poirot\AuthSystem\Authenticate\Interfaces\HttpMessageAware\iIdentifier;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\Http\Interfaces\Message\iHttpResponse;
+use Poirot\Http\Message\HttpRequest;
 use Poirot\Http\Message\HttpResponse;
 
-abstract class AbstractHttpIdentifier extends AbstractIdentifier
-    implements iIdentifier
+trait TraitHttpIdentifier
 {
-    /** @var iHttpRequest */
+    /** @var HttpRequest */
     protected $request;
-    /** @var iHttpResponse */
+    /** @var HttpResponse */
     protected $response;
 
     /**
@@ -23,7 +22,7 @@ abstract class AbstractHttpIdentifier extends AbstractIdentifier
      */
     function setRequest(iHttpRequest $request)
     {
-        $this->request = $request;
+        $this->request = new HttpRequest($request);
         return $this;
     }
 
