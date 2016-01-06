@@ -1,10 +1,10 @@
 <?php
 namespace Poirot\AuthSystem\Credential;
 
+use Poirot\AuthSystem\Authenticate\Identity\OpenIdentity;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
-use Poirot\Core\OpenOptions;
 
-class OpenCredential extends OpenOptions
+class OpenCredential extends OpenIdentity
     implements iCredential
 {
 

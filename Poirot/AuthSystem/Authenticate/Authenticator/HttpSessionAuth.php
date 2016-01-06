@@ -2,40 +2,10 @@
 namespace Poirot\AuthSystem\Authenticate\Authenticator;
 
 use Poirot\AuthSystem\Authenticate\AbstractHttpAuthenticator;
-use Poirot\AuthSystem\Authenticate\Credential\UserPassCredential;
-use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
-use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\Http\Message\HttpRequest;
 
 class HttpSessionAuth extends AbstractHttpAuthenticator
 {
-    /**
-     * Do Extract Credential From Request Object
-     * ie. post form data or token
-     *
-     * @param HttpRequest $request
-     *
-     * @throws AuthenticationException if auth credential not available
-     *         it cause user get authorize require response
-     *
-     * @return iCredential
-     */
-    function doExtractCredentialFromRequest(HttpRequest $request)
-    {
-        if ($request->plg()->methodType()->isPost()) {
-            $POST       = $request->plg()->phpServer()->getPost();
-            $credential = new UserPassCredential([
-                'username' => $POST->get('email'),
-                'password' => $POST->get('password'),
-            ]);
-
-            return $credential;
-        }
-
-        $this->riseException(new AuthenticationException);
-    }
-
     /**
      * Attain Identity Object From Signed Sign
      * @see identity()

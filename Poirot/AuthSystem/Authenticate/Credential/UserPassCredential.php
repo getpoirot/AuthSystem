@@ -1,11 +1,13 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Credential;
 
-use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
+use Poirot\AuthSystem\Authenticate\Interfaces\iCredentialHttpAware;
 use Poirot\Core\AbstractOptions;
+use Poirot\Http\Interfaces\Message\iHttpRequest;
+use Poirot\Http\Message\HttpRequest;
 
 class UserPassCredential extends AbstractOptions
-    implements iCredential
+    implements iCredentialHttpAware
 {
     protected $username;
     protected $password;
@@ -68,5 +70,33 @@ class UserPassCredential extends AbstractOptions
     {
         $this->__unset('username');
         $this->__unset('password');
+    }
+
+    /**
+     * Set Options From Request Http Object
+     *
+     *  ie. extract user/pass from post data
+     *
+     * @param iHttpRequest $request
+     *
+     * @throws \Exception
+     * @return $this
+     */
+    function fromRequest(iHttpRequest $request)
+    {
+        if (!$request instanceof HttpRequest)
+            $request = new HttpRequest($request);
+
+        if (!$request->plg()->methodType()->isPost())
+            return $this;
+
+
+        $POST       = $request->plg()->phpServer()->getPost();
+        $credential = [
+            'username' => $POST->get('email'),
+            'password' => $POST->get('password'),
+        ];
+
+        $this->fromArray($credential);
     }
 }
