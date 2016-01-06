@@ -1,11 +1,12 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Authenticator;
 
-use Poirot\AuthSystem\Authenticate\AbstractHttpAuthenticator;
+use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
+use Poirot\Storage\Gateway\SessionData;
 
-class HttpSessionAuth extends AbstractHttpAuthenticator
+trait TraitSessionAuth
 {
-    use TraitSessionAuth;
+    protected $_session;
 
     /**
      * Login Authenticated User
@@ -25,6 +26,16 @@ class HttpSessionAuth extends AbstractHttpAuthenticator
 
         $this->__session()->set(self::STORAGE_IDENTITY_KEY , $identity);
         return $this;
+    }
+
+    /**
+     * Attain Identity Object From Signed Sign
+     * @return iIdentity
+     */
+    function attainSignedIdentity()
+    {
+        $identity = $this->__session()->get(self::STORAGE_IDENTITY_KEY);
+        return $identity;
     }
 
     /**
@@ -60,5 +71,20 @@ class HttpSessionAuth extends AbstractHttpAuthenticator
             return true;
 
         return false;
+    }
+
+
+    // ...
+
+    /**
+     * Get Session Storage
+     * @return SessionData
+     */
+    function __session()
+    {
+        if(!$this->_session)
+            $this->_session = new SessionData(['realm' => $this->getRealm()]);
+
+        return $this->_session;
     }
 }
