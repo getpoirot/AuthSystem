@@ -57,6 +57,7 @@ abstract class AbstractHttpAuthenticator extends AbstractAuthenticator
     function doExtractCredentialFromRequest(HttpRequest $request)
     {
         $credential = $this->getAdapter()->newCredential();
+
         if ($credential instanceof iCredentialHttpAware)
             $credential->fromRequest($request);
 

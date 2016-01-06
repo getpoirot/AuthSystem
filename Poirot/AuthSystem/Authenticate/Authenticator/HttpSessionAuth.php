@@ -8,12 +8,20 @@ use Poirot\Http\Util\cookie;
 use Poirot\Http\Util\UCookie;
 use Poirot\Storage\Gateway\SessionData;
 
+// TODO now client can send session id by manual
+// it's seems that we need to regenerate session id on
+// successful login and response it to client
+// after that user can recognized with this session in request
+
 class HttpSessionAuth extends AbstractHttpAuthenticator
 {
     use TraitSessionAuth{
         TraitSessionAuth::signIn  as protected _t__signIn;
         TraitSessionAuth::signOut as protected _t__signOut;
     }
+
+    /** @var string session id */
+    protected $__session_id;
 
     /**
      * Login Authenticated User
@@ -30,8 +38,9 @@ class HttpSessionAuth extends AbstractHttpAuthenticator
     {
         $this->response()->getHeaders()->set(HeaderFactory::factory(
             'Set-Cookie'
-            , 'PHPSESSID='.session_id()
-              .'; path="/" Expires: Thu, 19; Nov; 1981; 08:52:00; GMT'
+            , 'PHPSESSID='.$this->__getSessionID()
+              .'; path="/" '
+              .'Expires: '. date('DD-Mon-YYYY HH:MM:SS GMT', time() + 2628000) // 5 years
         ));
 
         $this->_t__signIn();
@@ -52,7 +61,7 @@ class HttpSessionAuth extends AbstractHttpAuthenticator
     {
         $this->response()->getHeaders()->set(HeaderFactory::factory(
             'Set-Cookie'
-            , 'PHPSESSID=deleted'.session_id()
+            , 'PHPSESSID=deleted'.$this->__getSessionID()
             .'; path="/" Expires: Thu, 01-Jan-1970; 00:00:01; Max-Age=0;'
         ));
 
@@ -97,6 +106,9 @@ class HttpSessionAuth extends AbstractHttpAuthenticator
 
     function __getSessionID()
     {
+        if ($this->__session_id)
+            return $this->__session_id;
+
         /** @var iHeader $h */
         foreach($this->request->getHeaders() as $h) {
             if (strtolower($h->label()) != 'cookie')
@@ -106,10 +118,14 @@ class HttpSessionAuth extends AbstractHttpAuthenticator
             /** @var cookie $cookie */
             foreach(UCookie::parseCookie($cookieVal) as $cookie) {
                 if ($cookie->name == 'PHPSESSID')
-                    session_id($cookie->value);
+                    return $cookie->value;
             }
         }
 
-        return session_id();
+        if (session_status() !== PHP_SESSION_ACTIVE)
+            session_start();
+
+        return $this->__session_id = session_id();
+
     }
 }

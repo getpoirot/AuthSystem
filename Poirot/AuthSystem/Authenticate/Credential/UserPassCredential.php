@@ -106,12 +106,10 @@ class UserPassCredential extends AbstractOptions
             return $this;
 
 
-        $POST       = $request->plg()->phpServer()->getPost();
-        $credential = [
-            'username' => $POST->get('email'),
-            'password' => $POST->get('password'),
-        ];
+        // TODO define post value map request
+        $POST = $request->plg()->phpServer()->getPost()->toArray();
+        $this->fromArray($POST);
 
-        $this->fromArray($credential);
+        return $this;
     }
 }
