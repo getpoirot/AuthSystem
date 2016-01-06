@@ -45,7 +45,7 @@ class FulfillmentIdentity extends AbstractIdentity
      */
     function isFulfilled()
     {
-        return ($this->__isset($this->__fulfillment_property) && $this->__get($this->__fulfillment_property))
+        return (self::__isset($this->__fulfillment_property) && self::__get($this->__fulfillment_property))
             ? true : false;
     }
 }

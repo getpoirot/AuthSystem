@@ -105,7 +105,7 @@ class LazyFulfillmentIdentity extends FulfillmentIdentity
      */
     function __get($key)
     {
-        if (!$this->__isDataLoaded())
+        if (!parent::__isset($key) && !$this->__isDataLoaded())
             $this->__loadData();
 
         return parent::__get($key);
@@ -133,10 +133,7 @@ class LazyFulfillmentIdentity extends FulfillmentIdentity
         $this->_c__loaded_data = true;
 
         if (!$this->isFulfilled())
-            throw new \Exception(sprintf(
-                'We can`t access extra data, because identity not fulfilled on property (%s) Yet.'
-                , $this->__fulfillment_property
-            ));
+            return;
 
         if (!$this->_data_provider)
             throw new \Exception(
@@ -145,7 +142,7 @@ class LazyFulfillmentIdentity extends FulfillmentIdentity
 
         $this->_c__loaded_data = $this->_data_provider->findBy(
             $this->__fulfillment_property
-            , $this->__get($this->__fulfillment_property)
+            , parent::__get($this->__fulfillment_property)
         );
 
         $this->from($this->_c__loaded_data);
