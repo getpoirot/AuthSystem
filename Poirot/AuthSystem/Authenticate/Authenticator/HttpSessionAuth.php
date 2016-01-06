@@ -61,7 +61,7 @@ class HttpSessionAuth extends AbstractHttpAuthenticator
     {
         $this->response()->getHeaders()->set(HeaderFactory::factory(
             'Set-Cookie'
-            , 'PHPSESSID=deleted'.$this->__getSessionID()
+            , 'PHPSESSID=deleted'
             .'; path="/" Expires: Thu, 01-Jan-1970; 00:00:01; Max-Age=0;'
         ));
 
