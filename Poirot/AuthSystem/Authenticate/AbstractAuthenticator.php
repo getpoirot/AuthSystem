@@ -91,9 +91,10 @@ abstract class AbstractAuthenticator extends AbstractIdentifier
      */
     function authenticate($credential = null)
     {
-        if ($this->hasAuthenticated() && ($this->_c__credential !== null && $credential === $this->_c__credential))
+        if ($this->hasAuthenticated() && ($this->_c__credential === null || $credential === $this->_c__credential))
             ## authenticated and nothing changes
             return $this;
+
 
         $identity = $this->doAuthenticate($credential);
         if (!$identity instanceof iIdentity && !$identity->isFulfilled())
@@ -126,7 +127,7 @@ abstract class AbstractAuthenticator extends AbstractIdentifier
         // ...
 
         if (!$credential instanceof iCredential)
-            throw new \InvalidArgumentException(sprintf('%s Credential can`t be empty.'), get_class($this));
+            throw new \InvalidArgumentException(sprintf('%s Credential can`t be empty.', get_class($this)));
 
         $identity = $this->getAdapter()->doIdentityMatch($credential);
         return $identity;
