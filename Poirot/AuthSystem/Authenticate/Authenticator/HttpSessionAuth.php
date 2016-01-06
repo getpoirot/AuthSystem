@@ -13,7 +13,7 @@ class HttpSessionAuth extends AbstractHttpAuthenticator
     use TraitSessionAuth{
         TraitSessionAuth::signIn  as protected _t__signIn;
         TraitSessionAuth::signOut as protected _t__signOut;
-    };
+    }
 
     /**
      * Login Authenticated User
