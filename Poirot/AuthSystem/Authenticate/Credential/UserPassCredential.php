@@ -30,6 +30,16 @@ class UserPassCredential extends AbstractOptions
         return $this;
     }
 
+        function setEmail($username)
+        {
+            return $this->setUsername($username);
+        }
+
+        function setIdentity($username)
+        {
+            return $this->setUsername($username);
+        }
+
     /**
      * @return string
      */
@@ -47,6 +57,11 @@ class UserPassCredential extends AbstractOptions
         $this->password = $password;
         return $this;
     }
+
+        function setCredential($password)
+        {
+            return $this->setPassword($password);
+        }
 
     /**
      * Is Identity Full Filled
