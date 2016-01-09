@@ -17,6 +17,13 @@ abstract class AbstractHttpAuthenticator extends AbstractAuthenticator
     use TraitHttpIdentifier;
 
     /**
+     * Is SignIn Request Received By Request?
+     *
+     * @return boolean
+     */
+    abstract function isSignInRequestReceived();
+
+    /**
      * Authenticate user with Credential Data and return
      * FullFilled Identity Instance
      *

@@ -19,6 +19,16 @@ class HttpSessionAuth extends AbstractHttpAuthenticator
     protected $__session_id;
 
     /**
+     * Is SignIn Request Received By Request?
+     *
+     * @return boolean
+     */
+    function isSignInRequestReceived()
+    {
+        return (boolean) $this->doExtractCredentialFromRequest($this->request);
+    }
+
+    /**
      * Login Authenticated User
      *
      * - Sign user in environment and server
