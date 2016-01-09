@@ -31,9 +31,11 @@ class HttpSessionAuth extends AbstractHttpAuthenticator
      */
     function signIn()
     {
+        session_regenerate_id(true);
+        $this->__session_id = $sessionId = session_id();
         $this->response()->getHeaders()->set(HeaderFactory::factory(
             'Set-Cookie'
-            , 'PHPSESSID='.$this->__session_id = session_regenerate_id(true)
+            , 'PHPSESSID='.$sessionId
               .'; path="/" '
               .'Expires: '. date('DD-Mon-YYYY HH:MM:SS GMT', time() + 2628000) // 5 years
         ));
