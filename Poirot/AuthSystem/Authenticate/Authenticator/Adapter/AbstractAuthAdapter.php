@@ -16,13 +16,13 @@ abstract class AbstractAuthAdapter extends AbstractOptions
     /**
      * Get Identity Match By Identity
      *
-     * @param iCredential $credential
+     * @param iCredential|null $credential
      *
      * @throws AuthenticationException
      * @throws \Exception credential or etc.
      * @return iIdentity
      */
-    abstract function doIdentityMatch($credential);
+    abstract function doIdentityMatch($credential = null);
 
 
     // ...
@@ -45,5 +45,16 @@ abstract class AbstractAuthAdapter extends AbstractOptions
     function getRealm()
     {
         return $this->realm;
+    }
+
+    /**
+     * Set Credential
+     * @param iCredential $credential
+     * @return $this
+     */
+    function setCredential(iCredential $credential)
+    {
+        $this->credential = $credential;
+        return $this;
     }
 }

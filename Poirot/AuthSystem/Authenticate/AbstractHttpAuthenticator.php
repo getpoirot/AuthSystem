@@ -4,6 +4,7 @@ namespace Poirot\AuthSystem\Authenticate;
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
 use Poirot\AuthSystem\Authenticate\Exceptions\MissingCredentialException;
 use Poirot\AuthSystem\Authenticate\Interfaces\HttpMessageAware\iAuthenticator;
+use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredentialHttpAware;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
@@ -49,13 +50,6 @@ abstract class AbstractHttpAuthenticator extends AbstractAuthenticator
     use TraitHttpIdentifier;
 
     /**
-     * Is SignIn Request Received By Request?
-     *
-     * @return boolean
-     */
-    abstract function isSignInRequestReceived();
-
-    /**
      * Authenticate user with Credential Data and return
      * FullFilled Identity Instance
      *
@@ -76,6 +70,9 @@ abstract class AbstractHttpAuthenticator extends AbstractAuthenticator
             if (!$credential)
                 // if auth credential not available it cause user get authorize require response
                 $this->riseException(new AuthenticationException);
+
+            if ($credential instanceof iAuthAdapter)
+                return $credential->doIdentityMatch();
         }
 
         if (!$credential instanceof iCredential || !$credential->isFulfilled())
@@ -114,6 +111,7 @@ abstract class AbstractHttpAuthenticator extends AbstractAuthenticator
     protected function riseException(AuthenticationException $exception)
     {
         $this->response()->setStatCode($exception->getCode());
+        $exception->setAuthenticator($this);
 
         throw $exception;
     }

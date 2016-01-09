@@ -16,15 +16,17 @@ class DigestAuthAdapter extends AbstractAuthAdapter
     /**
      * Get Identity Match By Identity
      *
-     * @param iCredential $credential
+     * @param iCredential|null $credential
      *
      * @throws WrongCredentialException
      * @throws \Exception Credential not fulfill
      * @return iIdentity
      */
-    function doIdentityMatch($credential)
+    function doIdentityMatch($credential = null)
     {
-        if (!$credential->isFulfilled())
+        ($credential !== null) ?: $credential = $this->credential;
+
+        if (!$credential instanceof iCredential && !$credential->isFulfilled())
             throw new \Exception(sprintf('Credential (%s) is not Fulfilled.', get_class($credential)));
 
         ErrorStack::handleError(E_WARNING);

@@ -22,7 +22,7 @@ interface iAuthenticator extends \Poirot\AuthSystem\Authenticate\Interfaces\iAut
      *
      * @throws AuthenticationException Or extend of this
      * @throws \Exception request invalid or etc.
-     * @return iIdentifier
+     * @return $this
      */
     function authenticate(/* iHttpRequest */ $request = null);
 }

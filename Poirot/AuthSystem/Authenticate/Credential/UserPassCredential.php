@@ -9,6 +9,11 @@ use Poirot\Http\Message\HttpRequest;
 class UserPassCredential extends AbstractOptions
     implements iCredentialHttpAware
 {
+    protected $_t_options__internal = [
+        ## this method will ignore as option in prop
+        'isFulfilled',
+    ];
+
     protected $username;
     protected $password;
 

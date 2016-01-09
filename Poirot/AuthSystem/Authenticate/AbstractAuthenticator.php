@@ -4,9 +4,8 @@ namespace Poirot\AuthSystem\Authenticate;
 use Poirot\AuthSystem\Authenticate\Authenticator\Adapter\DigestAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
-use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
-use Poirot\AuthSystem\Authenticate\Interfaces\HttpMessageAware\iIdentifier as HttpMessageIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
+use Poirot\AuthSystem\Authenticate\Interfaces\HttpMessageAware\iAuthenticator as HttpAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Core\AbstractOptions;
@@ -87,7 +86,7 @@ abstract class AbstractAuthenticator extends AbstractIdentifier
      * Credential can be extracted from this
      *
      * @throws AuthenticationException|\Exception Or extend of this
-     * @return iIdentifier|HttpMessageIdentifier
+     * @return iAuthenticator|HttpAuthenticator
      */
     function authenticate($credential = null)
     {
@@ -95,8 +94,11 @@ abstract class AbstractAuthenticator extends AbstractIdentifier
             ## authenticated and nothing changes
             return $this;
 
+        if ($credential instanceof iAuthAdapter)
+            $identity = $credential->doIdentityMatch();
+        else
+            $identity = $this->doAuthenticate($credential);
 
-        $identity = $this->doAuthenticate($credential);
         if (!$identity instanceof iIdentity && !$identity->isFulfilled())
             throw new AuthenticationException('user authentication failure.');
 

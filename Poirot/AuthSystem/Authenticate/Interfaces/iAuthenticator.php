@@ -2,7 +2,6 @@
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
-use Poirot\Core\Interfaces\iDataSetConveyor;
 
 Interface iAuthenticator extends iIdentifier
 {
@@ -22,10 +21,10 @@ Interface iAuthenticator extends iIdentifier
      * note: after successful authentication, you must call
      *       login() outside of method to store identified user
      *
-     * @param iCredential|iDataSetConveyor|array $credential
+     * @param iCredential|iAuthAdapter $credential
      *
      * @throws AuthenticationException|\Exception Or extend of this
-     * @return iIdentifier
+     * @return $this
      */
     function authenticate($credential = null);
 

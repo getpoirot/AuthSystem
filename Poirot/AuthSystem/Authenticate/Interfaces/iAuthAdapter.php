@@ -9,13 +9,13 @@ interface iAuthAdapter extends iOptionImplement
     /**
      * Get Identity Match By Identity
      *
-     * @param iCredential $credential Fulfilled Credential
+     * @param iCredential|null $credential Fulfilled Credential
      *
      * @throws AuthenticationException
      * @throws \Exception credential or etc.
      * @return iIdentity
      */
-    function doIdentityMatch($credential);
+    function doIdentityMatch($credential = null);
 
     /**
      * Credential
@@ -39,4 +39,13 @@ interface iAuthAdapter extends iOptionImplement
      * @return string|null
      */
     function getRealm();
+
+    /**
+     * Set Credential
+     *
+     * @param iCredential $credential
+     *
+     * @return $this
+     */
+    function setCredential(iCredential $credential);
 }

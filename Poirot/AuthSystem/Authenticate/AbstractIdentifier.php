@@ -73,6 +73,7 @@ abstract class AbstractIdentifier implements iIdentifier
             $this->identity->from($identity);
         }
 
+
         return $this->identity;
     }
 

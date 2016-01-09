@@ -7,6 +7,9 @@ use Poirot\Http\Interfaces\iHeader;
 use Poirot\Http\Util\cookie;
 use Poirot\Http\Util\UCookie;
 use Poirot\Storage\Gateway\SessionData;
+use Poirot\Stream\Interfaces\Resource\iSRAccessMode;
+use Poirot\Stream\Streamable;
+use Poirot\Stream\WrapperClient;
 
 class HttpSessionAuth extends AbstractHttpAuthenticator
 {
@@ -17,16 +20,6 @@ class HttpSessionAuth extends AbstractHttpAuthenticator
 
     /** @var string session id */
     protected $__session_id;
-
-    /**
-     * Is SignIn Request Received By Request?
-     *
-     * @return boolean
-     */
-    function isSignInRequestReceived()
-    {
-        return (boolean) $this->doExtractCredentialFromRequest($this->request);
-    }
 
     /**
      * Login Authenticated User
@@ -103,7 +96,8 @@ class HttpSessionAuth extends AbstractHttpAuthenticator
      */
     function __session()
     {
-        session_id($this->__getSessionID());
+        $sesId = $this->__getSessionID();
+        session_id($sesId);
 
         if(!$this->_session)
             $this->_session = new SessionData(['realm' => $this->getRealm()]);
