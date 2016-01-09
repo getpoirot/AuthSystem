@@ -8,11 +8,6 @@ use Poirot\Http\Util\cookie;
 use Poirot\Http\Util\UCookie;
 use Poirot\Storage\Gateway\SessionData;
 
-// TODO now client can send session id by manual
-// it's seems that we need to regenerate session id on
-// successful login and response it to client
-// after that user can recognized with this session in request
-
 class HttpSessionAuth extends AbstractHttpAuthenticator
 {
     use TraitSessionAuth{
@@ -38,7 +33,7 @@ class HttpSessionAuth extends AbstractHttpAuthenticator
     {
         $this->response()->getHeaders()->set(HeaderFactory::factory(
             'Set-Cookie'
-            , 'PHPSESSID='.$this->__getSessionID()
+            , 'PHPSESSID='.$this->__session_id = session_regenerate_id(true)
               .'; path="/" '
               .'Expires: '. date('DD-Mon-YYYY HH:MM:SS GMT', time() + 2628000) // 5 years
         ));
