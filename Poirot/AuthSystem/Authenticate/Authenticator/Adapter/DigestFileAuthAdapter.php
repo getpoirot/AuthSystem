@@ -9,7 +9,7 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Core\ErrorStack;
 
-class DigestAuthAdapter extends AbstractAuthAdapter
+class DigestFileAuthAdapter extends AbstractAuthAdapter
 {
     protected $filename;
 
