@@ -100,7 +100,7 @@ abstract class AbstractAuthenticator extends AbstractIdentifier
             $identity = $this->doAuthenticate($credential);
 
         if (!$identity instanceof iIdentity && !$identity->isFulfilled())
-            throw new AuthenticationException('user authentication failure.');
+            throw (new AuthenticationException)->setAuthenticator($this);
 
         $this->identity()->from($identity);
         if (!$this->identity()->isFulfilled())

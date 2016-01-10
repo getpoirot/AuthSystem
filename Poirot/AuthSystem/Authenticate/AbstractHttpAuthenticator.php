@@ -88,7 +88,7 @@ abstract class AbstractHttpAuthenticator extends AbstractAuthenticator
      *
      * @param HttpRequest $request
      *
-     * @return iCredential|null Null if not available
+     * @return iCredential|iAuthAdapter|null Null if not available
      */
     function doExtractCredentialFromRequest(HttpRequest $request)
     {

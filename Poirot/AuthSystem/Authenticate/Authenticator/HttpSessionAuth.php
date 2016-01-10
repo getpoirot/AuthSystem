@@ -174,7 +174,7 @@ class HttpSessionAuth extends AbstractHttpAuthenticator
 
         /** @var iHeader $h */
         foreach($this->request->getHeaders() as $h) {
-            if (strtolower($h->label()) != 'cookie')
+            if (strtolower($h->getLabel()) != 'cookie')
                 continue;
 
             $cookieVal = $h->renderValueLine();
