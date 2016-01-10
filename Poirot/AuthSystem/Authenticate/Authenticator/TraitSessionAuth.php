@@ -30,6 +30,11 @@ trait TraitSessionAuth
 
     /**
      * Attain Identity Object From Signed Sign
+     *
+     * note: almost retrieve identity data from cache or
+     *       storage that store user data. ie. session
+     *
+     * @see identity()
      * @return iIdentity
      */
     function attainSignedIdentity()

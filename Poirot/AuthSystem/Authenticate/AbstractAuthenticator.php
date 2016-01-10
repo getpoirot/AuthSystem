@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate;
 
-use Poirot\AuthSystem\Authenticate\Authenticator\Adapter\DigestAuthAdapter;
+use Poirot\AuthSystem\Authenticate\Authenticator\Adapter\DigestFileAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
@@ -174,7 +174,7 @@ abstract class AbstractAuthenticator extends AbstractIdentifier
     function getAdapter()
     {
         if (!$this->adapter)
-            $this->adapter = new DigestAuthAdapter;
+            $this->adapter = new DigestFileAuthAdapter;
 
         $this->adapter->setRealm($this->getRealm());
         return $this->adapter;

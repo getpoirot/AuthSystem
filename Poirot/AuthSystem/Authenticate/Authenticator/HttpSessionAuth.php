@@ -87,7 +87,8 @@ class HttpSessionAuth extends AbstractHttpAuthenticator
      * Login Authenticated User
      *
      * - Sign user in environment and server
-     *   exp. store in session
+     *   exp. store in session, store data in cache
+     *        sign user token in header, etc.
      *
      * - logout current user if has
      *

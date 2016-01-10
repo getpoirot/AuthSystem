@@ -70,9 +70,10 @@ abstract class AbstractIdentifier implements iIdentifier
         // Attain Identity:
         if ($this->isSignIn()) {
             $identity = $this->attainSignedIdentity();
-            $this->identity->from($identity);
+            if ($identity !== null)
+                ## update identity
+                $this->identity->from($identity);
         }
-
 
         return $this->identity;
     }
@@ -80,8 +81,14 @@ abstract class AbstractIdentifier implements iIdentifier
 
     /**
      * Attain Identity Object From Signed Sign
+     *
+     * !! call when user is signed in to retrieve user identity
+     *
+     * note: almost retrieve identity data from cache or
+     *       storage that store user data. ie. session
+     *
      * @see identity()
-     * @return iIdentity
+     * @return iIdentity|null Null if no change need
      */
     abstract function attainSignedIdentity();
 
