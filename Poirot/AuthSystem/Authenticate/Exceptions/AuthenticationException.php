@@ -6,6 +6,7 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator;
 class AuthenticationException extends \RuntimeException
 {
     const EXCEPTION_DEFAULT_MESSAGE = 'Authentication Failed';
+    const EXCEPTION_DEFAULT_CODE    = 403;
 
     /** @var iAuthenticator */
     protected $authenticator;

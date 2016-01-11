@@ -50,6 +50,8 @@ abstract class AbstractHttpAuthenticator extends AbstractAuthenticator
     use TraitHttpIdentifier;
 
     /**
+     * TODO merge with authenticate
+     *
      * Authenticate user with Credential Data and return
      * FullFilled Identity Instance
      *
@@ -73,6 +75,9 @@ abstract class AbstractHttpAuthenticator extends AbstractAuthenticator
 
             if ($credential instanceof iAuthAdapter)
                 return $credential->doIdentityMatch();
+
+            if ($credential instanceof iIdentity)
+                return $credential;
         }
 
         if (!$credential instanceof iCredential || !$credential->isFulfilled())
@@ -83,6 +88,8 @@ abstract class AbstractHttpAuthenticator extends AbstractAuthenticator
     }
 
     /**
+     * TODO replace against doAuthenticate
+     *
      * Do Extract Credential From Request Object
      * ie. post form data or token
      *

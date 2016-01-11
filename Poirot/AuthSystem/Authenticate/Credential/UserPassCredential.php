@@ -1,19 +1,15 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Credential;
 
+use Poirot\AuthSystem\Authenticate\AbstractIdentity;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredentialHttpAware;
 use Poirot\Core\AbstractOptions;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\Http\Message\HttpRequest;
 
-class UserPassCredential extends AbstractOptions
+class UserPassCredential extends AbstractIdentity
     implements iCredentialHttpAware
 {
-    protected $_t_options__internal = [
-        ## this method will ignore as option in prop
-        'isFulfilled',
-    ];
-
     protected $username;
     protected $password;
 

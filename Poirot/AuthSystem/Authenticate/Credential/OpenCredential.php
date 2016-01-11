@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\AuthSystem\Credential;
+namespace Poirot\AuthSystem\Authenticate\Credential;
 
 use Poirot\AuthSystem\Authenticate\Identity\OpenIdentity;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
