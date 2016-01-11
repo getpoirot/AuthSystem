@@ -4,6 +4,7 @@ namespace Poirot\AuthSystem\Authenticate\Authenticator\Adapter;
 use Poirot\AuthSystem\Authenticate\Credential\UserPassCredential;
 use Poirot\AuthSystem\Authenticate\Exceptions\MissingCredentialException;
 use Poirot\AuthSystem\Authenticate\Exceptions\WrongCredentialException;
+use Poirot\AuthSystem\Authenticate\Identity\HttpDigestIdentity;
 use Poirot\AuthSystem\Authenticate\Identity\UsernameIdentity;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
@@ -26,8 +27,8 @@ class DigestFileAuthAdapter extends AbstractAuthAdapter
     {
         ($credential !== null) ?: $credential = $this->credential;
 
-        if (!$credential instanceof iCredential && !$credential->isFulfilled())
-            throw new \Exception(sprintf('Credential (%s) is not Fulfilled.', get_class($credential)));
+        if (!$credential instanceof iCredential || !$credential->isFulfilled())
+            throw new \Exception(sprintf('Credential (%s) is not Fulfilled.', \Poirot\Core\flatten($credential)));
 
         ErrorStack::handleError(E_WARNING);
         $hFile = fopen($this->getFilename(), 'r');
@@ -39,31 +40,33 @@ class DigestFileAuthAdapter extends AbstractAuthAdapter
         /** @var string $username */
         /** @var string $password */
         extract($credential->toArray());
-        if (!isset($username) || !isset($password))
+        if (!isset($username))
             throw new MissingCredentialException(sprintf(
-                'Credential (%s) not contains Username or Password.', get_class($credential)
+                'Credential (%s) not contains Username.', get_class($credential)
             ));
 
         $realm = $this->getRealm();
 
         $id       = "$username:$realm";
-        $result   = false;
         while (($line = fgets($hFile)) !== false) {
             $line = trim($line);
             if (substr($line, 0, strlen($id)) !== $id)
-                ## try next (user:admin) not match
+                ## try next (user:realm) not match
                 continue;
 
-            if (strtolower(substr($line, -32)) === strtolower(md5("$username:$realm:$password"))) {
-                $result = true;
-                break;
-            }
-        }
-        if (!$result)
-            throw new WrongCredentialException('Invalid Username or password.');
+            if (!isset($password))
+                ## username match, digest http auth. need secret key
+                return new HttpDigestIdentity(['username' => $username, 'hash' => strtolower(substr($line, -32))]);
 
-        // Set Identified User:
-        return new UsernameIdentity(['username' => $username]);
+            if (isset($password)
+                ## 32 for md5 length
+                && strtolower(substr($line, -32)) === strtolower(md5("$username:$realm:$password"))
+            )
+                ## user/pass credential match
+                return new UsernameIdentity(['username' => $username]);
+        }
+
+        throw new WrongCredentialException('Invalid Username or password.');
     }
 
     /**

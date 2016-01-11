@@ -3,8 +3,11 @@ namespace Poirot\AuthSystem\Authenticate\Authenticator;
 
 use Poirot\AuthSystem\Authenticate\AbstractHttpAuthenticator;
 use Poirot\AuthSystem\Authenticate\Authenticator\Adapter\DigestFileAuthAdapter;
+use Poirot\AuthSystem\Authenticate\Credential\OpenCredential;
 use Poirot\AuthSystem\Authenticate\Credential\UserPassCredential;
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
+use Poirot\AuthSystem\Authenticate\Identity\HttpDigestIdentity;
+use Poirot\AuthSystem\Authenticate\Identity\UsernameIdentity;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
@@ -64,9 +67,12 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
     ## digest options
     /** @var iAuthAdapter */
     protected $digestAdapter;
-    protected $nonceTimeout = 30;
-    /** @var string Space-delimited list of protected domains for Digest Auth */
-    protected $domains = '192.168.123.161';
+
+    protected $nonceTimeout = 300;
+    protected $nonce_secret = 'nonce_secret_key';
+
+    /** @var string space-separated list of URIs, define the protection space */
+    protected $domains;
     /** @var string The actual algorithm to use. Defaults to MD5 */
     protected $algo = 'MD5';
     /**
@@ -74,7 +80,8 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
      * 'auth-int', but 'auth-int' won't make it into the first version.
      */
     protected $supportedQops = ['auth'];
-    protected $useOpaque = false;
+    protected $useOpaque     = true;
+
 
     /**
      * Do Extract Credential From Request Object
@@ -82,7 +89,7 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
      *
      * @param HttpRequest $request
      *
-     * @return iCredential|iAuthAdapter|null Null if not available
+     * @return iCredential|iAuthAdapter|iIdentity|null Null if not available
      */
     function doExtractCredentialFromRequest(HttpRequest $request)
     {
@@ -114,14 +121,14 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
 
 
         if ($clientScheme == 'basic')
-            $credential = $this->__extractBasicCredential($hValue);
+            $credential = $this->__computeBasicCredential($hValue);
         else
-            $credential = $this->__extractDigestCredential($hValue);
+            $credential = $this->__computeDigestCredential($hValue);
 
         return $credential;
     }
 
-        protected function __extractBasicCredential($hValue)
+        protected function __computeBasicCredential($hValue)
         {
             // Decode the Authorization header
             $auth = substr($hValue, strlen('Basic '));
@@ -140,67 +147,83 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
             return $credential;
         }
 
-        protected function __extractDigestCredential($hValue)
+        protected function __computeDigestCredential($hValue)
         {
-            $headerData = $this->_parseDigestAuth($hValue);
+            /* TODO
+             * If a directive or its value is improper, or required directives are
+             * missing, the proper response is 400 Bad Request. If the request-
+             * digest is invalid, then a login failure should be logged, since
+             * repeated login failures from a single client may indicate an attacker
+             * attempting to guess passwords.
+             */
+            $headerData = $this->_parseDigestRequestHeader($hValue);
             if ($headerData === false)
                 return false;
 
-            // Verify that the client sent back the same nonce
-            if ($this->_calcNonce() != $headerData['nonce'])
+            if ($this->__generateNonce() != $headerData['nonce'])
+                ## client sent back same nonce
                 return false;
 
-            // The opaque value is also required to match, but of course IE doesn't
-            // play ball.
-            if (!$this->ieNoOpaque && $this->_calcOpaque() != $headerData['opaque'])
-                return false;
+
+            // If the server sent an opaque value, the client must send it back
+            if ($this->isUseOpaque()) {
+                // Validate Opaque
+                if (!isset($headerData['opaque']))
+                    return false;
+                elseif ($this->__generateOpaque() != $headerData['opaque'])
+                    return false;
+            }
 
 
             // ...
 
-            // Look up the user's password hash. If not found, deny access.
-            // This makes no assumptions about how the password hash was
-            // constructed beyond that it must have been built in such a way as
-            // to be recreatable with the current settings of this object.
-            $ha1 = $this->digestResolver->resolve($data['username'], $data['realm']);
-            if ($ha1 === false) {
-                return $this->_challengeClient();
-            }
+            /*
+             * A1 = md5(username:realm:password)
+             * A2 = md5(request-method:uri) // request method = GET, POST, etc.
+             * Hash = md5(A1:nonce:nc:cnonce:qop:A2)
+             * if (Hash == response)
+             *    //success!
+             */
 
+            /** @var HttpDigestIdentity $digestIdentity */
+            $digestIdentity = $this->getDigestAdapter()->doIdentityMatch(
+                new OpenCredential(['username' => $headerData['username']])
+            );
+
+            $ha1 = $digestIdentity->getA1();
             // If MD5-sess is used, a1 value is made of the user's password
             // hash with the server and client nonce appended, separated by
             // colons.
-            if ($this->algo == 'MD5-sess') {
-                $ha1 = hash('md5', $ha1 . ':' . $data['nonce'] . ':' . $data['cnonce']);
-            }
+            if ($this->algo == 'MD5-sess')
+                $ha1 = hash('md5', $ha1 . ':' . $headerData['nonce'] . ':' . $headerData['cnonce']);
 
             // Calculate h(a2). The value of this hash depends on the qop
             // option selected by the client and the supported hash functions
-            switch ($data['qop']) {
+            switch ($headerData['qop']) {
                 case 'auth':
-                    $a2 = $this->request->getMethod() . ':' . $data['uri'];
+                    $a2 = $this->request->getMethod() . ':' . $headerData['uri'];
                     break;
                 case 'auth-int':
                     // Should be REQUEST_METHOD . ':' . uri . ':' . hash(entity-body),
                     // but this isn't supported yet, so fall through to default case
                 default:
-                    throw new Exception\RuntimeException('Client requested an unsupported qop option');
+                    throw new \RuntimeException('Client requested an unsupported qop option');
             }
+
+
             // Using hash() should make parameterizing the hash algorithm
             // easier
             $ha2 = hash('md5', $a2);
 
-
             // Calculate the server's version of the request-digest. This must
             // match $data['response']. See RFC 2617, section 3.2.2.1
-            $message = $data['nonce'] . ':' . $data['nc'] . ':' . $data['cnonce'] . ':' . $data['qop'] . ':' . $ha2;
+            $message = $headerData['nonce'] . ':' . $headerData['nc'] . ':' . $headerData['cnonce'] . ':' . $headerData['qop'] . ':' . $ha2;
             $digest  = hash('md5', $ha1 . ':' . $message);
 
-            // If our digest matches the client's let them in, otherwise return
-            // a 401 code and exit to prevent access to the protected resource.
-            if (CryptUtils::compareStrings($digest, $data['response'])) {
-                $identity = array('username' => $data['username'], 'realm' => $data['realm']);
-                return new Authentication\Result(Authentication\Result::SUCCESS, $identity);
+            // If our digest matches the client's let them in
+            if ($digest == $headerData['response']) {
+                $identity = new UsernameIdentity([ 'username' => $headerData['username'] ]);
+                return $identity;
             }
         }
 
@@ -253,7 +276,7 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
      */
     function signOut()
     {
-        $this->__sendAuthorizationHeaders();
+        $this->__sendChalengeHeaders();
     }
 
     /**
@@ -284,13 +307,13 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
      */
     protected function riseException(AuthenticationException $exception)
     {
-        $this->__sendAuthorizationHeaders();
+        $this->__sendChalengeHeaders();
 
         $exception->setAuthenticator($this);
         throw $exception;
     }
 
-        protected function __sendAuthorizationHeaders()
+        protected function __sendChalengeHeaders()
         {
             if ($this->isProxyAuth()) {
                 $statusCode = 407;
@@ -378,6 +401,7 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
         return $this;
     }
 
+
     /**
      * Whether or not to do Proxy Authentication instead of origin server
      * authentication (send 407's instead of 401's). Off by default.
@@ -409,7 +433,7 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
     function isAcceptBasic()
     {
         ## !! when we accept digest, basic authentication will not acceptable both.
-        return (!$this->isAcceptDigest()) && $this->acceptBasicScheme;
+        return $this->acceptBasicScheme;
     }
 
     function setAcceptDigest($flag = true)
@@ -421,6 +445,59 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
     function isAcceptDigest()
     {
         return $this->acceptDigestScheme;
+    }
+
+    /**
+     * Space-separated list of URIs that define the protection space.
+     *
+     * An absoluteURI in this list may refer to a different server
+     * than the one being accessed.
+     * If this directive is omitted or its value is empty, the client
+     * should assume that the protection space consists of all URIs
+     * on the responding server.
+     *
+     * @param string|array $domains
+     * @return $this
+     */
+    function setDomains($domains)
+    {
+        if (is_array($domains))
+            $domains = implode(' ', $domains);
+
+        $this->domains = (string) $domains;
+        return $this;
+    }
+
+    /**
+     * Space-separated list of URIs that define the protection space
+     *
+     * @return string
+     */
+    function getDomains()
+    {
+        return $this->domains;
+    }
+
+    /**
+     * Set Nonce Timeout
+     *
+     * @param int $timeout
+     *
+     * @return $this
+     */
+    function setNonceTimeout($timeout)
+    {
+        $this->nonceTimeout = (int) $timeout;
+        return $this;
+    }
+
+    /**
+     * Get Nonce Timeout
+     * @return int
+     */
+    function getNonceTimeout()
+    {
+        return $this->nonceTimeout;
     }
 
     function setUseOpaque($flag = true)
@@ -461,9 +538,31 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
     protected function _getDigestHeader()
     {
         $wwwauth = 'Digest realm="' . $this->getRealm() . '", '
-            . 'domain="' . $this->domains . '", '
-            . 'nonce="' . $this->_calcNonce() . '", '
-            . ($this->isUseOpaque() ? 'opaque="' . $this->_calcOpaque() . '", ' : '')
+            /*
+             * Domain directive is not meaningful in Proxy-Authenticate headers,
+             * for which the protection space is always the entire proxy; if present
+             * it should be ignored.
+             */
+            . ( ($this->getDomains()) ? 'domain="' . $this->domains . '", ' : '' )
+            . 'nonce="' . $this->__generateNonce() . '", '
+            /*
+             * This can be treated as a session id. If this changes the browser
+             * will deauthenticate the user.
+             */
+            . ( ($this->isUseOpaque()) ? 'opaque="' . $this->__generateOpaque() . '", ' : '' )
+            /*
+             * indicating that the previous request from the client was
+             * rejected because the nonce value was stale. If stale is TRUE
+             * (case-insensitive), the client may wish to simply retry the request
+             * with a new encrypted response, without reprompting the user for a
+             * new username and password. The server should only set stale to TRUE
+             * if it receives a request for which the nonce is invalid but with a
+             * valid digest for that nonce (indicating that the client knows the
+             * correct username/password). If stale is FALSE, or anything other
+             * than TRUE, or the stale directive is not present, the username
+             * and/or password are invalid, and new values must be obtained.
+             */
+            . ( (isset($this->stale)) ? 'stale="true"' : '' )
             . 'algorithm="' . $this->algo . '", '
             . 'qop="' . implode(',', $this->supportedQops) . '"';
 
@@ -479,63 +578,87 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
      *
      * @return string The nonce value
      */
-    protected function _calcNonce()
+    protected function __generateNonce()
     {
-        // Once subtle consequence of this timeout calculation is that it
-        // actually divides all of time into nonceTimeout-sized sections, such
-        // that the value of timeout is the point in time of the next
-        // approaching "boundary" of a section. This allows the server to
-        // consistently generate the same timeout (and hence the same nonce
-        // value) across requests, but only as long as one of those
-        // "boundaries" is not crossed between requests. If that happens, the
-        // nonce will change on its own, and effectively log the user out. This
-        // would be surprising if the user just logged in.
+        /*
+         * server would recalculate the hash portion after receiving the client
+         * authentication header and reject the request if it did not match the
+         * nonce from that header or if the time-stamp value is not recent enough.
+         *
+         * In this way the server can limit the time of the nonce's validity.
+         */
         $timeout = ceil(time() / $this->nonceTimeout) * $this->nonceTimeout;
 
-        $userAgentHeader = $this->request->getHeaders()->get('User-Agent');
-        if ($userAgentHeader)
-            $userAgent = $userAgentHeader->renderValueLine();
-        elseif (isset($_SERVER['HTTP_USER_AGENT']))
-            $userAgent = $_SERVER['HTTP_USER_AGENT'];
-        else
-            $userAgent = self::STORAGE_IDENTITY_KEY;
+        /*
+         * The inclusion of the ETag prevents a replay request for an updated
+         * version of the resource.
+         *
+         * Note: including the IP address of the client in the nonce would appear
+         * to offer the server the ability to limit the reuse of the nonce to the
+         * same client that originally got it.
+         * However, that would break proxy farms, where requests from a single
+         * user often go through different proxies in the farm. Also, IP
+         * address spoofing is not that hard.
+         */
 
-        $nonce = hash('md5', $timeout . ':' . $userAgent . ':' . __CLASS__);
+        $Etag = null;
+        if ($this->request->getHeaders()->has('Etag'))
+            $Etag = $this->request->getHeaders()->get('Etag')->renderValueLine();
+        elseif ($this->request->getHeaders()->has('User-Agent'))
+            $Etag = $this->request->getHeaders()->get('User-Agent')->renderValueLine();
+        elseif (isset($_SERVER['HTTP_USER_AGENT']))
+            $Etag = $_SERVER['HTTP_USER_AGENT'];
+        else
+            $Etag = 'this_is_etag';
+
+        $nonce = hash('md5', $timeout . ':' . $Etag . ':' . $this->nonce_secret);
         return $nonce;
     }
 
     /**
      * Calculate Opaque
      *
-     * This field is optional.
+     * A string of data, specified by the server, which should be returned
+     * by the client unchanged in the Authorization header of subsequent
+     * requests with URIs in the same protection space.
      *
-     * quoted data string replied unchanged the whole session by the client;
-     * it might be used for example for session tracking by the web server.
+     * This can be treated as a session id. If this changes the browser
+     * will deauthenticate the user.
      *
-     * The opaque string can be anything; the client must return it exactly as
-     * it was sent. It may be useful to store data in this string in some
-     * applications. Ideally, a new value for this would be generated each time
-     * a WWW-Authenticate header is sent (in order to reduce predictability),
-     * but we would have to be able to create the same exact value across at
-     * least two separate requests from the same client.
+     * It is recommended that this string be base64 or hexadecimal data.
+     *
+     * It may be useful to store data in this string in some applications.
      *
      * @return string The opaque value
      */
-    protected function _calcOpaque()
+    protected function __generateOpaque()
     {
-        return hash('md5', 'Opaque Data:' . __CLASS__);
+        return base64_encode('opaque_data:');
     }
 
 
     /**
      * Parse Digest Authorization header
      *
+     * credentials = "Digest" digest-response
+     * digest-response = 1#( username | realm | nonce | digest-uri
+     *      | response | [ algorithm ] | [cnonce] | [opaque]
+     *      | [message-qop] | [nonce-count] | [auth-param] )
+     *
      * @param  string $header Client's Authorization: HTTP header
      * @return array|bool Data elements from header, or false if any part of
      *                    the header is invalid
      */
-    protected function _parseDigestAuth($header)
+    protected function _parseDigestRequestHeader($header)
     {
+        preg_match_all('@(\w+)=(?:(?:")([^"]+)"|([^\s,$]+))@', $header, $matches, PREG_SET_ORDER);
+
+        $data = [];
+        foreach ($matches as $m)
+            $data[$m[1]] = $m[2] ? $m[2] : $m[3];
+
+        return $data;
+
         $temp = null;
         $data = [];
 
@@ -572,6 +695,10 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
         $data['nonce'] = $temp[1];
 
         ## uri -----------------------------------------------------------
+        /*
+         * The URI from Request-URI of the Request-Line; duplicated here
+         * because proxies are allowed to change the Request-Line in transit.
+         */
         $temp = null;
         $ret = preg_match('/uri="([^"]+)"/', $header, $temp);
         if (!$ret || empty($temp[1]))
@@ -593,7 +720,11 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
         // code I don't want to write right now.
         $data['uri'] = $temp[1];
 
-        ## reponse -------------------------------------------------------
+        ## response -------------------------------------------------------
+        /*
+         * A string of 32 hex digits computed as defined below, which proves
+         * that the user knows a password
+         */
         $temp = null;
         $ret = preg_match('/response="([^"]+)"/', $header, $temp);
         if (!$ret || empty($temp[1]))
@@ -615,18 +746,6 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
             $data['algorithm'] = $temp[1];
         else
             $data['algorithm'] = 'MD5';  // = $this->algo; ?
-
-
-        ## cnonce -----------------------------------------------------------------
-        $temp = null;
-        // Not optional in this implementation
-        $ret = preg_match('/cnonce="([^"]+)"/', $header, $temp);
-        if (!$ret || empty($temp[1]))
-            return false;
-        if (!ctype_print($temp[1]))
-            return false;
-
-        $data['cnonce'] = $temp[1];
 
         ## opaque -----------------------------------------------------------------
         $temp = null;
@@ -657,22 +776,57 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
         }
 
         ## qop ---------------------------------------------------------------------------------------
-        // Not optional in this implementation, but must be one of the supported
-        // qop types
+        /*
+         * Indicates what "quality of protection" the client has applied to
+         * the message. If present, its value MUST be one of the alternatives
+         * the server indicated it supports in the WWW-Authenticate header.
+         */
         $temp = null;
         $ret = preg_match('/qop="?(' . implode('|', $this->supportedQops) . ')"?/', $header, $temp);
         if (!$ret || empty($temp[1]))
+            ## TODO not support challenge again
             return false;
 
         if (!in_array($temp[1], $this->supportedQops))
+            ## TODO not support challenge again
             return false;
 
         $data['qop'] = $temp[1];
 
+        ## cnonce -----------------------------------------------------------------
+        /*
+         * Nonce-count. This a hexadecimal serial number for the request.
+         * The client should increase this number by one for every request.
+         *
+         * This MUST be specified if a qop directive is sent (see above), and
+         * MUST NOT be specified if the server did not send a qop directive in
+         * the WWW-Authenticate header field. The cnonce-value is an opaque
+         * quoted string value provided by the client and used by both client
+         * and server to avoid chosen plaintext attacks, to provide mutual
+         * authentication, and to provide some message integrity protection.
+         */
+        $temp = null;
+        $ret = preg_match('/cnonce="([^"]+)"/', $header, $temp);
+        if (!$ret || empty($temp[1]))
+            return false;
+        if (!ctype_print($temp[1]))
+            return false;
+
+        $data['cnonce'] = $temp[1];
+
         ## nc ---------------------------------------------------------------------------------------
-        // Not optional in this implementation. The spec says this value
-        // shouldn't be a quoted string, but apparently some implementations
-        // quote it anyway. See ZF-1544.
+        /*
+         * This MUST be specified if a qop directive is sent (see above), and
+         * MUST NOT be specified if the server did not send a qop directive in
+         * the WWW-Authenticate header field. The nc-value is the hexadecimal
+         * count of the number of requests (including the current request)
+         * that the client has sent with the nonce value in this request. For
+         * example, in the first request sent in response to a given nonce
+         * value, the client sends "nc=00000001". The purpose of this
+         * directive is to allow the server to detect request replays by
+         * maintaining its own copy of this count - if the same nc-value is
+         * seen twice, then the request is a replay.
+         */
         $temp = null;
         $ret = preg_match('/nc="?([0-9A-Fa-f]{8})"?/', $header, $temp);
         if (!$ret || empty($temp[1]))
