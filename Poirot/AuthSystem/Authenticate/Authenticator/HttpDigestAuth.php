@@ -191,11 +191,15 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
             );
 
             $ha1 = $digestIdentity->getA1();
-            // If MD5-sess is used, a1 value is made of the user's password
-            // hash with the server and client nonce appended, separated by
-            // colons.
-            if ($this->algo == 'MD5-sess')
+            if ($this->algo == 'MD5-sess') {
+                /*
+                 * then A1 is calculated only once. This creates a 'session key' for
+                 * the authentication of subsequent requests and responses which is
+                 * different for each "authentication session", thus limiting the amount
+                 * of material hashed with any one key.
+                 */
                 $ha1 = hash('md5', $ha1 . ':' . $headerData['nonce'] . ':' . $headerData['cnonce']);
+            }
 
             // Calculate h(a2). The value of this hash depends on the qop
             // option selected by the client and the supported hash functions
@@ -204,8 +208,7 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
                     $a2 = $this->request->getMethod() . ':' . $headerData['uri'];
                     break;
                 case 'auth-int':
-                    // Should be REQUEST_METHOD . ':' . uri . ':' . hash(entity-body),
-                    // but this isn't supported yet, so fall through to default case
+                    ## A2 = Method ":" digest-uri-value ":" H(entity-body)
                 default:
                     throw new \RuntimeException('Client requested an unsupported qop option');
             }
@@ -574,7 +577,11 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
      *
      * server-specified quoted data string uniquely generated
      * each time a 401 response is made. It will be used for the
-     * encryption of the username/password pair
+     * encryption of the username/password pair.
+     *
+     * server is free to construct the nonce such that it may only be used
+     * from a particular client, for a particular resource, for a limited
+     * period of time or number of uses, or any other restrictions
      *
      * @return string The nonce value
      */
@@ -659,8 +666,7 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
 
         return $data;
 
-        $temp = null;
-        $data = [];
+        // TODO validate data header
 
         ## username ------------------------------------------------------
         $ret = preg_match('/username="([^"]+)"/', $header, $temp);
@@ -746,34 +752,6 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
             $data['algorithm'] = $temp[1];
         else
             $data['algorithm'] = 'MD5';  // = $this->algo; ?
-
-        ## opaque -----------------------------------------------------------------
-        $temp = null;
-        // If the server sent an opaque value, the client must send it back
-        if ($this->isUseOpaque()) {
-            $ret = preg_match('/opaque="([^"]+)"/', $header, $temp);
-            if (!$ret || empty($temp[1])) {
-
-                // Big surprise: IE isn't RFC 2617-compliant.
-                $headers = $this->request->getHeaders();
-                if (!$headers->has('User-Agent'))
-                    return false;
-
-                $userAgent = $headers->get('User-Agent')->renderValueLine();
-                if (false === strpos($userAgent, 'MSIE'))
-                    return false;
-
-                $temp[1] = '';
-                $this->ieNoOpaque = true;
-            }
-
-            // This implementation only sends MD5 hex strings in the opaque value
-            if (!$this->ieNoOpaque &&
-                (32 != strlen($temp[1]) || !ctype_xdigit($temp[1])))
-                return false;
-
-            $data['opaque'] = $temp[1];
-        }
 
         ## qop ---------------------------------------------------------------------------------------
         /*
