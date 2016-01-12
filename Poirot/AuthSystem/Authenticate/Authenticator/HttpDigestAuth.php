@@ -74,7 +74,7 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
     /** @var string space-separated list of URIs, define the protection space */
     protected $domains;
     /** @var string The actual algorithm to use. Defaults to MD5 */
-    protected $algo = 'MD5';
+    protected $defaultAlgorithm = 'MD5';
     /**
      * List of supported qop options. My intention is to support both 'auth' and
      * 'auth-int', but 'auth-int' won't make it into the first version.
@@ -160,6 +160,7 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
             if ($headerData === false)
                 return false;
 
+
             if ($this->__generateNonce() != $headerData['nonce'])
                 ## client sent back same nonce
                 return false;
@@ -191,7 +192,15 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
             );
 
             $ha1 = $digestIdentity->getA1();
-            if ($this->algo == 'MD5-sess') {
+
+            $algorithm = (
+                array_key_exists('algorithm', $headerData)
+                && in_array($headerData['algorithm'], ['MD5' /* SUPPORTED ALGORITHMS */])
+            )
+                ? $headerData['algorithm']
+                : $this->defaultAlgorithm;
+
+            if ($algorithm == 'MD5-sess') {
                 /*
                  * then A1 is calculated only once. This creates a 'session key' for
                  * the authentication of subsequent requests and responses which is
@@ -201,8 +210,31 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
                 $ha1 = hash('md5', $ha1 . ':' . $headerData['nonce'] . ':' . $headerData['cnonce']);
             }
 
+
             // Calculate h(a2). The value of this hash depends on the qop
             // option selected by the client and the supported hash functions
+
+            /*
+            * The URI from Request-URI of the Request-Line; duplicated here
+            * because proxies are allowed to change the Request-Line in transit.
+            */
+            if (isset($headerData['uri'])) {
+                // Section 3.2.2.5 in RFC 2617 says the authenticating server must
+                // verify that the URI field in the Authorization header is for the
+                // same resource requested in the Request Line.
+                $rUri = $this->request->getUri();
+                $cUri = $headerData['uri'];
+
+                // Section 3.2.2.5 seems to suggest that the value of the URI
+                // Authorization field should be made into an absolute URI if the
+                // Request URI is absolute, but it's vague, and that's a bunch of
+                // code I don't want to write right now.
+
+                // Make sure the path portion of both URIs is the same
+                if ($rUri->getPath()->toString() != strtolower($cUri))
+                    return false;
+            }
+
             switch ($headerData['qop']) {
                 case 'auth':
                     $a2 = $this->request->getMethod() . ':' . $headerData['uri'];
@@ -566,7 +598,7 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
              * and/or password are invalid, and new values must be obtained.
              */
             . ( (isset($this->stale)) ? 'stale="true"' : '' )
-            . 'algorithm="' . $this->algo . '", '
+            . 'algorithm="' . $this->defaultAlgorithm . '", '
             . 'qop="' . implode(',', $this->supportedQops) . '"';
 
         return $wwwauth;
@@ -661,115 +693,52 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
         preg_match_all('@(\w+)=(?:(?:")([^"]+)"|([^\s,$]+))@', $header, $matches, PREG_SET_ORDER);
 
         $data = [];
-        foreach ($matches as $m)
-            $data[$m[1]] = $m[2] ? $m[2] : $m[3];
+        foreach ($matches as $m) {
+            $key   = $m[1];
+            $value = ($m[2]) ? $m[2] : $m[3];
+
+            switch ($key) {
+                case 'realm':
+                case 'username': if (!ctype_print($value)) return false;
+                    break;
+                case 'nonce': if (!ctype_xdigit($value)) return false;
+                    break;
+                /*
+                * A string of 32 hex digits computed as defined below, which proves
+                * that the user knows a password
+                */
+                case 'response': if (32 != strlen($value) || !ctype_xdigit($value)) return false;
+                    break;
+                /*
+                 * Indicates what "quality of protection" the client has applied to
+                 * the message. If present, its value MUST be one of the alternatives
+                 * the server indicated it supports in the WWW-Authenticate header.
+                 */
+                case 'qop':
+                    if (!in_array($value, $this->supportedQops))
+                        ## TODO not support challenge again with alternative if exists
+                        return false;
+                    break;
+                /*
+                 * This MUST be specified if a qop directive is sent (see above), and
+                 * MUST NOT be specified if the server did not send a qop directive in
+                 * the WWW-Authenticate header field. The nc-value is the hexadecimal
+                 * count of the number of requests (including the current request)
+                 * that the client has sent with the nonce value in this request. For
+                 * example, in the first request sent in response to a given nonce
+                 * value, the client sends "nc=00000001". The purpose of this
+                 * directive is to allow the server to detect request replays by
+                 * maintaining its own copy of this count - if the same nc-value is
+                 * seen twice, then the request is a replay.
+                 */
+                case 'nc': if (8 != strlen($value) || !ctype_xdigit($value)) return false;
+                    break;
+            }
+
+            $data[$key] = $value;
+        }
 
         return $data;
-
-        // TODO validate data header
-
-        ## username ------------------------------------------------------
-        $ret = preg_match('/username="([^"]+)"/', $header, $temp);
-        if (!$ret || empty($temp[1])
-            || !ctype_print($temp[1])
-            || strpos($temp[1], ':') !== false
-        )
-            return false;
-        else
-            $data['username'] = $temp[1];
-
-
-        ## realm ----------------------------------------------------------
-        $temp = null;
-        $ret = preg_match('/realm="([^"]+)"/', $header, $temp);
-        if (!$ret || empty($temp[1]))
-            return false;
-
-        if (!ctype_print($temp[1]) || strpos($temp[1], ':') !== false)
-            return false;
-        else
-            $data['realm'] = $temp[1];
-
-        ## nonce ---------------------------------------------------------
-        $temp = null;
-        $ret = preg_match('/nonce="([^"]+)"/', $header, $temp);
-        if (!$ret || empty($temp[1]))
-            return false;
-        if (!ctype_xdigit($temp[1]))
-            return false;
-
-        $data['nonce'] = $temp[1];
-
-        ## uri -----------------------------------------------------------
-        /*
-         * The URI from Request-URI of the Request-Line; duplicated here
-         * because proxies are allowed to change the Request-Line in transit.
-         */
-        $temp = null;
-        $ret = preg_match('/uri="([^"]+)"/', $header, $temp);
-        if (!$ret || empty($temp[1]))
-            return false;
-
-        // Section 3.2.2.5 in RFC 2617 says the authenticating server must
-        // verify that the URI field in the Authorization header is for the
-        // same resource requested in the Request Line.
-        $rUri = $this->request->getUri();
-        $cUri = $temp[1];
-
-        // Make sure the path portion of both URIs is the same
-        if ($rUri->getPath()->toString() != strtolower($cUri))
-            return false;
-
-        // Section 3.2.2.5 seems to suggest that the value of the URI
-        // Authorization field should be made into an absolute URI if the
-        // Request URI is absolute, but it's vague, and that's a bunch of
-        // code I don't want to write right now.
-        $data['uri'] = $temp[1];
-
-        ## response -------------------------------------------------------
-        /*
-         * A string of 32 hex digits computed as defined below, which proves
-         * that the user knows a password
-         */
-        $temp = null;
-        $ret = preg_match('/response="([^"]+)"/', $header, $temp);
-        if (!$ret || empty($temp[1]))
-            return false;
-
-        if (32 != strlen($temp[1]) || !ctype_xdigit($temp[1]))
-            return false;
-
-        $data['response'] = $temp[1];
-
-        ## algorithm -------------------------------------------------------------
-        $temp = null;
-        // The spec says this should default to MD5 if omitted. OK, so how does
-        // that square with the algo we send out in the WWW-Authenticate header,
-        // if it can easily be overridden by the client?
-        $ret = preg_match('/algorithm="?(' . $this->algo . ')"?/', $header, $temp);
-        if ($ret && !empty($temp[1])
-            && in_array($temp[1], ['MD5' /* SUPPORTED ALGORITHMS */]))
-            $data['algorithm'] = $temp[1];
-        else
-            $data['algorithm'] = 'MD5';  // = $this->algo; ?
-
-        ## qop ---------------------------------------------------------------------------------------
-        /*
-         * Indicates what "quality of protection" the client has applied to
-         * the message. If present, its value MUST be one of the alternatives
-         * the server indicated it supports in the WWW-Authenticate header.
-         */
-        $temp = null;
-        $ret = preg_match('/qop="?(' . implode('|', $this->supportedQops) . ')"?/', $header, $temp);
-        if (!$ret || empty($temp[1]))
-            ## TODO not support challenge again
-            return false;
-
-        if (!in_array($temp[1], $this->supportedQops))
-            ## TODO not support challenge again
-            return false;
-
-        $data['qop'] = $temp[1];
 
         ## cnonce -----------------------------------------------------------------
         /*
@@ -783,39 +752,5 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
          * and server to avoid chosen plaintext attacks, to provide mutual
          * authentication, and to provide some message integrity protection.
          */
-        $temp = null;
-        $ret = preg_match('/cnonce="([^"]+)"/', $header, $temp);
-        if (!$ret || empty($temp[1]))
-            return false;
-        if (!ctype_print($temp[1]))
-            return false;
-
-        $data['cnonce'] = $temp[1];
-
-        ## nc ---------------------------------------------------------------------------------------
-        /*
-         * This MUST be specified if a qop directive is sent (see above), and
-         * MUST NOT be specified if the server did not send a qop directive in
-         * the WWW-Authenticate header field. The nc-value is the hexadecimal
-         * count of the number of requests (including the current request)
-         * that the client has sent with the nonce value in this request. For
-         * example, in the first request sent in response to a given nonce
-         * value, the client sends "nc=00000001". The purpose of this
-         * directive is to allow the server to detect request replays by
-         * maintaining its own copy of this count - if the same nc-value is
-         * seen twice, then the request is a replay.
-         */
-        $temp = null;
-        $ret = preg_match('/nc="?([0-9A-Fa-f]{8})"?/', $header, $temp);
-        if (!$ret || empty($temp[1]))
-            return false;
-
-        if (8 != strlen($temp[1]) || !ctype_xdigit($temp[1]))
-            return false;
-
-        $data['nc'] = $temp[1];
-
-
-        return $data;
     }
 }
