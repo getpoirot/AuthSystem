@@ -57,5 +57,6 @@ $response->flush();
 ```
 
 ## TODO
-
+- Aggregate Authenticator
+- Aggregate Adapter
 - Write Authentication Service Layer On Top Of Adapters For Application Dispatching Control 
