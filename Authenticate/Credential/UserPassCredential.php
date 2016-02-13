@@ -82,7 +82,7 @@ class UserPassCredential extends AbstractIdentity
      *
      * @return void
      */
-    function clean()
+    function clear()
     {
         $this->__unset('username');
         $this->__unset('password');

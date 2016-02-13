@@ -75,7 +75,7 @@ class LazyFulfillmentIdentity extends FulfillmentIdentity
      *
      * @return void
      */
-    function clean()
+    function clear()
     {
         foreach($this->props()->writable as $p) {
             if ($p == 'data_provider')

@@ -13,20 +13,5 @@ use Poirot\Core\Interfaces\iPoirotOptions;
  */
 interface iIdentity extends iPoirotOptions
 {
-    /**
-     * Is Identity Full Filled
-     *
-     * - full filled mean that all needed data
-     *   set for this identity.
-     *
-     * @return boolean
-     */
-    function isFulfilled();
 
-    /**
-     * Clean Identity Data
-     *
-     * @return void
-     */
-    function clean();
 }
