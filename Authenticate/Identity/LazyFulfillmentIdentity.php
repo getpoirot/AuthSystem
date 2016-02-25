@@ -2,8 +2,7 @@
 namespace Poirot\AuthSystem\Authenticate\Identity;
 
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentityDataProvider;
-use Poirot\Core\AbstractOptions\PropsObject;
-use Poirot\Core\Interfaces\EntityInterface;
+use Poirot\Std\Interfaces\Struct\iEntityData;
 
 /*
 class UserData implements iIdentityDataProvider
@@ -37,6 +36,8 @@ $lazyLoad->from(['username' => 'payam']);
 kd($lazyLoad->getPhone());
 */
 
+// TODO refactor to new StructData interface
+
 class LazyFulfillmentIdentity extends FulfillmentIdentity
 {
     protected $_t_options__internal = [
@@ -48,7 +49,7 @@ class LazyFulfillmentIdentity extends FulfillmentIdentity
 
     /** @var iIdentityDataProvider */
     protected $_data_provider;
-    /** @var EntityInterface */
+    /** @var iEntityData */
     protected $_c__loaded_data;
 
     /**

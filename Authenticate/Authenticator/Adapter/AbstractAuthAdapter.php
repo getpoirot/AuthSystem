@@ -5,9 +5,9 @@ use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\Core\AbstractOptions;
+use Poirot\Std\Struct\AbstractOptionsData;
 
-abstract class AbstractAuthAdapter extends AbstractOptions
+abstract class AbstractAuthAdapter extends AbstractOptionsData
     implements iAuthAdapter
 {
     protected $credential;

@@ -8,7 +8,7 @@ use Poirot\AuthSystem\Authenticate\Identity\HttpDigestIdentity;
 use Poirot\AuthSystem\Authenticate\Identity\UsernameIdentity;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\Core\ErrorStack;
+use Poirot\Std\ErrorStack;
 
 class DigestFileAuthAdapter extends AbstractAuthAdapter
 {
@@ -28,7 +28,7 @@ class DigestFileAuthAdapter extends AbstractAuthAdapter
         ($credential !== null) ?: $credential = $this->credential;
 
         if (!$credential instanceof iCredential || !$credential->isFulfilled())
-            throw new \Exception(sprintf('Credential (%s) is not Fulfilled.', \Poirot\Core\flatten($credential)));
+            throw new \Exception(sprintf('Credential (%s) is not Fulfilled.', \Poirot\Std\flatten($credential)));
 
         ErrorStack::handleError(E_WARNING);
         $hFile = fopen($this->getFilename(), 'r');
@@ -39,7 +39,7 @@ class DigestFileAuthAdapter extends AbstractAuthAdapter
 
         /** @var string $username */
         /** @var string $password */
-        extract($credential->toArray());
+        extract(\Poirot\Std\iterator_to_array($credential));
         if (!isset($username))
             throw new MissingCredentialException(sprintf(
                 'Credential (%s) not contains Username.', get_class($credential)

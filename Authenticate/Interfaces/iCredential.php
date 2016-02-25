@@ -1,8 +1,6 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
-use Poirot\Core\AbstractOptions;
-
 /**
  * Credential used by authenticator to authenticate user
  * usually checked against storage data like mysql, etc.

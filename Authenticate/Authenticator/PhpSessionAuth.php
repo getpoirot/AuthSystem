@@ -6,8 +6,7 @@ use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\Core\AbstractOptions;
-use Poirot\Core\Interfaces\iDataSetConveyor;
+use Poirot\Std\Interfaces\Struct\iDataStruct;
 
 class PhpSessionAuth extends AbstractAuthenticator
     implements iAuthenticator
@@ -18,7 +17,7 @@ class PhpSessionAuth extends AbstractAuthenticator
      * Authenticate user with Credential Data and return
      * FullFilled Identity Instance
      *
-     * @param iCredential|iDataSetConveyor|array $credential \
+     * @param iCredential|iDataStruct|array $credential \
      * Credential can be extracted from this
      *
      * @throws AuthenticationException Or extend of this

@@ -2,7 +2,6 @@
 namespace Poirot\AuthSystem\Authenticate\Identity;
 
 use Poirot\AuthSystem\Authenticate\AbstractIdentity;
-use Poirot\Core\AbstractOptions;
 
 /*
 ## this mean authenticator need at least username to satisfy by identifier
@@ -31,7 +30,7 @@ class FulfillmentIdentity extends AbstractIdentity
      */
     function setFulfillmentBy($property)
     {
-        $this->__fulfillment_property = \Poirot\Core\sanitize_underscore($property);
+        $this->__fulfillment_property = \Poirot\Std\sanitize_under_score($property);
         return $this;
     }
 
@@ -43,8 +42,10 @@ class FulfillmentIdentity extends AbstractIdentity
      *
      * @return boolean
      */
-    function isFulfilled()
+    function isFulfilled($key = null)
     {
+        // TODO implement check for specific key property fulfillment
+
         return (self::__isset($this->__fulfillment_property) && self::__get($this->__fulfillment_property))
             ? true : false;
     }

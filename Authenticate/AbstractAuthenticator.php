@@ -8,7 +8,6 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Interfaces\HttpMessageAware\iAuthenticator as HttpAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\Core\AbstractOptions;
 
 /*
 $auth       = new Authenticator(['identity' => new UsernameIdentity]);

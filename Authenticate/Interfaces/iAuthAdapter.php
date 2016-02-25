@@ -2,9 +2,9 @@
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
-use Poirot\Core\Interfaces\iOptionImplement;
+use Poirot\Std\Interfaces\Struct\iOptionsData;
 
-interface iAuthAdapter extends iOptionImplement
+interface iAuthAdapter extends iOptionsData
 {
     /**
      * Get Identity Match By Identity

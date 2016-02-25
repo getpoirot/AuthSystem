@@ -8,7 +8,6 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredentialHttpAware;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\Core\AbstractOptions;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\Http\Message\HttpRequest;
 

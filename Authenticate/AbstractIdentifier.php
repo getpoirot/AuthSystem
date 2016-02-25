@@ -5,11 +5,11 @@ use Poirot\AuthSystem\Authenticate\Exceptions\NotAuthenticatedException;
 use Poirot\AuthSystem\Authenticate\Identity\OpenIdentity;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\Core\BuilderSetterTrait;
+use Poirot\Std\SetterBuilderTrait;
 
 abstract class AbstractIdentifier implements iIdentifier
 {
-    use BuilderSetterTrait;
+    use SetterBuilderTrait;
 
     const STORAGE_REALM          = 'Default_Auth';
     const STORAGE_IDENTITY_KEY   = 'identity';

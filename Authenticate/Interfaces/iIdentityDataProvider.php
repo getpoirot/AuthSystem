@@ -1,8 +1,6 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
-use Poirot\Core\Interfaces\EntityInterface;
-
 /*
 class UserData implements iIdentityDataProvider
 {
@@ -38,6 +36,7 @@ if ($auth->hasAuthenticated()) {
     echo ("<h1>Hello User {$auth->identity()->getEmail()}</h1>");
 }
 */
+use Poirot\Std\Interfaces\Struct\iEntityData;
 
 /**
  * Data Model Used Within Identifier/Identity
@@ -55,7 +54,7 @@ interface iIdentityDataProvider
      * @param mixed  $value     ie. 'payam@mail.com'
      *
      * @throws \Exception
-     * @return EntityInterface
+     * @return iEntityData
      */
     function findBy($property, $value);
 }

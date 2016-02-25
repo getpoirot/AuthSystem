@@ -33,8 +33,10 @@ class UsernameIdentity extends AbstractIdentity
      *
      * @return boolean
      */
-    function isFulfilled()
+    function isFulfilled($key = null)
     {
+        // TODO implement check for specific key property fulfillment
+
         return ($this->getUsername() !== null) ? true : false;
     }
 }

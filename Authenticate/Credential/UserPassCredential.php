@@ -3,7 +3,6 @@ namespace Poirot\AuthSystem\Authenticate\Credential;
 
 use Poirot\AuthSystem\Authenticate\AbstractIdentity;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredentialHttpAware;
-use Poirot\Core\AbstractOptions;
 use Poirot\Http\Interfaces\Message\iHttpRequest;
 use Poirot\Http\Message\HttpRequest;
 
@@ -64,29 +63,6 @@ class UserPassCredential extends AbstractIdentity
             return $this->setPassword($password);
         }
 
-    /**
-     * Is Identity Full Filled
-     *
-     * - full filled mean that all needed data
-     *   set for this identity.
-     *
-     * @return boolean
-     */
-    function isFulfilled()
-    {
-        return ($this->getUsername() !== null && $this->getPassword() !== null);
-    }
-
-    /**
-     * Clean Identity Data
-     *
-     * @return void
-     */
-    function clear()
-    {
-        $this->__unset('username');
-        $this->__unset('password');
-    }
 
     /**
      * Set Options From Request Http Object
@@ -109,7 +85,7 @@ class UserPassCredential extends AbstractIdentity
 
         // TODO define post value map request
         $POST = $request->plg()->phpServer()->getPost()->toArray();
-        $this->fromArray($POST);
+        $this->from($POST);
 
         return $this;
     }
