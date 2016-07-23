@@ -10,8 +10,8 @@
         }
     ],
     "require": {
-        "poirot/std": "dev-master"
-        , "poirot/storage": "dev-master"
+        "poirot/std": "dev-devel"
+        , "poirot/storage": "dev-devel"
     },
     "target-dir": "Poirot/AuthSystem",
     "autoload"  : {
