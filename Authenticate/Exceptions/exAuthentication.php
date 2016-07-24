@@ -3,7 +3,8 @@ namespace Poirot\AuthSystem\Authenticate\Exceptions;
 
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator;
 
-class AuthenticationException extends \RuntimeException
+class exAuthentication 
+    extends \RuntimeException
 {
     const EXCEPTION_DEFAULT_MESSAGE = 'Authentication Failed';
     const EXCEPTION_DEFAULT_CODE    = 403;

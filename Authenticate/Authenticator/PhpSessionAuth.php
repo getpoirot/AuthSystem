@@ -2,7 +2,7 @@
 namespace Poirot\AuthSystem\Authenticate\Authenticator;
 
 use Poirot\AuthSystem\Authenticate\AbstractAuthenticator;
-use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
+use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
@@ -20,7 +20,7 @@ class PhpSessionAuth extends AbstractAuthenticator
      * @param iCredential|iDataStruct|array $credential \
      * Credential can be extracted from this
      *
-     * @throws AuthenticationException Or extend of this
+     * @throws exAuthentication Or extend of this
      * @return iIdentity|void
      */
     protected function doAuthenticate($credential = null)

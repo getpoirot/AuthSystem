@@ -1,12 +1,13 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Credential;
 
-use Poirot\AuthSystem\Authenticate\AbstractIdentity;
+use Poirot\AuthSystem\Authenticate\aIdentity;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredentialHttpAware;
-use Poirot\Http\Interfaces\Message\iHttpRequest;
-use Poirot\Http\Message\HttpRequest;
+use Poirot\Http\HttpRequest;
+use Poirot\Http\Interfaces\iHttpRequest;
 
-class UserPassCredential extends AbstractIdentity
+class CredentialUserPass
+    extends aIdentity
     implements iCredentialHttpAware
 {
     protected $username;

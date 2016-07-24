@@ -1,11 +1,11 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Authenticator\Adapter;
 
-use Poirot\AuthSystem\Authenticate\Credential\UserPassCredential;
-use Poirot\AuthSystem\Authenticate\Exceptions\MissingCredentialException;
-use Poirot\AuthSystem\Authenticate\Exceptions\WrongCredentialException;
+use Poirot\AuthSystem\Authenticate\Credential\CredentialUserPass;
+use Poirot\AuthSystem\Authenticate\Exceptions\exMissingCredential;
+use Poirot\AuthSystem\Authenticate\Exceptions\exWrongCredential;
 use Poirot\AuthSystem\Authenticate\Identity\HttpDigestIdentity;
-use Poirot\AuthSystem\Authenticate\Identity\UsernameIdentity;
+use Poirot\AuthSystem\Authenticate\Identity\IdentityUsername;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Std\ErrorStack;
@@ -19,11 +19,11 @@ class DigestFileAuthAdapter extends AbstractAuthAdapter
      *
      * @param iCredential|null $credential
      *
-     * @throws WrongCredentialException
+     * @throws exWrongCredential
      * @throws \Exception Credential not fulfill
      * @return iIdentity
      */
-    function doIdentityMatch($credential = null)
+    function getIdentityMatch($credential = null)
     {
         ($credential !== null) ?: $credential = $this->credential;
 
@@ -41,7 +41,7 @@ class DigestFileAuthAdapter extends AbstractAuthAdapter
         /** @var string $password */
         extract(\Poirot\Std\iterator_to_array($credential));
         if (!isset($username))
-            throw new MissingCredentialException(sprintf(
+            throw new exMissingCredential(sprintf(
                 'Credential (%s) not contains Username.', get_class($credential)
             ));
 
@@ -63,10 +63,10 @@ class DigestFileAuthAdapter extends AbstractAuthAdapter
                 && strtolower(substr($line, -32)) === strtolower(md5("$username:$realm:$password"))
             )
                 ## user/pass credential match
-                return new UsernameIdentity(['username' => $username]);
+                return new IdentityUsername(['username' => $username]);
         }
 
-        throw new WrongCredentialException('Invalid Username or password.');
+        throw new exWrongCredential('Invalid Username or password.');
     }
 
     /**
@@ -74,7 +74,7 @@ class DigestFileAuthAdapter extends AbstractAuthAdapter
      */
     static function newCredential()
     {
-        return new UserPassCredential;
+        return new CredentialUserPass;
     }
 
 

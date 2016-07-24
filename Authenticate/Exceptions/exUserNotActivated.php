@@ -1,7 +1,8 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Exceptions;
 
-class UserNotActivatedException extends AuthenticationException
+class exUserNotActivated
+    extends exAuthentication
 {
     const EXCEPTION_DEFAULT_MESSAGE = 'User Not Activated';
 }

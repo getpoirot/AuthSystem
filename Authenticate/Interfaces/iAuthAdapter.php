@@ -1,21 +1,23 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
-use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
-use Poirot\Std\Interfaces\Struct\iOptionsData;
+use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
+use Poirot\Std\Interfaces\Struct\iDataOptions;
 
-interface iAuthAdapter extends iOptionsData
+interface iAuthAdapter 
+    extends iDataOptions
 {
     /**
-     * Get Identity Match By Identity
+     * Get Identity Match By Credential
      *
      * @param iCredential|null $credential Fulfilled Credential
      *
-     * @throws AuthenticationException
-     * @throws \Exception credential or etc.
+     * @ignore
      * @return iIdentity
+     * @throws exAuthentication
+     * @throws \Exception credential or etc.
      */
-    function doIdentityMatch($credential = null);
+    function getIdentityMatch($credential = null);
 
     /**
      * Credential

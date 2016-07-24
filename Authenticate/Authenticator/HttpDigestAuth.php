@@ -3,11 +3,11 @@ namespace Poirot\AuthSystem\Authenticate\Authenticator;
 
 use Poirot\AuthSystem\Authenticate\AbstractHttpAuthenticator;
 use Poirot\AuthSystem\Authenticate\Authenticator\Adapter\DigestFileAuthAdapter;
-use Poirot\AuthSystem\Authenticate\Credential\OpenCredential;
-use Poirot\AuthSystem\Authenticate\Credential\UserPassCredential;
-use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
+use Poirot\AuthSystem\Authenticate\Credential\CredentialOpen;
+use Poirot\AuthSystem\Authenticate\Credential\CredentialUserPass;
+use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 use Poirot\AuthSystem\Authenticate\Identity\HttpDigestIdentity;
-use Poirot\AuthSystem\Authenticate\Identity\UsernameIdentity;
+use Poirot\AuthSystem\Authenticate\Identity\IdentityUsername;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
@@ -143,7 +143,7 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
             if (count($creds) != 2)
                 return false;
 
-            $credential = new UserPassCredential(['username' => $creds[0], 'password' => $creds[1]]);
+            $credential = new CredentialUserPass(['username' => $creds[0], 'password' => $creds[1]]);
             return $credential;
         }
 
@@ -187,8 +187,8 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
              */
 
             /** @var HttpDigestIdentity $digestIdentity */
-            $digestIdentity = $this->getDigestAdapter()->doIdentityMatch(
-                new OpenCredential(['username' => $headerData['username']])
+            $digestIdentity = $this->getDigestAdapter()->getIdentityMatch(
+                new CredentialOpen(['username' => $headerData['username']])
             );
 
             $ha1 = $digestIdentity->getA1();
@@ -257,7 +257,7 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
 
             // If our digest matches the client's let them in
             if ($digest == $headerData['response']) {
-                $identity = new UsernameIdentity([ 'username' => $headerData['username'] ]);
+                $identity = new IdentityUsername([ 'username' => $headerData['username'] ]);
                 return $identity;
             }
         }
@@ -336,11 +336,11 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
     /**
      * Manipulate Response From Exception Then Throw It
      *
-     * @param AuthenticationException $exception
+     * @param exAuthentication $exception
      *
-     * @throws AuthenticationException
+     * @throws exAuthentication
      */
-    protected function riseException(AuthenticationException $exception)
+    protected function riseException(exAuthentication $exception)
     {
         $this->__sendChalengeHeaders();
 

@@ -2,7 +2,7 @@
 namespace Poirot\AuthSystem\Authenticate;
 
 use Poirot\AuthSystem\Authenticate\Authenticator\Adapter\DigestFileAuthAdapter;
-use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
+use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Interfaces\HttpMessageAware\iAuthenticator as HttpAuthenticator;
@@ -84,7 +84,7 @@ abstract class AbstractAuthenticator extends AbstractIdentifier
      * @param mixed $credential \
      * Credential can be extracted from this
      *
-     * @throws AuthenticationException|\Exception Or extend of this
+     * @throws exAuthentication|\Exception Or extend of this
      * @return iAuthenticator|HttpAuthenticator
      */
     function authenticate($credential = null)
@@ -94,12 +94,12 @@ abstract class AbstractAuthenticator extends AbstractIdentifier
             return $this;
 
         if ($credential instanceof iAuthAdapter)
-            $identity = $credential->doIdentityMatch();
+            $identity = $credential->getIdentityMatch();
         else
             $identity = $this->doAuthenticate($credential);
 
         if (!$identity instanceof iIdentity && !$identity->isFulfilled())
-            throw (new AuthenticationException)->setAuthenticator($this);
+            throw (new exAuthentication)->setAuthenticator($this);
 
         $this->identity()->from($identity);
         if (!$this->identity()->isFulfilled())
@@ -119,7 +119,7 @@ abstract class AbstractAuthenticator extends AbstractIdentifier
      * @param iCredential|mixed $credential \
      * Credential can be extracted from this
      *
-     * @throws AuthenticationException Or extend of this
+     * @throws exAuthentication Or extend of this
      * @return iIdentity|void
      */
     protected function doAuthenticate($credential = null)
@@ -130,7 +130,7 @@ abstract class AbstractAuthenticator extends AbstractIdentifier
         if (!$credential instanceof iCredential)
             throw new \InvalidArgumentException(sprintf('%s Credential can`t be empty.', get_class($this)));
 
-        $identity = $this->getAdapter()->doIdentityMatch($credential);
+        $identity = $this->getAdapter()->getIdentityMatch($credential);
         return $identity;
     }
 

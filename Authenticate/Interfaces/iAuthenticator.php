@@ -1,9 +1,10 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
-use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
+use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 
-Interface iAuthenticator extends iIdentifier
+Interface iAuthenticator 
+    extends iIdentifier
 {
     /**
      * Authenticate
@@ -23,7 +24,7 @@ Interface iAuthenticator extends iIdentifier
      *
      * @param iCredential|iAuthAdapter $credential
      *
-     * @throws AuthenticationException|\Exception Or extend of this
+     * @throws exAuthentication|\Exception Or extend of this
      * @return $this
      */
     function authenticate($credential = null);

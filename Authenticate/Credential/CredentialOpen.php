@@ -1,7 +1,8 @@
 <?php
-namespace Poirot\AuthSystem\Authenticate\Interfaces;
+namespace Poirot\AuthSystem\Authenticate\Credential;
 
-use Poirot\Std\Interfaces\Struct\iDataOptions;
+use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
+use Poirot\Std\Struct\DataOptionsOpen;
 
 /**
  * Credential used by authenticator to authenticate user
@@ -23,6 +24,7 @@ use Poirot\Std\Interfaces\Struct\iDataOptions;
  * [code]
  */
 
-interface iCredential
-    extends iDataOptions
+class CredentialOpen
+    extends DataOptionsOpen
+    implements iCredential
 { }

@@ -1,11 +1,14 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Interfaces\HttpMessageAware;
 
-use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
-use Poirot\Http\Interfaces\Message\iHttpRequest;
+use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator as iBaseAuthenticator;
+use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
+
+use Poirot\Http\Interfaces\iHttpRequest;
 use Poirot\Http\Interfaces\Respec\iRequestAware;
 
-interface iAuthenticator extends \Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator
+interface iAuthenticator 
+    extends iBaseAuthenticator
     , iRequestAware
 {
     /**
@@ -20,7 +23,7 @@ interface iAuthenticator extends \Poirot\AuthSystem\Authenticate\Interfaces\iAut
      *
      * @param iHttpRequest $request
      *
-     * @throws AuthenticationException Or extend of this
+     * @throws exAuthentication Or extend of this
      * @throws \Exception request invalid or etc.
      * @return $this
      */

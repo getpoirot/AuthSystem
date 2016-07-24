@@ -1,8 +1,8 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate;
 
-use Poirot\AuthSystem\Authenticate\Exceptions\NotAuthenticatedException;
-use Poirot\AuthSystem\Authenticate\Identity\OpenIdentity;
+use Poirot\AuthSystem\Authenticate\Exceptions\exNotAuthenticated;
+use Poirot\AuthSystem\Authenticate\Identity\IdentityOpen;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Std\SetterBuilderTrait;
@@ -38,7 +38,7 @@ abstract class AbstractIdentifier implements iIdentifier
      *
      * @param iIdentity $identity
      *
-     * @throws NotAuthenticatedException Identity not full filled
+     * @throws exNotAuthenticated Identity not full filled
      * @return $this
      */
     function setIdentity(iIdentity $identity)
@@ -142,7 +142,7 @@ abstract class AbstractIdentifier implements iIdentifier
     function getDefaultIdentity()
     {
         if (!$this->defaultIdentity)
-            $this->defaultIdentity = new OpenIdentity;
+            $this->defaultIdentity = new IdentityOpen;
 
         return $this->defaultIdentity;
     }

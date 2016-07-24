@@ -1,6 +1,6 @@
 <?php
 namespace Poirot\AuthSystem\Authorize\Interfaces;
-use Poirot\Std\Interfaces\Struct\iOptionsData;
+use Poirot\Std\Interfaces\Struct\iDataOptions;
 
 /**
  * Each Permission has some resource
@@ -12,7 +12,6 @@ use Poirot\Std\Interfaces\Struct\iOptionsData;
  * combination
  *
  */
-interface iAuthResource extends iOptionsData
-{
-
-}
+interface iAuthResource 
+    extends iDataOptions
+{ }

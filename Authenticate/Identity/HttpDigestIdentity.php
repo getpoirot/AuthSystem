@@ -1,9 +1,9 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Identity;
 
-use Poirot\AuthSystem\Authenticate\AbstractIdentity;
+use Poirot\AuthSystem\Authenticate\aIdentity;
 
-class HttpDigestIdentity extends AbstractIdentity
+class HttpDigestIdentity extends aIdentity
 {
     protected $username;
     protected $hash;     ## A1 = md5(username:realm:password)

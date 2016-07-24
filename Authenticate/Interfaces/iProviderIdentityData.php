@@ -36,7 +36,7 @@ if ($auth->hasAuthenticated()) {
     echo ("<h1>Hello User {$auth->identity()->getEmail()}</h1>");
 }
 */
-use Poirot\Std\Interfaces\Struct\iEntityData;
+use Poirot\Std\Interfaces\Struct\iData;
 
 /**
  * Data Model Used Within Identifier/Identity
@@ -45,7 +45,7 @@ use Poirot\Std\Interfaces\Struct\iEntityData;
  * this data model can injected into
  * classes that implemented this feature
  */
-interface iIdentityDataProvider
+interface iProviderIdentityData
 {
     /**
      * Finds a user by the given user Identity.
@@ -53,8 +53,8 @@ interface iIdentityDataProvider
      * @param string $property  ie. 'user_name'
      * @param mixed  $value     ie. 'payam@mail.com'
      *
+     * @return iData
      * @throws \Exception
-     * @return iEntityData
      */
     function findBy($property, $value);
 }

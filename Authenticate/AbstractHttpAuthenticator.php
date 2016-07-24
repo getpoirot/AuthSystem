@@ -1,8 +1,8 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate;
 
-use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
-use Poirot\AuthSystem\Authenticate\Exceptions\MissingCredentialException;
+use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
+use Poirot\AuthSystem\Authenticate\Exceptions\exMissingCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\HttpMessageAware\iAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
@@ -57,7 +57,7 @@ abstract class AbstractHttpAuthenticator extends AbstractAuthenticator
      * @param iCredential|iHttpRequest $credential \
      * Credential can be extracted from this
      *
-     * @throws AuthenticationException Or extend of this
+     * @throws exAuthentication Or extend of this
      * @return iIdentity|void
      */
     protected function doAuthenticate($credential = null)
@@ -70,19 +70,19 @@ abstract class AbstractHttpAuthenticator extends AbstractAuthenticator
             $credential = $this->doExtractCredentialFromRequest(new HttpRequest($credential));
             if (!$credential)
                 // if auth credential not available it cause user get authorize require response
-                $this->riseException(new AuthenticationException);
+                $this->riseException(new exAuthentication);
 
             if ($credential instanceof iAuthAdapter)
-                return $credential->doIdentityMatch();
+                return $credential->getIdentityMatch();
 
             if ($credential instanceof iIdentity)
                 return $credential;
         }
 
         if (!$credential instanceof iCredential || !$credential->isFulfilled())
-            throw new MissingCredentialException(sprintf('%s Credential can`t be empty.', get_class($this)));
+            throw new exMissingCredential(sprintf('%s Credential can`t be empty.', get_class($this)));
 
-        $identity = $this->getAdapter()->doIdentityMatch($credential);
+        $identity = $this->getAdapter()->getIdentityMatch($credential);
         return $identity;
     }
 
@@ -110,11 +110,11 @@ abstract class AbstractHttpAuthenticator extends AbstractAuthenticator
     /**
      * Manipulate Response From Exception Then Throw It
      *
-     * @param AuthenticationException $exception
+     * @param exAuthentication $exception
      *
-     * @throws AuthenticationException
+     * @throws exAuthentication
      */
-    protected function riseException(AuthenticationException $exception)
+    protected function riseException(exAuthentication $exception)
     {
         $this->response()->setStatCode($exception->getCode());
         $exception->setAuthenticator($this);

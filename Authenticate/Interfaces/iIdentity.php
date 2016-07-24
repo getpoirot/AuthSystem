@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
-use Poirot\Std\Interfaces\Struct\iOptionsData;
+use Poirot\Std\Interfaces\Struct\iDataOptions;
 
 /**
  * Represent User Identity and Data
@@ -12,7 +12,6 @@ use Poirot\Std\Interfaces\Struct\iOptionsData;
  * [code]
  *
  */
-interface iIdentity extends iOptionsData
-{
-
-}
+interface iIdentity 
+    extends iDataOptions
+{ }

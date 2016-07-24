@@ -1,9 +1,10 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
-use Poirot\Http\Interfaces\Message\iHttpRequest;
+use Poirot\Http\Interfaces\iHttpRequest;
 
-interface iCredentialHttpAware extends iCredential
+interface iCredentialHttpAware 
+    extends iCredential
 {
     /**
      * Set Options From Request Http Object

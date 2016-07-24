@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Authenticator\Adapter;
 
-use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationException;
+use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
@@ -18,11 +18,11 @@ abstract class AbstractAuthAdapter extends AbstractOptionsData
      *
      * @param iCredential|null $credential
      *
-     * @throws AuthenticationException
+     * @throws exAuthentication
      * @throws \Exception credential or etc.
      * @return iIdentity
      */
-    abstract function doIdentityMatch($credential = null);
+    abstract function getIdentityMatch($credential = null);
 
 
     // ...

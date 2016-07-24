@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
-use Poirot\AuthSystem\Authenticate\Exceptions\NotAuthenticatedException;
+use Poirot\AuthSystem\Authenticate\Exceptions\exNotAuthenticated;
 
 /**
  * Sign In/Out User as Identity into Environment
@@ -34,7 +34,7 @@ interface iIdentifier
      *
      * @param iIdentity $identity
      *
-     * @throws NotAuthenticatedException Identity not full filled
+     * @throws exNotAuthenticated Identity not full filled
      * @return $this
      */
     function setIdentity(iIdentity $identity);
