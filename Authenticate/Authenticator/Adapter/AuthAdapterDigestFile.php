@@ -10,7 +10,8 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Std\ErrorStack;
 
-class DigestFileAuthAdapter extends AbstractAuthAdapter
+class AuthAdapterDigestFile 
+    extends aAuthAdapter
 {
     protected $filename;
 
@@ -39,7 +40,7 @@ class DigestFileAuthAdapter extends AbstractAuthAdapter
 
         /** @var string $username */
         /** @var string $password */
-        extract(\Poirot\Std\iterator_to_array($credential));
+        extract(\Poirot\Std\cast($credential)->toArray());
         if (!isset($username))
             throw new exMissingCredential(sprintf(
                 'Credential (%s) not contains Username.', get_class($credential)

@@ -1,8 +1,8 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Authenticator;
 
-use Poirot\AuthSystem\Authenticate\AbstractHttpAuthenticator;
-use Poirot\AuthSystem\Authenticate\Authenticator\Adapter\DigestFileAuthAdapter;
+use Poirot\AuthSystem\Authenticate\aAuthenticatorHttp;
+use Poirot\AuthSystem\Authenticate\Authenticator\Adapter\AuthAdapterDigestFile;
 use Poirot\AuthSystem\Authenticate\Credential\CredentialOpen;
 use Poirot\AuthSystem\Authenticate\Credential\CredentialUserPass;
 use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
@@ -11,8 +11,6 @@ use Poirot\AuthSystem\Authenticate\Identity\IdentityUsername;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\Http\Header\HeaderFactory;
-use Poirot\Http\Message\HttpRequest;
 
 /*
 $request  = new HttpRequest(new PhpServerRequestBuilder);
@@ -53,7 +51,8 @@ if ($auth->hasAuthenticated()) {
 $response->flush();
 */
 
-class HttpDigestAuth extends AbstractHttpAuthenticator
+class AuthenticatorHttpDigest
+    extends aAuthenticatorHttp
 {
     // Options
     /** @var bool */
@@ -273,7 +272,7 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
      * @see identity()
      * @return iIdentity|null Null if no change need
      */
-    function attainSignedIdentity()
+    function doAttainSignedIdentity()
     {
         ## when user signed in, identity is available during authentication process with
         ## Authorize header and no need to change.
@@ -397,7 +396,7 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
     function getDigestAdapter()
     {
         if (!$this->digestAdapter)
-            $this->setDigestAdapter(new DigestFileAuthAdapter);
+            $this->setDigestAdapter(new AuthAdapterDigestFile);
 
         return $this->digestAdapter;
     }
@@ -409,7 +408,7 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
     function getBasicAdapter()
     {
         if (!$this->basicAdapter)
-            $this->setBasicAdapter(new DigestFileAuthAdapter);
+            $this->setBasicAdapter(new AuthAdapterDigestFile);
 
         return $this->basicAdapter;
     }

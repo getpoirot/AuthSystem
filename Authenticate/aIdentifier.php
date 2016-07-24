@@ -5,12 +5,12 @@ use Poirot\AuthSystem\Authenticate\Exceptions\exNotAuthenticated;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityOpen;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\Std\SetterBuilderTrait;
+use Poirot\Std\ConfigurableSetter;
 
-abstract class AbstractIdentifier implements iIdentifier
+abstract class aIdentifier
+    extends ConfigurableSetter
+    implements iIdentifier
 {
-    use SetterBuilderTrait;
-
     const STORAGE_REALM          = 'Default_Auth';
     const STORAGE_IDENTITY_KEY   = 'identity';
 
@@ -22,17 +22,7 @@ abstract class AbstractIdentifier implements iIdentifier
     protected $defaultIdentity;
     protected $realm;
 
-    /**
-     * Construct
-     *
-     * @param array|null $options
-     */
-    function __construct(array $options = null)
-    {
-        if ($options !== null)
-            $this->setupFromArray($options);
-    }
-
+    
     /**
      * Inject Identity
      *
@@ -61,7 +51,7 @@ abstract class AbstractIdentifier implements iIdentifier
     function identity()
     {
         if (!$this->identity)
-            $this->identity = $this->getDefaultIdentity();
+            $this->identity = $this->_getDefaultIdentity();
 
         if($this->identity->isFulfilled())
             return $this->identity;
@@ -69,10 +59,10 @@ abstract class AbstractIdentifier implements iIdentifier
 
         // Attain Identity:
         if ($this->isSignIn()) {
-            $identity = $this->attainSignedIdentity();
+            $identity = $this->doAttainSignedIdentity();
             if ($identity !== null)
                 ## update identity
-                $this->identity->from($identity);
+                $this->identity->import($identity);
         }
 
         return $this->identity;
@@ -90,7 +80,7 @@ abstract class AbstractIdentifier implements iIdentifier
      * @see identity()
      * @return iIdentity|null Null if no change need
      */
-    abstract function attainSignedIdentity();
+    abstract function doAttainSignedIdentity();
 
 
     // Options:
@@ -139,7 +129,7 @@ abstract class AbstractIdentifier implements iIdentifier
      * Get Default Identity Instance
      * @return iIdentity
      */
-    function getDefaultIdentity()
+    protected function _getDefaultIdentity()
     {
         if (!$this->defaultIdentity)
             $this->defaultIdentity = new IdentityOpen;

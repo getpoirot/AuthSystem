@@ -1,10 +1,10 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate;
 
-use Poirot\Http\Interfaces\Message\iHttpRequest;
-use Poirot\Http\Interfaces\Message\iHttpResponse;
-use Poirot\Http\Message\HttpRequest;
-use Poirot\Http\Message\HttpResponse;
+use Poirot\Http\HttpRequest;
+use Poirot\Http\HttpResponse;
+use Poirot\Http\Interfaces\iHttpRequest;
+use Poirot\Http\Interfaces\iHttpResponse;
 
 trait TraitHttpIdentifier
 {

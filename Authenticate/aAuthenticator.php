@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate;
 
-use Poirot\AuthSystem\Authenticate\Authenticator\Adapter\DigestFileAuthAdapter;
+use Poirot\AuthSystem\Authenticate\Authenticator\Adapter\AuthAdapterDigestFile;
 use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
@@ -57,7 +57,8 @@ echo "<h1>Hello User {$auth->identifier()->identity()->getUsername()}</h1>";
 die('>_');
 */
 
-abstract class AbstractAuthenticator extends AbstractIdentifier
+abstract class aAuthenticator
+    extends aIdentifier
     implements iAuthenticator
 {
     /** @var iAuthAdapter Credential Authenticate Match Adapter (check usr/pas) */
@@ -101,7 +102,7 @@ abstract class AbstractAuthenticator extends AbstractIdentifier
         if (!$identity instanceof iIdentity && !$identity->isFulfilled())
             throw (new exAuthentication)->setAuthenticator($this);
 
-        $this->identity()->from($identity);
+        $this->identity()->import($identity);
         if (!$this->identity()->isFulfilled())
             throw new \Exception(
                 'User Authenticated Successfully But Identifier Identity Not'
@@ -173,7 +174,7 @@ abstract class AbstractAuthenticator extends AbstractIdentifier
     function getAdapter()
     {
         if (!$this->adapter)
-            $this->adapter = new DigestFileAuthAdapter;
+            $this->adapter = new AuthAdapterDigestFile;
 
         $this->adapter->setRealm($this->getRealm());
         return $this->adapter;

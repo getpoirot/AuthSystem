@@ -1,11 +1,8 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Authenticator;
 
-use Poirot\AuthSystem\Authenticate\AbstractHttpAuthenticator;
-use Poirot\Http\Header\HeaderFactory;
+use Poirot\AuthSystem\Authenticate\aAuthenticatorHttp;
 use Poirot\Http\Interfaces\iHeader;
-use Poirot\Http\Util\cookie;
-use Poirot\Http\Util\UCookie;
 use Poirot\Storage\Gateway\SessionData;
 use Poirot\Stream\Streamable;
 
@@ -73,7 +70,8 @@ if ($auth->hasAuthenticated()) {
 $response->flush();
 */
 
-class HttpSessionAuth extends AbstractHttpAuthenticator
+class AuthenticatorHttpSession
+    extends aAuthenticatorHttp
 {
     use TraitSessionAuth{
         TraitSessionAuth::signIn  as protected _t__signIn;

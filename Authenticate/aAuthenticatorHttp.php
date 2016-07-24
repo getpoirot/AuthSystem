@@ -8,8 +8,8 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredentialHttpAware;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\Http\Interfaces\Message\iHttpRequest;
-use Poirot\Http\Message\HttpRequest;
+use Poirot\Http\HttpRequest;
+use Poirot\Http\Interfaces\iHttpRequest;
 
 /*
 $auth     = new Authenticator\HttpSessionAuth([
@@ -43,7 +43,8 @@ try {
 $response->flush();
 */
 
-abstract class AbstractHttpAuthenticator extends AbstractAuthenticator
+abstract class aAuthenticatorHttp 
+    extends aAuthenticator
     implements iAuthenticator
 {
     use TraitHttpIdentifier;
@@ -116,7 +117,7 @@ abstract class AbstractHttpAuthenticator extends AbstractAuthenticator
      */
     protected function riseException(exAuthentication $exception)
     {
-        $this->response()->setStatCode($exception->getCode());
+        $this->response()->setStatusCode($exception->getCode());
         $exception->setAuthenticator($this);
 
         throw $exception;

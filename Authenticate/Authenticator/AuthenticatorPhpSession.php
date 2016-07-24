@@ -1,14 +1,14 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Authenticator;
 
-use Poirot\AuthSystem\Authenticate\AbstractAuthenticator;
+use Poirot\AuthSystem\Authenticate\aAuthenticator;
 use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\Std\Interfaces\Struct\iDataStruct;
 
-class PhpSessionAuth extends AbstractAuthenticator
+class AuthenticatorPhpSession
+    extends aAuthenticator
     implements iAuthenticator
 {
     use TraitSessionAuth;
