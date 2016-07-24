@@ -6,6 +6,7 @@ use Poirot\AuthSystem\Authenticate\Exceptions\exWrongCredential;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityHttpDigest;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityUsername;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
+
 use Poirot\Std\ErrorStack;
 
 class AuthAdapterDigestFile 
@@ -83,7 +84,7 @@ class AuthAdapterDigestFile
      */
     public function setUsername($username)
     {
-        $this->username = $username;
+        $this->username = (string) $username;
         return $this;
     }
 
@@ -101,7 +102,7 @@ class AuthAdapterDigestFile
      */
     public function setPassword($password)
     {
-        $this->password = $password;
+        $this->password = (string) $password;
         return $this;
     }
 
