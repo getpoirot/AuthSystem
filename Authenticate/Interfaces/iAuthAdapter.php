@@ -8,23 +8,15 @@ interface iAuthAdapter
     extends iDataOptions
 {
     /**
-     * Get Identity Match By Credential
-     *
-     * @param iCredential|null $credential Fulfilled Credential
-     *
      * @ignore
+     *
+     * Get Identity Match By Credential as Options
+     *
      * @return iIdentity
      * @throws exAuthentication
-     * @throws \Exception credential or etc.
+     * @throws \Exception credential not fulfilled, etc..
      */
-    function getIdentityMatch($credential = null);
-
-    /**
-     * Credential
-     *
-     * @return iCredential
-     */
-    static function newCredential();
+    function getIdentityMatch();
 
 
     // Options:
@@ -41,13 +33,9 @@ interface iAuthAdapter
      * @return string|null
      */
     function getRealm();
-
-    /**
-     * Set Credential
-     *
-     * @param iCredential $credential
-     *
-     * @return $this
-     */
-    function setCredential(iCredential $credential);
+    
+    
+    // Credential Options:
+    
+    // function setUsername();
 }

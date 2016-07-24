@@ -1,50 +1,44 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Authenticator\Adapter;
 
-use Poirot\AuthSystem\Authenticate\Credential\CredentialUserPass;
 use Poirot\AuthSystem\Authenticate\Exceptions\exMissingCredential;
 use Poirot\AuthSystem\Authenticate\Exceptions\exWrongCredential;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityHttpDigest;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityUsername;
-use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Std\ErrorStack;
 
 class AuthAdapterDigestFile 
     extends aAuthAdapter
 {
-    protected $filename;
+    protected $username;
+    protected $password;
+    
+    /** @var string Path to file contains digest passwords */
+    protected $pwd_file_path;
 
     /**
-     * Get Identity Match By Identity
+     * Do Match Identity With Given Options/Credential
      *
-     * @param iCredential|null $credential
+     * @param array $options Include Credential Data
      *
-     * @throws exWrongCredential
-     * @throws \Exception Credential not fulfill
      * @return iIdentity
+     * @throws \Exception
      */
-    function getIdentityMatch($credential = null)
+    function doIdentityMatch(array $options)
     {
-        ($credential !== null) ?: $credential = $this->credential;
+        ErrorStack::handleError(E_WARNING); // {
+            $hFile = fopen($this->getPwdFilePath(), 'r');
+        $error = ErrorStack::handleDone();  // }
 
-        if (!$credential instanceof iCredential || !$credential->isFulfilled())
-            throw new \Exception(sprintf('Credential (%s) is not Fulfilled.', \Poirot\Std\flatten($credential)));
-
-        ErrorStack::handleError(E_WARNING);
-        $hFile = fopen($this->getFilename(), 'r');
-        $error = ErrorStack::handleDone();
         if ($hFile === false)
-            throw new \RuntimeException("Cannot open '{$this->getFilename()}' for reading", 0, $error);
+            throw new \RuntimeException("Cannot open '{$this->getPwdFilePath()}' for reading", 0, $error);
 
 
-        /** @var string $username */
-        /** @var string $password */
-        extract(\Poirot\Std\cast($credential)->toArray());
+        $username = $this->getUsername();
+        $password = $this->getPassword();
         if (!isset($username))
-            throw new exMissingCredential(sprintf(
-                'Credential (%s) not contains Username.', get_class($credential)
-            ));
+            throw new exMissingCredential('Adapter Credential not contains Username.');
 
         $realm = $this->getRealm();
 
@@ -57,48 +51,80 @@ class AuthAdapterDigestFile
 
             if (!isset($password))
                 ## username match, digest http auth. need secret key
-                return new IdentityHttpDigest(['username' => $username, 'hash' => strtolower(substr($line, -32))]);
+                return new IdentityHttpDigest(array('username' => $username, 'hash' => strtolower(substr($line, -32))));
 
             if (isset($password)
                 ## 32 for md5 length
                 && strtolower(substr($line, -32)) === strtolower(md5("$username:$realm:$password"))
             )
                 ## user/pass credential match
-                return new IdentityUsername(['username' => $username]);
+                return new IdentityUsername(array('username' => $username));
         }
 
         throw new exWrongCredential('Invalid Username or password.');
     }
+    
+    
+    // Credentials as Options:
 
     /**
-     * @return iCredential
+     * @required
+     * 
+     * @return string
      */
-    static function newCredential()
+    public function getUsername()
     {
-        return new CredentialUserPass;
+        return $this->username;
     }
 
+    /**
+     * @param string $username
+     * @return $this
+     */
+    public function setUsername($username)
+    {
+        $this->username = $username;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * @param string $password
+     * @return $this
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+        return $this;
+    }
 
     // Options:
 
     /**
      * @return string
      */
-    public function getFilename()
+    public function getPwdFilePath()
     {
-        if (!$this->filename)
-            $this->filename = realpath(__DIR__.'/../../../data/users.pws');
+        if (!$this->pwd_file_path)
+            $this->pwd_file_path = realpath(__DIR__.'/../../../data/users.pws');
 
-        return $this->filename;
+        return $this->pwd_file_path;
     }
 
     /**
      * @param string $filename
      * @return $this
      */
-    public function setFilename($filename)
+    public function setPwdFilePath($filename)
     {
-        $this->filename = $filename;
+        $this->pwd_file_path = $filename;
         return $this;
     }
 }

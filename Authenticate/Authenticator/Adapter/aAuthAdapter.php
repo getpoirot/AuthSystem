@@ -3,10 +3,12 @@ namespace Poirot\AuthSystem\Authenticate\Authenticator\Adapter;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
-use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Std\Struct\aDataOptions;
 
+/**
+ * @method getIdentityMatch($credential = null) @ignore
+ */
 abstract class aAuthAdapter
     extends aDataOptions
     implements iAuthAdapter
@@ -15,16 +17,30 @@ abstract class aAuthAdapter
     protected $realm;
 
     /**
-     * Get Identity Match By Identity
+     * @ignore
      *
-     * @param iCredential|null $credential
+     * Get Identity Match By Credential as Options
      *
+     * @return iIdentity
      * @throws exAuthentication
-     * @throws \Exception credential or etc.
+     * @throws \Exception credential not fulfilled, etc..
+     */
+    final function getIdentityMatch()
+    {
+        if (!$this->isFulfilled())
+            throw new \Exception('Adapter Options Not Fulfilled To Retrieve Identity Match.');
+
+        return $this->doIdentityMatch(\Poirot\Std\cast($this)->toArray());
+    }
+
+    /**
+     * Do Match Identity With Given Options/Credential
+     *
+     * @param array $options Include Credential Data
+     *
      * @return iIdentity
      */
-    abstract function getIdentityMatch($credential = null);
-
+    abstract function doIdentityMatch(array $options);
 
     // ...
 
@@ -46,16 +62,5 @@ abstract class aAuthAdapter
     function getRealm()
     {
         return $this->realm;
-    }
-
-    /**
-     * Set Credential
-     * @param iCredential $credential
-     * @return $this
-     */
-    function setCredential(iCredential $credential)
-    {
-        $this->credential = $credential;
-        return $this;
     }
 }
