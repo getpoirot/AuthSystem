@@ -5,7 +5,6 @@ use Poirot\AuthSystem\Authenticate\Authenticator\Adapter\AuthAdapterDigestFile;
 use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
-use Poirot\AuthSystem\Authenticate\Interfaces\HttpMessageAware\iAuthenticator as HttpAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 
@@ -86,7 +85,7 @@ abstract class aAuthenticator
      * Credential can be extracted from this
      *
      * @throws exAuthentication|\Exception Or extend of this
-     * @return iAuthenticator|HttpAuthenticator
+     * @return iAuthenticator|aAuthenticator
      */
     function authenticate($credential = null)
     {
@@ -94,13 +93,21 @@ abstract class aAuthenticator
             ## authenticated and nothing changes
             return $this;
 
-        if ($credential instanceof iAuthAdapter)
+        if ($credential instanceof iAuthAdapter) {
             $identity = $credential->getIdentityMatch();
-        else
-            $identity = $this->doAuthenticate($credential);
+        } else {
+            if (!$credential instanceof iCredential)
+                throw new \InvalidArgumentException(sprintf('%s Credential can`t be empty.', get_class($this)));
 
-        if (!$identity instanceof iIdentity && !$identity->isFulfilled())
-            throw (new exAuthentication)->setAuthenticator($this);
+            $identity = $this->getAdapter()->getIdentityMatch($credential);
+        }
+
+        
+        if (!$identity instanceof iIdentity && !$identity->isFulfilled()) {
+            $e = new exAuthentication;
+            $e->setAuthenticator($this);
+            throw $e;
+        }
 
         $this->identity()->import($identity);
         if (!$this->identity()->isFulfilled())
@@ -111,28 +118,6 @@ abstract class aAuthenticator
 
         $this->_c__credential = $credential;
         return $this;
-    }
-
-    /**
-     * Authenticate user with Credential Data and return
-     * FullFilled Identity Instance
-     *
-     * @param iCredential|mixed $credential \
-     * Credential can be extracted from this
-     *
-     * @throws exAuthentication Or extend of this
-     * @return iIdentity|void
-     */
-    protected function doAuthenticate($credential = null)
-    {
-        // do credential extraction on extended
-        // ...
-
-        if (!$credential instanceof iCredential)
-            throw new \InvalidArgumentException(sprintf('%s Credential can`t be empty.', get_class($this)));
-
-        $identity = $this->getAdapter()->getIdentityMatch($credential);
-        return $identity;
     }
 
     /**

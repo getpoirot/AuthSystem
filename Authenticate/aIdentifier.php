@@ -59,7 +59,7 @@ abstract class aIdentifier
 
         // Attain Identity:
         if ($this->isSignIn()) {
-            $identity = $this->doAttainSignedIdentity();
+            $identity = $this->doIdentifierSignedIdentity();
             if ($identity !== null)
                 ## update identity
                 $this->identity->import($identity);
@@ -71,6 +71,7 @@ abstract class aIdentifier
 
     /**
      * Attain Identity Object From Signed Sign
+     * exp. extract from authorize header, load lazy data, etc.
      *
      * !! call when user is signed in to retrieve user identity
      *
@@ -80,7 +81,7 @@ abstract class aIdentifier
      * @see identity()
      * @return iIdentity|null Null if no change need
      */
-    abstract function doAttainSignedIdentity();
+    abstract function doIdentifierSignedIdentity();
 
 
     // Options:
@@ -114,8 +115,13 @@ abstract class aIdentifier
         return $this->realm;
     }
 
+
+    // Options:
+
     /**
      * Set Default Identity Instance
+     * that Signed data load into
+     *
      * @param iIdentity $identity
      * @return $this
      */
@@ -127,6 +133,8 @@ abstract class aIdentifier
 
     /**
      * Get Default Identity Instance
+     * that Signed data load into
+     *
      * @return iIdentity
      */
     protected function _getDefaultIdentity()

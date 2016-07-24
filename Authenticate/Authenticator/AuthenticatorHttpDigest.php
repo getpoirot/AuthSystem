@@ -272,7 +272,7 @@ class AuthenticatorHttpDigest
      * @see identity()
      * @return iIdentity|null Null if no change need
      */
-    function doAttainSignedIdentity()
+    function doIdentifierSignedIdentity()
     {
         ## when user signed in, identity is available during authentication process with
         ## Authorize header and no need to change.

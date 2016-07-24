@@ -1,14 +1,12 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Credential;
 
-use Poirot\AuthSystem\Authenticate\Interfaces\iCredentialHttpAware;
-use Poirot\Http\HttpRequest;
-use Poirot\Http\Interfaces\iHttpRequest;
+use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\Std\Struct\aDataOptions;
 
 class CredentialUserPass
     extends aDataOptions
-    implements iCredentialHttpAware
+    implements iCredential
 {
     protected $username;
     protected $password;
@@ -63,31 +61,5 @@ class CredentialUserPass
         {
             return $this->setPassword($password);
         }
-
-
-    /**
-     * Set Options From Request Http Object
-     *
-     *  ie. extract user/pass from post data
-     *
-     * @param iHttpRequest $request
-     *
-     * @throws \Exception
-     * @return $this
-     */
-    function fromRequest(iHttpRequest $request)
-    {
-        if (!$request instanceof HttpRequest)
-            $request = new HttpRequest($request);
-
-        if (!$request->plg()->methodType()->isPost())
-            return $this;
-
-
-        // TODO define post value map request
-        $POST = $request->plg()->phpServer()->getPost()->toArray();
-        $this->from($POST);
-
-        return $this;
-    }
+    
 }
