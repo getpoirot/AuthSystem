@@ -48,9 +48,7 @@ class IdentityFulfillment
             $result = parent::isFulfilled($property_key);
         } else {
             // Fulfillment by specific property
-            $result = ( self::__isset($this->fulfillment_property) && self::__get($this->fulfillment_property) )
-                ? true : false;
-            
+            $result = ( self::__isset($this->fulfillment_property) && self::__get($this->fulfillment_property) );
             $result = $result && parent::isFulfilled();
         }
         

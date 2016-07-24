@@ -6,7 +6,7 @@ use Poirot\AuthSystem\Authenticate\Authenticator\Adapter\DigestFileAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Credential\CredentialOpen;
 use Poirot\AuthSystem\Authenticate\Credential\CredentialUserPass;
 use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
-use Poirot\AuthSystem\Authenticate\Identity\HttpDigestIdentity;
+use Poirot\AuthSystem\Authenticate\Identity\IdentityHttpDigest;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityUsername;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
@@ -186,7 +186,7 @@ class HttpDigestAuth extends AbstractHttpAuthenticator
              *    //success!
              */
 
-            /** @var HttpDigestIdentity $digestIdentity */
+            /** @var IdentityHttpDigest $digestIdentity */
             $digestIdentity = $this->getDigestAdapter()->getIdentityMatch(
                 new CredentialOpen(['username' => $headerData['username']])
             );

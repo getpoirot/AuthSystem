@@ -41,8 +41,7 @@ class IdentityUsername
             $result = parent::isFulfilled($property_key);
         } else {
             // Fulfillment by specific property
-            $result = ($this->getUsername() !== null) ? true : false;
-
+            $result = ($this->getUsername() !== null);
             $result = $result && parent::isFulfilled();
         }
 

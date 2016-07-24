@@ -3,7 +3,8 @@ namespace Poirot\AuthSystem\Authenticate\Identity;
 
 use Poirot\AuthSystem\Authenticate\aIdentity;
 
-class HttpDigestIdentity extends aIdentity
+class IdentityHttpDigest
+    extends aIdentity
 {
     protected $username;
     protected $hash;     ## A1 = md5(username:realm:password)
@@ -53,17 +54,26 @@ class HttpDigestIdentity extends aIdentity
         }
 
     /**
-     * Is Identity Full Filled
+     * Is Identity Full Filled?
      *
      * - full filled mean that all needed data
      *   set for this identity.
+     * - with no property it will check for whole properties
+     *
+     * @param null|string $property_key
      *
      * @return boolean
      */
-    function isFulfilled($key = null)
+    function isFulfilled($property_key = null)
     {
-        // TODO implement check for specific key property fulfillment
+        if ($property_key) {
+            $result = parent::isFulfilled($property_key);
+        } else {
+            // Fulfillment by specific property
+            $result = ($this->getUsername() !== null && $this->getHash() !== null);
+            $result = $result && parent::isFulfilled();
+        }
 
-        return ($this->getUsername() !== null && $this->getHash() !== null);
+        return $result;
     }
 }

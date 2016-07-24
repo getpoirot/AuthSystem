@@ -4,7 +4,7 @@ namespace Poirot\AuthSystem\Authenticate\Authenticator\Adapter;
 use Poirot\AuthSystem\Authenticate\Credential\CredentialUserPass;
 use Poirot\AuthSystem\Authenticate\Exceptions\exMissingCredential;
 use Poirot\AuthSystem\Authenticate\Exceptions\exWrongCredential;
-use Poirot\AuthSystem\Authenticate\Identity\HttpDigestIdentity;
+use Poirot\AuthSystem\Authenticate\Identity\IdentityHttpDigest;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityUsername;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
@@ -56,7 +56,7 @@ class DigestFileAuthAdapter extends AbstractAuthAdapter
 
             if (!isset($password))
                 ## username match, digest http auth. need secret key
-                return new HttpDigestIdentity(['username' => $username, 'hash' => strtolower(substr($line, -32))]);
+                return new IdentityHttpDigest(['username' => $username, 'hash' => strtolower(substr($line, -32))]);
 
             if (isset($password)
                 ## 32 for md5 length
