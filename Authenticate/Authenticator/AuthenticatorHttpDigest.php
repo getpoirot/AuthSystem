@@ -186,7 +186,7 @@ class AuthenticatorHttpDigest
              */
 
             /** @var IdentityHttpDigest $digestIdentity */
-            $digestIdentity = $this->getDigestAdapter()->getIdentityMatch(
+            $digestIdentity = $this->getDigestAdapter()->findIdentityMatch(
                 new CredentialOpen(['username' => $headerData['username']])
             );
 

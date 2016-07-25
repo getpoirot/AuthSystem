@@ -16,7 +16,7 @@ interface iAuthAdapter
      * @throws exAuthentication
      * @throws \Exception credential not fulfilled, etc..
      */
-    function getIdentityMatch();
+    function findIdentityMatch();
 
 
     // Options:

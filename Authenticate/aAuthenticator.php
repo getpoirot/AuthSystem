@@ -94,12 +94,12 @@ abstract class aAuthenticator
             return $this;
 
         if ($credential instanceof iAuthAdapter) {
-            $identity = $credential->getIdentityMatch();
+            $identity = $credential->findIdentityMatch();
         } else {
             if (!$credential instanceof iCredential)
                 throw new \InvalidArgumentException(sprintf('%s Credential can`t be empty.', get_class($this)));
 
-            $identity = $this->getAdapter()->getIdentityMatch($credential);
+            $identity = $this->getAdapter()->findIdentityMatch($credential);
         }
 
         

@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\AuthSystem\Authenticate\Authenticator\Adapter;
+namespace Poirot\AuthSystem\Authenticate\Authenticator\IdentityCredentialRepo;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\exMissingCredential;
 use Poirot\AuthSystem\Authenticate\Exceptions\exWrongCredential;
@@ -9,8 +9,8 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 
 use Poirot\Std\ErrorStack;
 
-class AuthAdapterDigestFile 
-    extends aAuthAdapter
+class IdentityCredentialDigestFile 
+    extends aIdentityCredentialAdapter
 {
     protected $username;
     protected $password;
@@ -26,7 +26,7 @@ class AuthAdapterDigestFile
      * @return iIdentity
      * @throws \Exception
      */
-    function doIdentityMatch(array $options)
+    function doFindIdentityMatch(array $options)
     {
         ErrorStack::handleError(E_WARNING); // {
             $hFile = fopen($this->getPwdFilePath(), 'r');
