@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\AuthSystem\Authenticate;
+namespace Poirot\AuthSystem\Authenticate\Identity;
 
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Std\Struct\DataOptionsOpen;

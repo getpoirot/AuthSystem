@@ -1,10 +1,23 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Authenticator\IdentityCredentialRepo;
 
-use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
-use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
+use Poirot\AuthSystem\Authenticate\aIdentifier;
+use Poirot\AuthSystem\Authenticate\Interfaces\iIdentityCredentialRepo;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Std\Struct\aDataOptions;
+
+/*
+$adapter = new IdentityCredentialDigestFile();
+$match   = $adapter
+    ->setUsername('admin')
+    ->setPassword('123456')
+    ->findIdentityMatch();
+
+if (!$match)
+    throw new P\AuthSystem\Authenticate\Exceptions\exWrongCredential();
+
+echo "Hello {$match->getUsername()}.";
+*/
 
 /**
  * Match Identity Against Options as Credential.
@@ -21,24 +34,21 @@ use Poirot\Std\Struct\aDataOptions;
  *       to retrieve extra data.
  * 
  * In Most Cases You Must Implement Your Own Adapter!
- * 
- * @method getIdentityMatch($credential = null) @ignore
  */
 abstract class aIdentityCredentialAdapter
     extends aDataOptions
-    implements iAuthAdapter
+    implements iIdentityCredentialRepo
 {
+    const DEFAULT_REALM = aIdentifier::DEFAULT_REALM;
+
     protected $credential;
     protected $realm;
 
     /**
-     * @ignore
-     *
      * Get Identity Match By Credential as Options
      *
-     * @return iIdentity
-     * @throws exAuthentication
-     * @throws \Exception credential not fulfilled, etc..
+     * @return iIdentity|false
+     * @throws \Exception credential not fulfilled
      */
     final function findIdentityMatch()
     {
@@ -53,10 +63,11 @@ abstract class aIdentityCredentialAdapter
      *
      * @param array $options Include Credential Data
      *
-     * @return iIdentity
+     * @return iIdentity|false
      */
     abstract function doFindIdentityMatch(array $options);
 
+    
     // ...
 
     /**
@@ -66,16 +77,19 @@ abstract class aIdentityCredentialAdapter
      */
     function setRealm($realm)
     {
-        $this->realm = $realm;
+        $this->realm = (string) $realm;
         return $this;
     }
 
     /**
      * Get Realm
-     * @return string|null
+     * @return string
      */
     function getRealm()
     {
+        if (!$this->realm)
+            $this->setRealm(self::DEFAULT_REALM);
+
         return $this->realm;
     }
 }

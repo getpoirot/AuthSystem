@@ -8,7 +8,7 @@ use Poirot\AuthSystem\Authenticate\Credential\CredentialUserPass;
 use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityHttpDigest;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityUsername;
-use Poirot\AuthSystem\Authenticate\Interfaces\iAuthAdapter;
+use Poirot\AuthSystem\Authenticate\Interfaces\iIdentityCredentialRepo;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 
@@ -60,11 +60,11 @@ class AuthenticatorHttpDigest
     protected $acceptBasicScheme  = true;
     protected $acceptDigestScheme = true;
 
-    /** @var iAuthAdapter */
+    /** @var iIdentityCredentialRepo */
     protected $basicAdapter;
 
     ## digest options
-    /** @var iAuthAdapter */
+    /** @var iIdentityCredentialRepo */
     protected $digestAdapter;
 
     protected $nonceTimeout = 300;
@@ -88,7 +88,7 @@ class AuthenticatorHttpDigest
      *
      * @param HttpRequest $request
      *
-     * @return iCredential|iAuthAdapter|iIdentity|null Null if not available
+     * @return iCredential|iIdentityCredentialRepo|iIdentity|null Null if not available
      */
     function doExtractCredentialFromRequest(HttpRequest $request)
     {
@@ -376,7 +376,7 @@ class AuthenticatorHttpDigest
     /**
      * Get Authentication Adapter
      *
-     * @return iAuthAdapter
+     * @return iIdentityCredentialRepo
      */
     function getAdapter()
     {
@@ -391,7 +391,7 @@ class AuthenticatorHttpDigest
 
     /**
      * Get Digest Adapter
-     * @return iAuthAdapter
+     * @return iIdentityCredentialRepo
      */
     function getDigestAdapter()
     {
@@ -403,7 +403,7 @@ class AuthenticatorHttpDigest
 
     /**
      * Get Basic Adapter
-     * @return iAuthAdapter
+     * @return iIdentityCredentialRepo
      */
     function getBasicAdapter()
     {
@@ -415,10 +415,10 @@ class AuthenticatorHttpDigest
 
     /**
      * Set Digest Adapter
-     * @param iAuthAdapter $adapter
+     * @param iIdentityCredentialRepo $adapter
      * @return $this
      */
-    function setDigestAdapter(iAuthAdapter $adapter)
+    function setDigestAdapter(iIdentityCredentialRepo $adapter)
     {
         $this->digestAdapter = $adapter;
         return $this;
@@ -426,10 +426,10 @@ class AuthenticatorHttpDigest
 
     /**
      * Set Basic Adapter
-     * @param iAuthAdapter $adapter
+     * @param iIdentityCredentialRepo $adapter
      * @return $this
      */
-    function setBasicAdapter(iAuthAdapter $adapter)
+    function setBasicAdapter(iIdentityCredentialRepo $adapter)
     {
         $this->basicAdapter = $adapter;
         return $this;

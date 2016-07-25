@@ -1,8 +1,6 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Identity;
 
-use Poirot\AuthSystem\Authenticate\aIdentity;
-
 class IdentityUsername
     extends aIdentity
 {

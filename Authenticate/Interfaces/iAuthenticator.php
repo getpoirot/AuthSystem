@@ -22,7 +22,7 @@ Interface iAuthenticator
      * note: after successful authentication, you must call
      *       login() outside of method to store identified user
      *
-     * @param iCredential|iAuthAdapter $credential
+     * @param iCredential|iIdentityCredentialRepo $credential
      *
      * @throws exAuthentication|\Exception Or extend of this
      * @return $this

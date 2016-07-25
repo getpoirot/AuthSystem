@@ -2,12 +2,24 @@
 namespace Poirot\AuthSystem\Authenticate\Authenticator\IdentityCredentialRepo;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\exMissingCredential;
-use Poirot\AuthSystem\Authenticate\Exceptions\exWrongCredential;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityHttpDigest;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityUsername;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 
 use Poirot\Std\ErrorStack;
+
+/*
+$adapter = new IdentityCredentialDigestFile();
+$match   = $adapter
+    ->setUsername('admin')
+    ->setPassword('123456')
+    ->findIdentityMatch();
+
+if (!$match)
+    throw new P\AuthSystem\Authenticate\Exceptions\exWrongCredential();
+
+echo "Hello {$match->getUsername()}.";
+*/
 
 class IdentityCredentialDigestFile 
     extends aIdentityCredentialAdapter
@@ -23,8 +35,7 @@ class IdentityCredentialDigestFile
      *
      * @param array $options Include Credential Data
      *
-     * @return iIdentity
-     * @throws \Exception
+     * @return iIdentity|false 
      */
     function doFindIdentityMatch(array $options)
     {
@@ -50,19 +61,28 @@ class IdentityCredentialDigestFile
                 ## try next (user:realm) not match
                 continue;
 
-            if (!isset($password))
+            if (!isset($password)) {
                 ## username match, digest http auth. need secret key
-                return new IdentityHttpDigest(array('username' => $username, 'hash' => strtolower(substr($line, -32))));
+                $identity = new IdentityHttpDigest;
+                $identity->setUsername($username);
+                $identity->setHash(strtolower(substr($line, -32)));
+
+                return $identity;
+            }
 
             if (isset($password)
                 ## 32 for md5 length
                 && strtolower(substr($line, -32)) === strtolower(md5("$username:$realm:$password"))
-            )
+            ) {
                 ## user/pass credential match
-                return new IdentityUsername(array('username' => $username));
+                $identity = new IdentityUsername;
+                $identity->setUsername($username);
+
+                return $identity;
+            }
         }
 
-        throw new exWrongCredential('Invalid Username or password.');
+        return false;
     }
     
     

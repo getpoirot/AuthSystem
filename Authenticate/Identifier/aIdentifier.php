@@ -1,17 +1,27 @@
 <?php
-namespace Poirot\AuthSystem\Authenticate;
+namespace Poirot\AuthSystem\Authenticate\Identifier;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\exNotAuthenticated;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityOpen;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
+
 use Poirot\Std\ConfigurableSetter;
 
+/**
+ * Sign In/Out User as Identity into Environment(by session or something)
+ *
+ * - if identity is fulfilled/validated means user is recognized
+ * - you can sign-in fulfillment identity
+ * - sign-in/out take control of current identifier realm
+ * - sign in some cases can be happen on request/response headers
+ *
+ */
 abstract class aIdentifier
     extends ConfigurableSetter
     implements iIdentifier
 {
-    const STORAGE_REALM          = 'Default_Auth';
+    const DEFAULT_REALM          = 'Default_Auth';
     const STORAGE_IDENTITY_KEY   = 'identity';
 
     /** @var iIdentity */
@@ -71,7 +81,8 @@ abstract class aIdentifier
 
     /**
      * Attain Identity Object From Signed Sign
-     * exp. extract from authorize header, load lazy data, etc.
+     * exp. session, extract from authorize header,
+     *      load lazy data, etc.
      *
      * !! call when user is signed in to retrieve user identity
      *
@@ -79,7 +90,7 @@ abstract class aIdentifier
      *       storage that store user data. ie. session
      *
      * @see identity()
-     * @return iIdentity|null Null if no change need
+     * @return iIdentity|\Traversable|null Null if no change need
      */
     abstract function doIdentifierSignedIdentity();
 
@@ -110,7 +121,7 @@ abstract class aIdentifier
     function getRealm()
     {
         if (!$this->realm)
-            $this->realm = self::STORAGE_REALM;
+            $this->setRealm(self::DEFAULT_REALM);
 
         return $this->realm;
     }

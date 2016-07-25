@@ -3,7 +3,7 @@ namespace Poirot\AuthSystem\Authenticate\Authenticator;
 
 use Poirot\AuthSystem\Authenticate\aAuthenticatorHttp;
 use Poirot\Http\Interfaces\iHeader;
-use Poirot\Storage\Gateway\SessionData;
+use Poirot\Storage\Gateway\DataStorageSession;
 use Poirot\Stream\Streamable;
 
 /*
@@ -153,7 +153,7 @@ class AuthenticatorHttpSession
 
     /**
      * Get Session Storage
-     * @return SessionData
+     * @return DataStorageSession
      */
     function __session()
     {
@@ -161,7 +161,7 @@ class AuthenticatorHttpSession
         session_id($sesId);
 
         if(!$this->_session)
-            $this->_session = new SessionData(['realm' => $this->getRealm()]);
+            $this->_session = new DataStorageSession(['realm' => $this->getRealm()]);
 
         return $this->_session;
     }

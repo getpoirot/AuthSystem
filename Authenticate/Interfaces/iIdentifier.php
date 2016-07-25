@@ -4,8 +4,13 @@ namespace Poirot\AuthSystem\Authenticate\Interfaces;
 use Poirot\AuthSystem\Authenticate\Exceptions\exNotAuthenticated;
 
 /**
- * Sign In/Out User as Identity into Environment
+ * Sign In/Out User as Identity into Environment(by session or something)
  *
+ * - if identity is fulfilled/validated means user is recognized
+ * - you can sign-in fulfillment identity
+ * - sign-in/out take control of current identifier realm
+ * - sign in some cases can be happen on request/response headers
+ * 
  */
 interface iIdentifier
 {

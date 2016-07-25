@@ -1,8 +1,6 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Identity;
 
-use Poirot\AuthSystem\Authenticate\aIdentity;
-
 /*
 ## this mean authenticator need at least username to satisfy by identifier
 new Authenticator(['identity' => new IdentityFulfillment(['fulfillment_by' => 'username'])]);
