@@ -12,6 +12,19 @@ class IdentityFulfillment
     /** @var string 'property_underscore_format' */
     protected $fulfillment_property;
 
+
+    /**
+     * AbstractStruct constructor.
+     *
+     * @param string                  $fulfillmentProp
+     * @param null|array|\Traversable $data
+     */
+    function __construct($fulfillmentProp, $data = null)
+    {
+        parent::__construct($data);
+        $this->setFulfillmentBy($fulfillmentProp);
+    }
+
     /**
      * @ignore 
      * 
@@ -25,8 +38,26 @@ class IdentityFulfillment
      */
     function setFulfillmentBy($property)
     {
-        $this->fulfillment_property = \Poirot\Std\cast((string)$property)->under_score();
+        $this->fulfillment_property = (string) \Poirot\Std\cast((string)$property)->under_score();
         return $this;
+    }
+
+    /**
+     * @override avoid recursion call
+     * 
+     * !! Be Aware You Cant Use isset() inside getter methods itself
+     *
+     * @param string $key
+     * @return bool
+     */
+    function __isset($key)
+    {
+        $isset = false;
+        try {
+            $isset = (parent::__get($key) !== null);
+        } catch(\Exception $e) { }
+
+        return $isset;
     }
 
     /**
@@ -46,7 +77,7 @@ class IdentityFulfillment
             $result = parent::isFulfilled($property_key);
         } else {
             // Fulfillment by specific property
-            $result = ( self::__isset($this->fulfillment_property) && self::__get($this->fulfillment_property) );
+            $result = ( self::__isset($this->fulfillment_property) && parent::__get($this->fulfillment_property) );
             $result = $result && parent::isFulfilled();
         }
         

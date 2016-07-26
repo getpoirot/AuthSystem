@@ -1,7 +1,7 @@
 <?php
-namespace Poirot\AuthSystem\Authenticate\Authenticator\IdentityCredentialRepo;
+namespace Poirot\AuthSystem\Authenticate\RepoIdentityCredential;
 
-use Poirot\AuthSystem\Authenticate\aIdentifier;
+use Poirot\AuthSystem\Authenticate\Identifier\aIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentityCredentialRepo;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Std\Struct\aDataOptions;
@@ -61,11 +61,11 @@ abstract class aIdentityCredentialAdapter
     /**
      * Do Match Identity With Given Options/Credential
      *
-     * @param array $options Include Credential Data
+     * @param array $credentials Include Credential Data
      *
      * @return iIdentity|false
      */
-    abstract function doFindIdentityMatch(array $options);
+    abstract protected function doFindIdentityMatch(array $credentials);
 
     
     // ...

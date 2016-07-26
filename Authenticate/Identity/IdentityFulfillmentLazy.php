@@ -47,6 +47,20 @@ class IdentityFulfillmentLazy
     /** @var iData */
     protected $_c__loaded_data;
 
+
+    /**
+     * AbstractStruct constructor.
+     *
+     * @param iProviderIdentityData   $provider
+     * @param string                  $fulfillmentProp Find entity data this property from provider
+     * @param null|array|\Traversable $data
+     */
+    function __construct(iProviderIdentityData $provider, $fulfillmentProp, $data = null)
+    {
+        parent::__construct($fulfillmentProp, $data);
+        $this->setDataProvider($provider);
+    }
+
     /**
      * @ignore
      * 
@@ -64,7 +78,20 @@ class IdentityFulfillmentLazy
     }
 
     // ...
-    
+
+    /**
+     * Get Options Properties Information
+     *
+     */
+    protected function _getProperties()
+    {
+        if (!$this->_isDataLoaded())
+            // load data to represent all properties
+            $this->_loadData();
+
+        return parent::_getProperties();
+    }
+
     /**
      * @override
      * @inheritdoc

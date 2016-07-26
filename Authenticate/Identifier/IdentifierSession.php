@@ -22,9 +22,11 @@ class IdentifierSession
      * @see identity()
      * @return iIdentity|\Traversable|null Null if no change need
      */
-    function doIdentifierSignedIdentity()
+    protected function doIdentifierSignedIdentity()
     {
         $identity = $this->_storage()->get(self::STORAGE_IDENTITY_KEY);
+        $identity = unserialize($identity);
+
         return $identity;
     }
 
@@ -42,9 +44,10 @@ class IdentifierSession
      */
     function signIn()
     {
-        if (!($identity = $this->identity) && !$identity->isFulfilled())
+        if ( (null === $identity = $this->identity) || !$identity->isFulfilled() )
             throw new \Exception('Identity not exists or not fullfilled');
 
+        $identity = serialize($identity);
         $this->_storage()->set(self::STORAGE_IDENTITY_KEY , $identity);
         return $this;
     }
@@ -98,7 +101,8 @@ class IdentifierSession
     {
         if(!$this->_session) {
             $session = new DataStorageSession();
-            $session->setRealm($this->getRealm());
+            // Store in session by realm defined with this authentication domain
+            $session->setRealm(self::STORAGE_IDENTITY_KEY.'_'.$this->getRealm());
             $this->_session = $session;
         }
 

@@ -34,6 +34,17 @@ abstract class aIdentifier
 
     
     /**
+     * Construct
+     *
+     * @param array|\Traversable $options
+     */
+    function __construct($realm = self::DEFAULT_REALM, $options = null)
+    {
+        parent::__construct($options);
+        $this->setRealm($realm);
+    }
+    
+    /**
      * Inject Identity
      *
      * @param iIdentity $identity
@@ -92,7 +103,7 @@ abstract class aIdentifier
      * @see identity()
      * @return iIdentity|\Traversable|null Null if no change need
      */
-    abstract function doIdentifierSignedIdentity();
+    abstract protected function doIdentifierSignedIdentity();
 
 
     // Options:

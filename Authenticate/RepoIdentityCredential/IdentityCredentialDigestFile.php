@@ -1,5 +1,5 @@
 <?php
-namespace Poirot\AuthSystem\Authenticate\Authenticator\IdentityCredentialRepo;
+namespace Poirot\AuthSystem\Authenticate\RepoIdentityCredential;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\exMissingCredential;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityHttpDigest;
@@ -33,11 +33,11 @@ class IdentityCredentialDigestFile
     /**
      * Do Match Identity With Given Options/Credential
      *
-     * @param array $options Include Credential Data
+     * @param array $credentials Include Credential Data
      *
      * @return iIdentity|false 
      */
-    function doFindIdentityMatch(array $options)
+    protected function doFindIdentityMatch(array $credentials)
     {
         ErrorStack::handleError(E_WARNING); // {
             $hFile = fopen($this->getPwdFilePath(), 'r');
@@ -134,7 +134,7 @@ class IdentityCredentialDigestFile
     public function getPwdFilePath()
     {
         if (!$this->pwd_file_path)
-            $this->pwd_file_path = realpath(__DIR__.'/../../../data/users.pws');
+            $this->pwd_file_path = realpath(__DIR__.'/../../data/users.pws');
 
         return $this->pwd_file_path;
     }
