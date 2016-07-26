@@ -24,7 +24,7 @@ class IdentifierSession
      */
     function doIdentifierSignedIdentity()
     {
-        $identity = $this->__session()->get(self::STORAGE_IDENTITY_KEY);
+        $identity = $this->_storage()->get(self::STORAGE_IDENTITY_KEY);
         return $identity;
     }
 
@@ -45,7 +45,7 @@ class IdentifierSession
         if (!($identity = $this->identity) && !$identity->isFulfilled())
             throw new \Exception('Identity not exists or not fullfilled');
 
-        $this->__session()->set(self::STORAGE_IDENTITY_KEY , $identity);
+        $this->_storage()->set(self::STORAGE_IDENTITY_KEY , $identity);
         return $this;
     }
 
@@ -61,7 +61,7 @@ class IdentifierSession
      */
     function signOut()
     {
-        $this->__session()->destroy();
+        $this->_storage()->destroy();
         $this->identity()->clean();
     }
 
@@ -81,7 +81,7 @@ class IdentifierSession
      */
     function isSignIn()
     {
-        if($this->__session()->has(self::STORAGE_IDENTITY_KEY))
+        if($this->_storage()->has(self::STORAGE_IDENTITY_KEY))
             return true;
 
         return false;
@@ -94,10 +94,11 @@ class IdentifierSession
      * Get Session Storage
      * @return DataStorageSession
      */
-    function __session()
+    function _storage()
     {
         if(!$this->_session) {
-            $session = new DataStorageSession(array('realm' => $this->getRealm()));
+            $session = new DataStorageSession();
+            $session->setRealm($this->getRealm());
             $this->_session = $session;
         }
 
