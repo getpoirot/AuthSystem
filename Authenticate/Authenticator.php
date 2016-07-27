@@ -2,7 +2,6 @@
 namespace Poirot\AuthSystem\Authenticate;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
-use Poirot\AuthSystem\Authenticate\Exceptions\exWrongCredential;
 use Poirot\AuthSystem\Authenticate\Identifier\IdentifierWrapIdentityMap;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;

@@ -2,6 +2,63 @@
 
 ```php
 class UserData implements P\AuthSystem\Authenticate\Interfaces\iProviderIdentityData
+{
+    # Finds a user by the given user Identity.
+    #
+    # @param string $property ie. 'user_name'
+    # @param mixed $value ie. 'payam@mail.com'
+    #
+    # @throws \Exception
+    # @return EntityInterface
+    #
+    function findBy($property, $value)
+    {
+        $entity = new P\Std\Struct\DataEntity();
+        if ($property == 'username' && $value == 'admin')
+            ## find by user name
+            $entity->import([
+                'email' => 'naderi.payam@gmail.com',
+                'phone' => '+989354323345',
+                'facbook' => '@dfsdf'
+            ]);
+
+        return $entity;
+    }
+}
+
+$authenticator = new P\AuthSystem\Authenticate\Authenticator(
+    new P\AuthSystem\Authenticate\Identifier\IdentifierSession('realm_members')
+    ## identity credential repository
+    , new P\AuthSystem\Authenticate\RepoIdentityCredential\IdentityCredentialDigestFile()      // data this provide
+    ## to retrieve extra data of user identity
+    , new P\AuthSystem\Authenticate\Identity\IdentityFulfillmentLazy(new UserData, 'username') // must fulfilled this
+);
+
+// =================================================================================================================
+
+// Identifier To Sign User In/Out
+try {
+    if (!$authenticator->hasAuthenticated())
+        throw new P\AuthSystem\Authenticate\Exceptions\exAccessDenied;
+} catch (P\AuthSystem\Authenticate\Exceptions\exAccessDenied $e) {
+    echo '<h1>You MUST Loggin:</h1>';
+    // Challenge User For Credential Login:
+
+    ## credential repository
+    $identifier = $authenticator->authenticate(['username' => 'admin', 'password' => '123456']);
+    $identifier->signIn();
+}
+
+echo '<h1>Logged In User Data:</h1>';
+$identity = $authenticator->hasAuthenticated()->identity();
+### now we can get extra data
+k(P\Std\cast($identity)->toArray());
+```
+
+
+
+```php
+class UserData implements P\AuthSystem\Authenticate\Interfaces\iProviderIdentityData
     {
         # Finds a user by the given user Identity.
         #

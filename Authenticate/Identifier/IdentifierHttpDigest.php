@@ -1,8 +1,6 @@
 <?php
-namespace Poirot\AuthSystem\Authenticate\Authenticator;
+namespace Poirot\AuthSystem\Authenticate\Identifier;
 
-use Poirot\AuthSystem\Authenticate\aAuthenticatorHttp;
-use Poirot\AuthSystem\Authenticate\Authenticator\Adapter\AuthAdapterDigestFile;
 use Poirot\AuthSystem\Authenticate\Credential\CredentialOpen;
 use Poirot\AuthSystem\Authenticate\Credential\CredentialUserPass;
 use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
@@ -11,6 +9,18 @@ use Poirot\AuthSystem\Authenticate\Identity\IdentityUsername;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentityCredentialRepo;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
+use Poirot\Http\HttpMessage\Request\DataParseRequestPhp;
+use Poirot\Http\HttpMessage\Response\DataParseResponsePhp;
+use Poirot\Http\HttpRequest;
+use Poirot\Http\HttpResponse;
+use Poirot\Http\Interfaces\iHttpRequest;
+use Poirot\Http\Interfaces\iHttpResponse;
+use Poirot\Http\Interfaces\Respec\iRequestAware;
+use Poirot\Http\Interfaces\Respec\iRequestProvider;
+use Poirot\Http\Interfaces\Respec\iResponseAware;
+use Poirot\Http\Interfaces\Respec\iResponseProvider;
+
+use \Poirot\AuthSystem\Authenticate\Identifier\HttpDigest;
 
 /*
 $request  = new HttpRequest(new PhpServerRequestBuilder);
@@ -51,8 +61,12 @@ if ($auth->hasAuthenticated()) {
 $response->flush();
 */
 
-class AuthenticatorHttpDigest
-    extends aAuthenticatorHttp
+class IdentifierHttpDigest
+    extends aIdentifier
+    implements iRequestAware
+    , iResponseAware
+    , iRequestProvider
+    , iResponseProvider
 {
     // Options
     /** @var bool */
@@ -78,53 +92,59 @@ class AuthenticatorHttpDigest
      * List of supported qop options. My intention is to support both 'auth' and
      * 'auth-int', but 'auth-int' won't make it into the first version.
      */
-    protected $supportedQops = ['auth'];
+    protected $supportedQops = array('auth');
     protected $useOpaque     = true;
 
+    /** @var iHttpRequest */
+    protected $request;
+    /** @var iHttpResponse */
+    protected $response;
+
+
+    /**
+     * Attain Identity Object From Signed Sign
+     * exp. session, extract from authorize header,
+     *      load lazy data, etc.
+     *
+     * !! call when user is signed in to retrieve user identity
+     *
+     * note: almost retrieve identity data from cache or
+     *       storage that store user data. ie. session
+     *
+     * @see identity()
+     * @return iIdentity|\Traversable|null Null if no change need
+     */
+    protected function doRecognizedIdentity()
+    {
+        // TODO: Implement doRecognizedIdentity() method.
+    }
+
+    /**
+     * Can Recognize Identity?
+     *
+     * note: never check remember flag
+     *   the user that authenticated with
+     *   Remember Me must recognized when
+     *   exists.
+     *
+     * @return boolean
+     */
+    function canRecognizeIdentity()
+    {
+        return (boolean) HttpDigest\hasAuthorizationHeader($this->request(), $this->isProxyAuth());
+    }
 
     /**
      * Do Extract Credential From Request Object
      * ie. post form data or token
      *
-     * @param HttpRequest $request
-     *
      * @return iCredential|iIdentityCredentialRepo|iIdentity|null Null if not available
      */
-    function doExtractCredentialFromRequest(HttpRequest $request)
+    function doExtractCredentialFromRequest()
     {
-        if ($this->isProxyAuth())
-            $headerName = 'Proxy-Authorization';
-        else
-            $headerName = 'Authorization';
+        $hValue = HttpDigest\hasAuthorizationHeader($this->request(), $this->isProxyAuth());
 
-        $headers = $request->getHeaders();
-        if (!($headers->has($headerName) && $hValue = $headers->get($headerName)->renderValueLine()))
-            ## Authorization Header Not Found. exception will rise contains header to challenge user for login
-            return null;
-
-
-        // ...
-
-        list($clientScheme) = explode(' ', trim($hValue));
-        $clientScheme       = strtolower($clientScheme);
-
-        if (!in_array($clientScheme, ['basic', 'digest']))
-            ## not support, Authorization: basic .....
-            return null;
-
-        ## scheme not acceptable by config
-        if ($clientScheme == 'digest' && !$this->isAcceptDigest())
-            return null;
-        if ($clientScheme == 'basic'  && !$this->isAcceptBasic())
-            return null;
-
-
-        if ($clientScheme == 'basic')
-            $credential = $this->__computeBasicCredential($hValue);
-        else
-            $credential = $this->__computeDigestCredential($hValue);
-
-        return $credential;
+        
     }
 
         protected function __computeBasicCredential($hValue)
@@ -160,7 +180,7 @@ class AuthenticatorHttpDigest
                 return false;
 
 
-            if ($this->__generateNonce() != $headerData['nonce'])
+            if ($this->_generateNonce() != $headerData['nonce'])
                 ## client sent back same nonce
                 return false;
 
@@ -170,7 +190,7 @@ class AuthenticatorHttpDigest
                 // Validate Opaque
                 if (!isset($headerData['opaque']))
                     return false;
-                elseif ($this->__generateOpaque() != $headerData['opaque'])
+                elseif ($this->_generateOpaque() != $headerData['opaque'])
                     return false;
             }
 
@@ -260,24 +280,6 @@ class AuthenticatorHttpDigest
                 return $identity;
             }
         }
-
-    /**
-     * Attain Identity Object From Signed Sign
-     *
-     * !! call when user is signed in to retrieve user identity
-     *
-     * note: almost retrieve identity data from cache or
-     *       storage that store user data. ie. session
-     *
-     * @see identity()
-     * @return iIdentity|null Null if no change need
-     */
-    function doIdentifierSignedIdentity()
-    {
-        ## when user signed in, identity is available during authentication process with
-        ## Authorize header and no need to change.
-        return null;
-    }
 
     /**
      * Login Authenticated User
@@ -578,12 +580,12 @@ class AuthenticatorHttpDigest
              * it should be ignored.
              */
             . ( ($this->getDomains()) ? 'domain="' . $this->domains . '", ' : '' )
-            . 'nonce="' . $this->__generateNonce() . '", '
+            . 'nonce="' . $this->_generateNonce() . '", '
             /*
              * This can be treated as a session id. If this changes the browser
              * will deauthenticate the user.
              */
-            . ( ($this->isUseOpaque()) ? 'opaque="' . $this->__generateOpaque() . '", ' : '' )
+            . ( ($this->isUseOpaque()) ? 'opaque="' . $this->_generateOpaque() . '", ' : '' )
             /*
              * indicating that the previous request from the client was
              * rejected because the nonce value was stale. If stale is TRUE
@@ -616,7 +618,7 @@ class AuthenticatorHttpDigest
      *
      * @return string The nonce value
      */
-    protected function __generateNonce()
+    protected function _generateNonce()
     {
         /*
          * server would recalculate the hash portion after receiving the client
@@ -669,7 +671,7 @@ class AuthenticatorHttpDigest
      *
      * @return string The opaque value
      */
-    protected function __generateOpaque()
+    protected function _generateOpaque()
     {
         return base64_encode('opaque_data:');
     }
@@ -691,7 +693,7 @@ class AuthenticatorHttpDigest
     {
         preg_match_all('@(\w+)=(?:(?:")([^"]+)"|([^\s,$]+))@', $header, $matches, PREG_SET_ORDER);
 
-        $data = [];
+        $data = array();
         foreach ($matches as $m) {
             $key   = $m[1];
             $value = ($m[2]) ? $m[2] : $m[3];
@@ -751,5 +753,70 @@ class AuthenticatorHttpDigest
          * and server to avoid chosen plaintext attacks, to provide mutual
          * authentication, and to provide some message integrity protection.
          */
+    }
+
+
+    // Implement Request/Response Aware
+
+    /**
+     * Set Request
+     *
+     * @param iHttpRequest $request
+     *
+     * @return $this
+     */
+    function setRequest(iHttpRequest $request)
+    {
+        $this->request = $request;
+        return $this;
+    }
+
+    /**
+     * Set Response
+     *
+     * @param iHttpResponse $response
+     *
+     * @return $this
+     */
+    function setResponse(iHttpResponse $response)
+    {
+        $this->response = $response;
+        return $this;
+    }
+
+    /**
+     * Http Request
+     *
+     * !! most time the request object must inject into class
+     *    and manipulated during authentication flow.
+     *
+     * @return iHttpRequest
+     */
+    function request()
+    {
+        if (!$this->request) {
+            $request = new HttpRequest(new DataParseRequestPhp);
+            $this->request = $request;
+        }
+
+        return $this->request;
+    }
+
+    /**
+     * Http Response
+     *
+     * !! most time the response object must inject into class
+     *    and manipulated during authentication flow.
+     *
+     * @return iHttpResponse
+     */
+    function response()
+    {
+        if (!$this->response) {
+            $response = new HttpResponse(new DataParseResponsePhp);
+            $this->response = $response;
+        }
+
+        return $this->response;
     }
 }

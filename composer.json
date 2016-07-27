@@ -12,11 +12,17 @@
     "require": {
         "poirot/std": "dev-devel"
         , "poirot/storage": "dev-devel"
-    },
-    "target-dir": "Poirot/AuthSystem",
+    }
+    , "suggest": {
+        "poirot/http": "To Handle Request Aware Authentication Like Digest."
+    }
+    , "target-dir": "Poirot/AuthSystem",
     "autoload"  : {
         "psr-0": {
             "Poirot\\AuthSystem": "."
         }
+        , "files": [
+            "_functions.php"
+        ]
     }
 }
