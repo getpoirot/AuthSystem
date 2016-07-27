@@ -21,7 +21,7 @@ if (!$match)
 echo "Hello {$match->getUsername()}.";
 */
 
-class IdentityCredentialDigestFile 
+class IdentityCredentialDigestFile
     extends aIdentityCredentialAdapter
 {
     protected $username;
