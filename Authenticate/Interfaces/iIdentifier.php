@@ -4,6 +4,11 @@ namespace Poirot\AuthSystem\Authenticate\Interfaces;
 use Poirot\AuthSystem\Authenticate\Exceptions\exNotAuthenticated;
 
 /**
+ * Identifier is an object that recognize user in each request 
+ * or tell that has no recognized user exists.
+ * then we can achieve user data with identity that fulfilled with required
+ * data.
+ * 
  * Sign In/Out User as Identity into Environment(by session or something)
  *
  * - if identity is fulfilled/validated means user is recognized
@@ -33,30 +38,18 @@ interface iIdentifier
     */
     function getRealm();
 
-
-    /**
-     * Inject Identity
-     *
-     * @param iIdentity $identity
-     *
-     * @throws exNotAuthenticated Identity not full filled
-     * @return $this
-     */
-    function setIdentity(iIdentity $identity);
-
     /**
      * Get Authenticated User Data
      *
-     * - if identity exists use it
-     * - otherwise if signIn extract data from it
+     * - for check that user is signIn the identity must 
+     *   fulfilled.
+     * - if canRecognizeIdentity extract data from it
+     *   this cause identity fulfillment with given data
      *   ie. when user exists in session build identity from that
-     *
-     * - not one of above situation return empty identity
      *
      * @return iIdentity
      */
     function identity();
-
 
     /**
      * Login Authenticated User
@@ -85,18 +78,14 @@ interface iIdentifier
     function signOut();
 
     /**
-     * Has User Logged in?
-     *
-     * - login mean that user uid exists in the storage
+     * Can Recognize Identity? 
      *
      * note: never check remember flag
      *   the user that authenticated with
      *   Remember Me must recognized when
      *   exists.
      *
-     * note: user must be login() to recognize here
-     *
      * @return boolean
      */
-    function isSignIn();
+    function canRecognizeIdentity();
 }

@@ -22,7 +22,7 @@ class IdentifierSession
      * @see identity()
      * @return iIdentity|\Traversable|null Null if no change need
      */
-    protected function doIdentifierSignedIdentity()
+    protected function doRecognizedIdentity()
     {
         $identity = $this->_storage()->get(self::STORAGE_IDENTITY_KEY);
         $identity = unserialize($identity);
@@ -82,7 +82,7 @@ class IdentifierSession
      *
      * @return boolean
      */
-    function isSignIn()
+    function canRecognizeIdentity()
     {
         if($this->_storage()->has(self::STORAGE_IDENTITY_KEY))
             return true;

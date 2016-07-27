@@ -1,7 +1,6 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Identifier;
 
-use Poirot\AuthSystem\Authenticate\Exceptions\exNotAuthenticated;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityOpen;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
@@ -9,6 +8,11 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Std\ConfigurableSetter;
 
 /**
+ * Identifier is an object that recognize user in each request
+ * or tell that has no recognized user exists.
+ * then we can achieve user data with identity that fulfilled with required
+ * data.
+ *
  * Sign In/Out User as Identity into Environment(by session or something)
  *
  * - if identity is fulfilled/validated means user is recognized
@@ -32,10 +36,11 @@ abstract class aIdentifier
     protected $defaultIdentity;
     protected $realm;
 
-    
+
     /**
      * Construct
      *
+     * @param string             $realm   Authentication Realm/Domain
      * @param array|\Traversable $options
      */
     function __construct($realm = self::DEFAULT_REALM, $options = null)
@@ -44,20 +49,6 @@ abstract class aIdentifier
         $this->setRealm($realm);
     }
     
-    /**
-     * Inject Identity
-     *
-     * @param iIdentity $identity
-     *
-     * @throws exNotAuthenticated Identity not full filled
-     * @return $this
-     */
-    function setIdentity(iIdentity $identity)
-    {
-        $this->identity = $identity;
-        return $this;
-    }
-
     /**
      * Get Authenticated User Data
      *
@@ -72,15 +63,15 @@ abstract class aIdentifier
     function identity()
     {
         if (!$this->identity)
-            $this->identity = $this->_getDefaultIdentity();
+            $this->identity = $this->_newDefaultIdentity();
 
         if($this->identity->isFulfilled())
             return $this->identity;
 
 
         // Attain Identity:
-        if ($this->isSignIn()) {
-            $identity = $this->doIdentifierSignedIdentity();
+        if ($this->canRecognizeIdentity()) {
+            $identity = $this->doRecognizedIdentity();
             if ($identity !== null)
                 ## update identity
                 $this->identity->import($identity);
@@ -103,11 +94,11 @@ abstract class aIdentifier
      * @see identity()
      * @return iIdentity|\Traversable|null Null if no change need
      */
-    abstract protected function doIdentifierSignedIdentity();
+    abstract protected function doRecognizedIdentity();
 
 
     // Options:
-
+    
     /**
      * Set Realm To Limit Authentication
      *
@@ -141,29 +132,13 @@ abstract class aIdentifier
     // Options:
 
     /**
-     * Set Default Identity Instance
-     * that Signed data load into
-     *
-     * @param iIdentity $identity
-     * @return $this
-     */
-    function setDefaultIdentity(iIdentity $identity)
-    {
-        $this->defaultIdentity = $identity;
-        return $this;
-    }
-
-    /**
      * Get Default Identity Instance
      * that Signed data load into
      *
      * @return iIdentity
      */
-    protected function _getDefaultIdentity()
+    protected function _newDefaultIdentity()
     {
-        if (!$this->defaultIdentity)
-            $this->defaultIdentity = new IdentityOpen;
-
-        return $this->defaultIdentity;
+        return new IdentityOpen;
     }
 }

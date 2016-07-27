@@ -4,40 +4,32 @@ namespace Poirot\AuthSystem\Authenticate\Interfaces;
 use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 
 Interface iAuthenticator 
-    extends iIdentifier
 {
+    /**
+     * iAuthenticator constructor.
+     *
+     * @param iIdentifier $identifier
+     */
+    function __construct(iIdentifier $identifier);
+
     /**
      * Authenticate
      *
-     * - authenticate user using credential
-     * - login into identifier with iIdentity set from recognized
-     *   user data
-     *
-     * - it can be used to force user for login on each page that
-     *   need access control
-     *   ie. $auth->authenticate()
-     *   if it has authenticated and not new credential passed as
-     *   argument it will return and do nothing
-     *
-     * note: after successful authentication, you must call
-     *       login() outside of method to store identified user
-     *
+     * - match credential with Credential Adapter if given
+     * 
      * @param iCredential|iIdentityCredentialRepo $credential
      *
-     * @throws exAuthentication|\Exception Or extend of this
-     * @return $this
+     * @return iIdentifier Fulfilled Identifier also
+     * @throws exAuthentication Authentication failed
      */
     function authenticate($credential = null);
 
     /**
      * Has Authenticated And Identifier Exists
      *
-     * - it mean that Identifier has full filled identity
+     * - it mean that Identifier has fulfilled
      *
-     * note: this allow to register this authenticator as a service
-     *       to retrieve authenticate information
-     *
-     * @return boolean
+     * @return iIdentifier|false
      */
     function hasAuthenticated();
 }

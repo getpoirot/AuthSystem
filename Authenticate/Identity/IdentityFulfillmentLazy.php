@@ -77,6 +77,18 @@ class IdentityFulfillmentLazy
         return $this;
     }
 
+    /**
+     * Empty from all values
+     * @return $this
+     */
+    function clean()
+    {
+        parent::clean();
+
+        $this->_c__loaded_data = false;
+        return $this;
+    }
+
     // ...
 
     /**
