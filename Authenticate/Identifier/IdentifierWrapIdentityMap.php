@@ -4,6 +4,11 @@ namespace Poirot\AuthSystem\Authenticate\Identifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 
+/**
+ * Used To Change Default Identity of Identifier
+ * Usually when we need some extra data against default identifier
+ * filled entity.
+ */
 class IdentifierWrapIdentityMap 
     extends IdentifierWrap
 {
@@ -18,7 +23,7 @@ class IdentifierWrapIdentityMap
      */
     function __construct(iIdentifier $identifier, iIdentity $identity)
     {
-        $this->identity_map = $identity;
+        $this->identity_map = clone $identity;
         parent::__construct($identifier);
     }
     

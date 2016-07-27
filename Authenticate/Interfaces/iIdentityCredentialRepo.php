@@ -26,9 +26,8 @@ interface iIdentityCredentialRepo
     /**
      * Get Identity Match By Credential as Options
      *
-     * @return iIdentity
-     * @throws exAuthentication
-     * @throws \Exception credential not fulfilled, etc..
+     * @return iIdentity|false
+     * @throws \Exception credential not fulfilled
      */
     function findIdentityMatch();
 
