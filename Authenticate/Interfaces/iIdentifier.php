@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
-use Poirot\AuthSystem\Authenticate\Exceptions\exNotAuthenticated;
+use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 
 /**
  * Identifier is an object that recognize user in each request 
@@ -88,4 +88,26 @@ interface iIdentifier
      * @return boolean
      */
     function canRecognizeIdentity();
+
+    /**
+     * Issue To Handle Authentication Exception
+     *
+     * usually called when authentication exception rise
+     * to challenge client to login form or something.
+     *
+     * [code:]
+     * // ..
+     * } catch (P\AuthSystem\Authenticate\Exceptions\exAuthentication $e) {
+     *     echo '<h1>You MUST Login:</h1>';
+     *     // Challenge User For Credential Login:
+     *     # $e->issueException(); // recommended 
+     *     $e->getAuthenticator()->identifier()->issueException();
+     * }
+     * [code]
+     * 
+     * @param exAuthentication $exception Maybe support for specific error
+     * 
+     * @return void
+     */
+    function issueException(exAuthentication $exception = null);
 }

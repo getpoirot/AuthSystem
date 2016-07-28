@@ -32,4 +32,12 @@ Interface iAuthenticator
      * @return iIdentifier|false
      */
     function hasAuthenticated();
+
+    /**
+     * Identifier Instance
+     * 
+     * @return iIdentifier
+     */
+    function identifier();
+    
 }

@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Identifier;
 
+use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 
@@ -111,6 +112,31 @@ class IdentifierWrap
     function identity()
     {
         return $this->identifier->identity();
+    }
+
+    /**
+     * Issue To Handle Authentication Exception
+     *
+     * usually called when authentication exception rise
+     * to challenge client to login form or something.
+     *
+     * [code:]
+     * // ..
+     * } catch (P\AuthSystem\Authenticate\Exceptions\exAuthentication $e) {
+     *     echo '<h1>You MUST Login:</h1>';
+     *     // Challenge User For Credential Login:
+     *     # $e->issueException(); // recommended
+     *     $e->getAuthenticator()->identifier()->issueException();
+     * }
+     * [code]
+     *
+     * @param exAuthentication $exception Maybe support for specific error
+     *
+     * @return void
+     */
+    function issueException(exAuthentication $exception = null)
+    {
+        $this->identifier->issueException($exception);
     }
 
     // ..

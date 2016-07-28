@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Identifier;
 
+use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityOpen;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
@@ -35,6 +36,8 @@ abstract class aIdentifier
     /** @var iIdentity */
     protected $defaultIdentity;
     protected $realm;
+    /** @var callable */
+    protected $issuer_exception;
 
 
     /**
@@ -96,7 +99,29 @@ abstract class aIdentifier
      */
     abstract protected function doRecognizedIdentity();
 
+    /**
+     * Issue To Handle Authentication Exception
+     *
+     * usually called when authentication exception rise
+     * to challenge client to login form or something.
+     *
+     * @param exAuthentication $exception Maybe support for specific error
+     *
+     * @return void
+     */
+    function issueException(exAuthentication $exception = null)
+    {
+        $callable = ($this->issuer_exception)
+            ? $this->issuer_exception
+            : function($e) {
+                // Nothing to do special; just let it go.
+                throw $e;
+            };
+        
+        call_user_func($callable, $exception);
+    }
 
+    
     // Options:
     
     /**
@@ -128,8 +153,29 @@ abstract class aIdentifier
         return $this->realm;
     }
 
+    /**
+     * Set Exception Issuer
+     *
+     * callable:
+     * function(exAuthentication $e)
+     * 
+     * @param callable $callable
+     * 
+     * @return $this
+     */
+    function setIssuerException(/*callable*/ $callable)
+    {
+        if (!is_callable($callable))
+            throw new \InvalidArgumentException(sprintf(
+                'Issuer must be callable; given: (%s).'
+                , \Poirot\Std\flatten($callable)
+            ));
+        
+        $this->issuer_exception = $callable;
+        return $this;
+    }
 
-    // Options:
+    // ..
 
     /**
      * Get Default Identity Instance

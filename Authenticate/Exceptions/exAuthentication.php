@@ -6,22 +6,21 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator;
 class exAuthentication 
     extends \RuntimeException
 {
-    const EXCEPTION_DEFAULT_MESSAGE = 'Authentication Failed';
-    const EXCEPTION_DEFAULT_CODE    = 403;
+    const EXCEPTION_DEFAULT_MESSAGE = 'Authentication Failed.';
+    const EXCEPTION_DEFAULT_CODE    = 400;
 
     /** @var iAuthenticator */
     protected $authenticator;
 
-    function __construct(
-        $message = self::EXCEPTION_DEFAULT_MESSAGE,
-        $code = 403,
-        \Exception $previous = null,
-        iAuthenticator $authenticator = null
-    )
+    /**
+     * exAuthentication constructor.
+     * 
+     * @param iAuthenticator|null $authenticator
+     */
+    function __construct(iAuthenticator $authenticator = null)
     {
-        parent::__construct($message, $code, $previous);
-
         $this->authenticator = $authenticator;
+        parent::__construct(self::EXCEPTION_DEFAULT_MESSAGE, self::EXCEPTION_DEFAULT_CODE);
     }
 
     /**
@@ -42,5 +41,31 @@ class exAuthentication
     {
         $this->authenticator = $authenticator;
         return $this;
+    }
+
+    /**
+     * Issue To Handle Authentication Exception
+     *
+     * usually called when authentication exception rise
+     * to challenge client to login form or something.
+     *
+     * [code:]
+     * // ..
+     * } catch (P\AuthSystem\Authenticate\Exceptions\exAuthentication $e) {
+     *     echo '<h1>You MUST Login:</h1>';
+     *     // Challenge User For Credential Login:
+     *     $e->issueException();
+     * }
+     * [code]
+     * 
+     * @return void
+     */
+    function issueException()
+    {
+        if (!$authenticator = $this->getAuthenticator())
+            // Not Identifier Handle Error!! Let It Go...
+            throw $this;
+
+        $authenticator->identifier()->issueException($this);
     }
 }

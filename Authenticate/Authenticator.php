@@ -54,8 +54,7 @@ class Authenticator
      */
     function authenticate($credential = null)
     {
-        if ($credential instanceof iIdentity)
-        {
+        if ($credential instanceof iIdentity) {
             $identity = $credential;
             goto f_authenticate_done;
         }
@@ -89,12 +88,12 @@ f_authenticate_done:
             throw new exAuthentication;
 
 
-        $identifier = clone $this->identifier;
+        $identifier = clone $this->identifier();
         $identifier->identity()->clean()->import($identity);
         if (!$identifier->identity()->isFulfilled())
             throw new \Exception(sprintf(
                 'Given Identity By IdentityCredential Repo Not Fulfilled Authentication Identity (%s).'
-                , \Poirot\Std\flatten($this->identifier->identity())
+                , \Poirot\Std\flatten($this->identifier()->identity())
             ));
 
         return $identifier;
@@ -110,9 +109,19 @@ f_authenticate_done:
      */
     function hasAuthenticated()
     {
-        if (!$this->identifier->identity()->isFulfilled())
+        if (!$this->identifier()->identity()->isFulfilled())
             return false;
         
+        return $this->identifier();
+    }
+
+    /**
+     * Identifier Instance
+     *
+     * @return iIdentifier
+     */
+    function identifier()
+    {
         return $this->identifier;
     }
 }
