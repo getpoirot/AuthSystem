@@ -5,6 +5,7 @@ use Poirot\AuthSystem\Authenticate\Identifier\aIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentityCredentialRepo;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Std\Struct\aDataOptions;
+use Poirot\Std\Struct\DataOptionsOpen;
 
 /*
 $adapter = new IdentityCredentialDigestFile();
@@ -36,7 +37,7 @@ echo "Hello {$match->getUsername()}.";
  * In Most Cases You Must Implement Your Own Adapter!
  */
 abstract class aIdentityCredentialAdapter
-    extends aDataOptions
+    extends DataOptionsOpen
     implements iIdentityCredentialRepo
 {
     const DEFAULT_REALM = aIdentifier::DEFAULT_REALM;
