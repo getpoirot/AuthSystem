@@ -2,6 +2,7 @@
 namespace Poirot\AuthSystem\Authenticate;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
+use Poirot\AuthSystem\Authenticate\Exceptions\exNotAuthenticated;
 use Poirot\AuthSystem\Authenticate\Identifier\IdentifierWrapIdentityMap;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
@@ -103,9 +104,15 @@ f_authenticate_done:
      */
     function hasAuthenticated()
     {
-        if (!$this->identifier()->withIdentity()->isFulfilled())
+        try {
+            // if identifier cant detect identity and identity not set manually-
+            // it will rise exception
+            if (!$this->identifier()->withIdentity()->isFulfilled())
+                return false;
+        } catch (exNotAuthenticated $e) {
             return false;
-        
+        }
+            
         return $this->identifier();
     }
 
