@@ -27,11 +27,12 @@ class Authenticator
      */
     function __construct(iIdentifier $identifier, iIdentityCredentialRepo $adapter = null, iIdentity $identityMap = null)
     {
-        $this->identifier = new IdentifierWrapIdentityMap($identifier, $identityMap);
-
+        if ($identityMap)
+            $identifier = new IdentifierWrapIdentityMap($identifier, $identityMap);
+        $this->identifier = $identifier;
+        
         if ($adapter === null)
             throw new \InvalidArgumentException('Identity Credential Adapter Required.');
-
         $this->identityCredential = $adapter;
     }
 
@@ -87,15 +88,8 @@ f_authenticate_done:
         if (!$identity instanceof iIdentity || ($identity instanceof iIdentity && !$identity->isFulfilled()))
             throw new exAuthentication;
 
-
-        $identifier = clone $this->identifier();
-        $identifier->identity()->clean()->import($identity);
-        if (!$identifier->identity()->isFulfilled())
-            throw new \Exception(sprintf(
-                'Given Identity By IdentityCredential Repo Not Fulfilled Authentication Identity (%s).'
-                , \Poirot\Std\flatten($this->identifier()->identity())
-            ));
-
+        $identifier = $this->identifier();
+        $identifier->exactIdentity($identity);
         return $identifier;
     }
 
@@ -109,7 +103,7 @@ f_authenticate_done:
      */
     function hasAuthenticated()
     {
-        if (!$this->identifier()->identity()->isFulfilled())
+        if (!$this->identifier()->withIdentity()->isFulfilled())
             return false;
         
         return $this->identifier();

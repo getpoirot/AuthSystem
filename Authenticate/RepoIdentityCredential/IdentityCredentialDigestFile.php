@@ -32,6 +32,9 @@ class IdentityCredentialDigestFile
 
     /**
      * Do Match Identity With Given Options/Credential
+     * 
+     * - match against username:realm; used on http digest authorization
+     *   to retrieve A1. A1 = md5(username:realm:password)
      *
      * @param array $credentials Include Credential Data
      *
@@ -55,17 +58,19 @@ class IdentityCredentialDigestFile
         $realm = $this->getRealm();
 
         $id       = "$username:$realm";
-        while (($line = fgets($hFile)) !== false) {
+        while (($line = fgets($hFile)) !== false) 
+        {
             $line = trim($line);
+            
             if (substr($line, 0, strlen($id)) !== $id)
                 ## try next (user:realm) not match
                 continue;
 
             if (!isset($password)) {
-                ## username match, digest http auth. need secret key
+                // just username match, digest http authorization need secret key (A1)
                 $identity = new IdentityHttpDigest;
                 $identity->setUsername($username);
-                $identity->setHash(strtolower(substr($line, -32)));
+                $identity->setA1(strtolower(substr($line, -32)));
 
                 return $identity;
             }

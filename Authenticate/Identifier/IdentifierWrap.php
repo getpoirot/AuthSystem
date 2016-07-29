@@ -36,7 +36,7 @@ class IdentifierWrap
      */
     function signIn()
     {
-        $this->identifier->identity()->import($this->identity());
+        $this->identifier->withIdentity()->import($this->withIdentity());
         $this->identifier->signIn();
         return $this;
     }
@@ -54,7 +54,7 @@ class IdentifierWrap
     function signOut()
     {
         $this->identifier->signOut();
-        $this->identity()->clean();
+        $this->withIdentity()->clean();
     }
 
     /**
@@ -99,7 +99,21 @@ class IdentifierWrap
     }
 
     /**
-     * Get Authenticated User Data
+     * Set Immutable Identity
+     *
+     * @param iIdentity $identity
+     *
+     * @return $this
+     * @throws \Exception immutable error; identity not met requirement
+     */
+    function exactIdentity(iIdentity $identity)
+    {
+        $this->identifier->exactIdentity($identity);
+        return $this;
+    }
+    
+    /**
+     * Get Authenticated User Data Copy
      *
      * - for check that user is signIn the identity must
      *   fulfilled.
@@ -109,9 +123,9 @@ class IdentifierWrap
      *
      * @return iIdentity
      */
-    function identity()
+    function withIdentity()
     {
-        return $this->identifier->identity();
+        return $this->identifier->withIdentity();
     }
 
     /**

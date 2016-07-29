@@ -2,6 +2,7 @@
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
+use Poirot\AuthSystem\Authenticate\Exceptions\exNotAuthenticated;
 
 /**
  * Identifier is an object that recognize user in each request 
@@ -37,19 +38,30 @@ interface iIdentifier
     * @return string
     */
     function getRealm();
+    
+    /**
+     * Set Immutable Identity
+     * 
+     * @param iIdentity $identity
+     * 
+     * @return $this
+     * @throws \Exception immutable error; identity not met requirement
+     */
+    function exactIdentity(iIdentity $identity);
 
     /**
-     * Get Authenticated User Data
+     * Get Authenticated User Data Copy
      *
-     * - for check that user is signIn the identity must 
+     * - for check that user is signIn the identity must
      *   fulfilled.
      * - if canRecognizeIdentity extract data from it
      *   this cause identity fulfillment with given data
      *   ie. when user exists in session build identity from that
      *
      * @return iIdentity
+     * @throws exNotAuthenticated not set or cant recognized
      */
-    function identity();
+    function withIdentity();
 
     /**
      * Login Authenticated User
@@ -57,8 +69,6 @@ interface iIdentifier
      * - Sign user in environment and server
      *   exp. store in session, store data in cache
      *        sign user token in header, etc.
-     *
-     * - logout current user if has
      *
      * @throws \Exception no identity defined
      * @return $this
@@ -71,7 +81,7 @@ interface iIdentifier
      * - it must destroy sign
      *   ie. destroy session or invalidate token in storage
      *
-     * - clear identity
+     * - destroy identity (immutable)
      *
      * @return void
      */

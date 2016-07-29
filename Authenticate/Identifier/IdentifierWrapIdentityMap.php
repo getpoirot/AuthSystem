@@ -23,12 +23,12 @@ class IdentifierWrapIdentityMap
      */
     function __construct(iIdentifier $identifier, iIdentity $identity)
     {
-        $this->identity_map = clone $identity;
+        $this->identity_map = $identity;
         parent::__construct($identifier);
     }
-    
+
     /**
-     * Get Authenticated User Data
+     * Get Authenticated User Data Copy
      *
      * - for check that user is signIn the identity must
      *   fulfilled.
@@ -38,9 +38,11 @@ class IdentifierWrapIdentityMap
      *
      * @return iIdentity
      */
-    function identity()
+    function withIdentity()
     {
-        $this->identity_map->import($this->identifier->identity());
-        return $this->identity_map;
+        // TODO improved if we use Identity Map To Lazy Get Data
+        $identity = clone $this->identity_map;
+        $identity->import($this->identifier->withIdentity());
+        return $identity;
     }
 }

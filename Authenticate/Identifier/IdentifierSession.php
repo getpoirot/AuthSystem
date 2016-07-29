@@ -7,7 +7,31 @@ use Poirot\Storage\Gateway\DataStorageSession;
 class IdentifierSession 
     extends aIdentifier
 {
+    /** @var DataStorageSession */
     protected $_session;
+
+    
+    /**
+     * Has User Logged in?
+     *
+     * - login mean that user uid exists in the storage
+     *
+     * note: never check remember flag
+     *   the user that authenticated with
+     *   Remember Me must recognized when
+     *   exists.
+     *
+     * note: user must be login() to recognize here
+     *
+     * @return boolean
+     */
+    function canRecognizeIdentity()
+    {
+        if($this->_storage()->has(self::STORAGE_IDENTITY_KEY))
+            return true;
+
+        return false;
+    }
     
     /**
      * Attain Identity Object From Signed Sign
@@ -19,14 +43,16 @@ class IdentifierSession
      * note: almost retrieve identity data from cache or
      *       storage that store user data. ie. session
      *
-     * @see identity()
+     * @see withIdentity()
      * @return iIdentity|\Traversable|null Null if no change need
      */
     protected function doRecognizedIdentity()
     {
-        $identity = $this->_storage()->get(self::STORAGE_IDENTITY_KEY);
-        $identity = unserialize($identity);
+        $storedIdentity = $this->_storage()->get(self::STORAGE_IDENTITY_KEY);
+        $storedIdentity = unserialize($storedIdentity);
 
+        $identity = $this->_newDefaultIdentity();
+        $identity->import($storedIdentity);
         return $identity;
     }
 
@@ -65,31 +91,9 @@ class IdentifierSession
     function signOut()
     {
         $this->_storage()->destroy();
-        $this->identity()->clean();
+        $this->withIdentity()->clean();
     }
 
-    /**
-     * Has User Logged in?
-     *
-     * - login mean that user uid exists in the storage
-     *
-     * note: never check remember flag
-     *   the user that authenticated with
-     *   Remember Me must recognized when
-     *   exists.
-     *
-     * note: user must be login() to recognize here
-     *
-     * @return boolean
-     */
-    function canRecognizeIdentity()
-    {
-        if($this->_storage()->has(self::STORAGE_IDENTITY_KEY))
-            return true;
-
-        return false;
-    }
-    
     
     // ..
 

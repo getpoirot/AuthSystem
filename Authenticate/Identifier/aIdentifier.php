@@ -2,6 +2,7 @@
 namespace Poirot\AuthSystem\Authenticate\Identifier;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
+use Poirot\AuthSystem\Authenticate\Exceptions\exNotAuthenticated;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityOpen;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
@@ -51,54 +52,85 @@ abstract class aIdentifier
         parent::__construct($options);
         $this->setRealm($realm);
     }
+
     
     /**
-     * Get Authenticated User Data
-     *
-     * - if identity exists use it
-     * - otherwise if signIn extract data from it
-     *   ie. when user exists in session build identity from that
-     *
-     * - not one of above situation return empty identity
+     * Get Default Identity Instance
+     * that Signed data load into
      *
      * @return iIdentity
      */
-    function identity()
-    {
-        if (!$this->identity)
-            $this->identity = $this->_newDefaultIdentity();
-
-        if($this->identity->isFulfilled())
-            return $this->identity;
-
-
-        // Attain Identity:
-        if ($this->canRecognizeIdentity()) {
-            $identity = $this->doRecognizedIdentity();
-            if ($identity !== null)
-                ## update identity
-                $this->identity->import($identity);
-        }
-
-        return $this->identity;
-    }
-
+    abstract protected function _newDefaultIdentity();
 
     /**
      * Attain Identity Object From Signed Sign
      * exp. session, extract from authorize header,
      *      load lazy data, etc.
      *
-     * !! call when user is signed in to retrieve user identity
+     * !! called when user is signed in to retrieve user identity
      *
      * note: almost retrieve identity data from cache or
      *       storage that store user data. ie. session
      *
-     * @see identity()
+     * @see withIdentity()
      * @return iIdentity|\Traversable|null Null if no change need
      */
     abstract protected function doRecognizedIdentity();
+    
+    
+    /**
+     * Set Immutable Identity
+     *
+     * @param iIdentity $identity
+     *
+     * @return $this
+     * @throws \Exception immutable error; identity not met requirement
+     */
+    final function exactIdentity(iIdentity $identity)
+    {
+        if ($this->identity)
+            throw new \Exception('Identity is immutable.');
+        
+        $defIdentity = $this->_newDefaultIdentity();
+        $defIdentity->import($identity);
+        if (!$defIdentity->isFulfilled())
+            throw new \InvalidArgumentException(sprintf(
+                'Identity (%s) not fulfillment (%s).'
+                , \Poirot\Std\flatten($identity)
+                , \Poirot\Std\flatten($defIdentity)
+            ));
+        
+        $this->identity = $defIdentity;
+        return $this;
+    }
 
+    /**
+     * Get Authenticated User Data Copy
+     *
+     * - for check that user is signIn the identity must
+     *   fulfilled.
+     * - if canRecognizeIdentity extract data from it
+     *   this cause identity fulfillment with given data
+     *   ie. when user exists in session build identity from that
+     * 
+     * @return iIdentity
+     * @throws exNotAuthenticated not set or cant recognized
+     */
+    final function withIdentity()
+    {
+        if (!$this->identity && $this->canRecognizeIdentity()) { 
+            $identity = $this->doRecognizedIdentity();
+            if ($identity)
+                ## update identity
+                $this->exactIdentity($identity);
+        }
+        
+        if (!$this->identity)
+            throw new exNotAuthenticated('Identity not set and cant recognized.');
+
+        return clone $this->identity;
+    }
+    
     /**
      * Issue To Handle Authentication Exception
      *
@@ -109,16 +141,25 @@ abstract class aIdentifier
      *
      * @return void
      */
-    function issueException(exAuthentication $exception = null)
+    final function issueException(exAuthentication $exception = null)
     {
         $callable = ($this->issuer_exception)
             ? $this->issuer_exception
-            : function($e) {
-                // Nothing to do special; just let it go.
-                throw $e;
-            };
+            : $this->doIssueExceptionDefault();
         
         call_user_func($callable, $exception);
+    }
+
+    /**
+     * Default Exception Issuer
+     * @return \Closure
+     */
+    protected function doIssueExceptionDefault()
+    {
+        return function($e) {
+            // Nothing to do special; just let it go.
+            throw $e;
+        };
     }
 
     
@@ -173,18 +214,5 @@ abstract class aIdentifier
         
         $this->issuer_exception = $callable;
         return $this;
-    }
-
-    // ..
-
-    /**
-     * Get Default Identity Instance
-     * that Signed data load into
-     *
-     * @return iIdentity
-     */
-    protected function _newDefaultIdentity()
-    {
-        return new IdentityOpen;
     }
 }
