@@ -126,7 +126,7 @@ abstract class aIdentifier
         }
         
         if (!$this->identity)
-            throw new exNotAuthenticated('Identity not set and cant recognized.');
+            throw new exNotAuthenticated;
 
         return clone $this->identity;
     }

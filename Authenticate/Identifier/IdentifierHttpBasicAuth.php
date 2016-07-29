@@ -1,11 +1,42 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Identifier;
 
+use Poirot\AuthSystem\Authenticate\Identity\IdentityUsername;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentityCredentialRepo;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
+use Poirot\AuthSystem\Authenticate\Identifier\HttpDigest;
+
 use Poirot\Http\Header\FactoryHttpHeader;
 
-use \Poirot\AuthSystem\Authenticate\Identifier\HttpDigest;
+/*
+$request  = new P\Http\HttpRequest(new P\Http\HttpMessage\Request\DataParseRequestPhp());
+$response = new P\Http\HttpResponse();
+
+$adapter = new P\AuthSystem\Authenticate\RepoIdentityCredential\IdentityCredentialDigestFile();
+$authenticator = new P\AuthSystem\Authenticate\Authenticator(
+    new P\AuthSystem\Authenticate\Identifier\IdentifierHttpBasicAuth('realm_members', [
+        'request'  => $request,
+        'response' => $response,
+        'credential_adapter' => $adapter,
+    ])
+    ## identity credential repository
+    ,  $adapter
+);
+
+try {
+    if (!$authenticator->hasAuthenticated())
+        throw new P\AuthSystem\Authenticate\Exceptions\exAuthentication($authenticator);
+
+    echo 'program continue run..';
+
+} catch (P\AuthSystem\Authenticate\Exceptions\exAuthentication $e)
+{
+    $e->issueException();
+}
+
+$response->with(new P\Http\HttpMessage\Response\DataParseResponsePhp());
+P\Http\HttpMessage\Response\Plugin\PhpServer::_($response)->send();
+*/
 
 class IdentifierHttpBasicAuth
     extends aIdentifierHttp
@@ -29,7 +60,8 @@ class IdentifierHttpBasicAuth
      */
     function canRecognizeIdentity()
     {
-        return (boolean) HttpDigest\hasAuthorizationHeader($this->request(), $this->isProxyAuth());
+        $r = HttpDigest\hasAuthorizationHeader($this->request(), $this->isProxyAuth());
+        return ($r !== false);
     }
 
     /**
@@ -43,11 +75,25 @@ class IdentifierHttpBasicAuth
      *       storage that store user data. ie. session
      *
      * @see withIdentity()
-     * @return iIdentity|\Traversable|null Null if no change need
+     * @return null|iIdentity|\Traversable Null if no change need
+     * @throws \Exception
      */
     protected function doRecognizedIdentity()
     {
-        // TODO: Implement doRecognizedIdentity() method.
+        $headerValue = HttpDigest\hasAuthorizationHeader($this->request(), $this->isProxyAuth());
+        try {
+            $parseHeader = HttpDigest\parseBasicAuthorizationHeader($headerValue);
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        $credentialAdapter = $this->credentialAdapter;
+        if (!$credentialAdapter)
+            throw new \Exception('Credential Adapter Repository not defined.');
+
+        $credentialAdapter = clone $credentialAdapter;
+        $credentialAdapter->import($parseHeader); # [ username=>xx, password=>xx ]
+        return $credentialAdapter->findIdentityMatch();
     }
 
     /**
@@ -76,8 +122,7 @@ class IdentifierHttpBasicAuth
      */
     function signIn()
     {
-        // TODO: Implement signIn() method.
-        return $this;
+        throw new \Exception('SignIn Method for Http Authentication Basic can`t implemented by mean.');
     }
     
     /**
@@ -103,7 +148,8 @@ class IdentifierHttpBasicAuth
      */
     protected function _newDefaultIdentity()
     {
-        // TODO: Implement _newDefaultIdentity() method.
+        // Credential Repo Cause To Achieve Valid Unique Username
+        return new IdentityUsername();
     }
     
     

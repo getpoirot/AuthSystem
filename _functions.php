@@ -18,14 +18,15 @@ namespace Poirot\AuthSystem\Authenticate\Identifier\HttpDigest
         else
             $headerName = 'Authorization';
 
-        $headers = $request->headers();
 
         $hValue = false;
-        foreach ($headers->get($headerName) as $h) {
+
+        $headers = $request->headers();
+        if ($headers->has($headerName)) {
+            $h = $headers->get($headerName)->current();
             $hValue = $h->renderValueLine();
-            break;
         }
-        
+
         return $hValue;
     }
 
