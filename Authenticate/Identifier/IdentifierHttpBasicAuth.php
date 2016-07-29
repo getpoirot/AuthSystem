@@ -82,7 +82,7 @@ class IdentifierHttpBasicAuth
     {
         $headerValue = HttpDigest\hasAuthorizationHeader($this->request(), $this->isProxyAuth());
         try {
-            $parseHeader = HttpDigest\parseBasicAuthorizationHeader($headerValue);
+            $UserPass = HttpDigest\parseBasicAuthorizationHeader($headerValue);
         } catch (\Exception $e) {
             return false;
         }
@@ -92,7 +92,7 @@ class IdentifierHttpBasicAuth
             throw new \Exception('Credential Adapter Repository not defined.');
 
         $credentialAdapter = clone $credentialAdapter;
-        $credentialAdapter->import($parseHeader); # [ username=>xx, password=>xx ]
+        $credentialAdapter->import($UserPass); # [ username=>xx, password=>xx ]
         return $credentialAdapter->findIdentityMatch();
     }
 
