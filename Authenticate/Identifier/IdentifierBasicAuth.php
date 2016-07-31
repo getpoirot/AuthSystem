@@ -80,6 +80,7 @@ class IdentifierBasicAuth
             throw new \Exception('Credential Adapter Repository not defined.');
 
         $credentialAdapter = clone $credentialAdapter;
+        $credentialAdapter->setRealm($this->getRealm());
         $credentialAdapter->import($UserPass); # [ username=>xx, password=>xx ]
         return $credentialAdapter->findIdentityMatch();
     }
