@@ -92,6 +92,7 @@ class IdentifierHttpBasicAuth
             throw new \Exception('Credential Adapter Repository not defined.');
 
         $credentialAdapter = clone $credentialAdapter;
+        $credentialAdapter->setRealm($this->getRealm());
         $credentialAdapter->import($UserPass); # [ username=>xx, password=>xx ]
         return $credentialAdapter->findIdentityMatch();
     }
@@ -122,7 +123,7 @@ class IdentifierHttpBasicAuth
      */
     function signIn()
     {
-        throw new \Exception('SignIn Method for Http Authentication Basic can`t implemented by mean.');
+        throw new \Exception('SignIn Method for Http Authentication can`t implemented by mean.');
     }
     
     /**

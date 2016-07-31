@@ -42,6 +42,11 @@ class IdentityHttpDigest
      */
     public function setHash($a1hash)
     {
+        $a1hash = (string) $a1hash;
+        if (strlen($a1hash) !== 32)
+            // MD5 hash error
+            throw new \InvalidArgumentException(sprintf('The A1 Hash (%s) seems is invalid.', $a1hash));
+        
         $this->hash = $a1hash;
         return $this;
     }

@@ -70,7 +70,9 @@ class IdentityCredentialDigestFile
                 // just username match, digest http authorization need secret key (A1)
                 $identity = new IdentityHttpDigest;
                 $identity->setUsername($username);
-                $identity->setA1(strtolower(substr($line, -32)));
+                $a1Hash = substr($line, strlen($id)+1 /* +1 for : */);
+                if (strlen($a1Hash) !== 32) continue; // it seems invalid a1hash just continue; if match others.
+                $identity->setA1(strtolower($a1Hash));
 
                 return $identity;
             }
@@ -134,6 +136,8 @@ class IdentityCredentialDigestFile
     // Options:
 
     /**
+     * @required
+     * 
      * @return string
      */
     public function getPwdFilePath()

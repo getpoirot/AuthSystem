@@ -1,6 +1,5 @@
-username:realm:[md5($username:$realm:$password)]
-admin:Default_Auth:md5(123456)
-=============================================
+# username:realm:[md5($username:$realm:$password)]
+# =============================================
 
+#admin:Default_Auth:md5(123456)
 admin:Default_Auth:9c68d2b76e9109a226860499db45c2c5
-

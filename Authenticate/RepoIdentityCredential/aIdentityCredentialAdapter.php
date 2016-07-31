@@ -84,6 +84,7 @@ abstract class aIdentityCredentialAdapter
 
     /**
      * Get Realm
+     * @required
      * @return string
      */
     function getRealm()

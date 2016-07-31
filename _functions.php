@@ -137,9 +137,6 @@ namespace Poirot\AuthSystem\Authenticate\Identifier\HttpDigest
                  * the server indicated it supports in the WWW-Authenticate header.
                  */
                 case 'qop':
-                    if (!in_array($value, $this->supportedQops))
-                        ## TODO not support challenge again with alternative if exists
-                        return false;
                     break;
                 /*
                  * This MUST be specified if a qop directive is sent (see above), and
