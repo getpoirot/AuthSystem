@@ -32,7 +32,7 @@ try {
     echo 'program continue run..';
 
     // signout
-    $authenticator->identifier()->signOut();
+    // $authenticator->identifier()->signOut();
 
 } catch (P\AuthSystem\Authenticate\Exceptions\exAuthentication $e)
 {
