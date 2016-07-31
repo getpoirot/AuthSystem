@@ -3,28 +3,46 @@ namespace Poirot\AuthSystem\Authenticate\Identifier;
 
 use Poirot\AuthSystem\Authenticate\Identity\IdentityHttpDigest;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityUsername;
-use Poirot\AuthSystem\Authenticate\Interfaces\iIdentityCredentialRepo;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\Http\Header\FactoryHttpHeader;
 
 use \Poirot\AuthSystem\Authenticate\Identifier\HttpDigest;
+
+/*
+$request = new P\Http\HttpRequest(new P\Http\HttpMessage\Request\DataParseRequestPhp);
+$response = new P\Http\HttpResponse(new P\Http\HttpMessage\Response\DataParseResponsePhp());
+
+$adapter = new P\AuthSystem\Authenticate\RepoIdentityCredential\IdentityCredentialDigestFile();
+$authenticator = new P\AuthSystem\Authenticate\Authenticator(
+    new P\AuthSystem\Authenticate\Identifier\IdentifierHttpDigestAuth('Default_Auth', [
+        'request'            => $request,
+        'response'           => $response,
+        'credential_adapter' => $adapter,
+    ])
+    ## identity credential repository
+    ,  $adapter
+);
+
+try {
+    if (!$authenticator->hasAuthenticated())
+        throw new P\AuthSystem\Authenticate\Exceptions\exAuthentication($authenticator);
+
+    echo 'program continue run..';
+
+    // signout
+    #$authenticator->identifier()->signOut();
+
+} catch (P\AuthSystem\Authenticate\Exceptions\exAuthentication $e)
+{
+    $e->issueException();
+}
+
+P\Http\HttpMessage\Response\Plugin\PhpServer::_($response)->send();
+*/
 
 class IdentifierHttpDigestAuth
     extends IdentifierHttpBasicAuth
 {
     // Options
-    /** @var bool */
-    protected $proxyAuth          = false;
-    protected $acceptBasicScheme  = true;
-    protected $acceptDigestScheme = true;
-
-    /** @var iIdentityCredentialRepo */
-    protected $basicCrdentialAdapter;
-
-    ## digest options
-    /** @var iIdentityCredentialRepo */
-    protected $digestCredentialAdapter;
-
     protected $nonceTimeout = 300;
     protected $nonce_secret = 'nonce_secret_key';
 
@@ -65,129 +83,141 @@ class IdentifierHttpDigestAuth
      * note: almost retrieve identity data from cache or
      *       storage that store user data. ie. session
      *
-     * @see withIdentity()
-     * @return iIdentity|\Traversable|null Null if no change need
+     * @return null|iIdentity|\Traversable Null if no change need
+     * @throws \Exception
      */
     protected function doRecognizedIdentity()
     {
-        // TODO: Implement doRecognizedIdentity() method.
+        $headerValue = HttpDigest\hasAuthorizationHeader($this->request(), $this->isProxyAuth());
+
+        /* TODO
+         * If a directive or its value is improper, or required directives are
+         * missing, the proper response is 400 Bad Request. If the request-
+         * digest is invalid, then a login failure should be logged, since
+         * repeated login failures from a single client may indicate an attacker
+         * attempting to guess passwords.
+         */
+        $headerData = HttpDigest\parseDigestAuthorizationHeader($headerValue);
+
+        if (!in_array($headerData['qop'], $this->supportedQops))
+            ## TODO not support challenge again with alternative if exists
+            throw new \Exception(sprintf('"qop"(%s) not support.', $headerData['qop']));
+
+        if ($this->_generateNonce() != $headerData['nonce'])
+            ## client sent back same nonce
+            return false;
+
+
+        // If the server sent an opaque value, the client must send it back
+        if ($this->isUseOpaque()) {
+            // Validate Opaque
+            if (!isset($headerData['opaque']))
+                return false;
+            elseif ($this->_generateOpaque() != $headerData['opaque'])
+                return false;
+        }
+
+
+        // ...
+
+        /*
+         * A1 = md5(username:realm:password)
+         * A2 = md5(request-method:uri) // request method = GET, POST, etc.
+         * Hash = md5(A1:nonce:nc:cnonce:qop:A2)
+         * if (Hash == response)
+         *    //success!
+         */
+
+        /** @var IdentityHttpDigest $digestIdentity */
+        $credentialAdapter = $this->credentialAdapter;
+        if (!$credentialAdapter)
+            throw new \Exception('Credential Adapter Repository not defined.');
+
+        $credentialAdapter->setRealm($this->getRealm());
+        $credentialAdapter->import(array('username' => $headerData['username']));
+        $digestIdentity = $credentialAdapter->findIdentityMatch();
+        if (!$digestIdentity)
+            // User not recognized!
+            return false;
+
+        $digestIdentity = new IdentityHttpDigest($digestIdentity);
+
+        $ha1 = $digestIdentity->getA1();
+
+        $algorithm = (
+            array_key_exists('algorithm', $headerData)
+            && in_array($headerData['algorithm'], array('MD5' /* SUPPORTED ALGORITHMS */))
+        )
+            ? $headerData['algorithm']
+            : $this->defaultAlgorithm;
+
+        if ($algorithm == 'MD5-sess') {
+            /*
+             * then A1 is calculated only once. This creates a 'session key' for
+             * the authentication of subsequent requests and responses which is
+             * different for each "authentication session", thus limiting the amount
+             * of material hashed with any one key.
+             */
+            $ha1 = hash('md5', $ha1 . ':' . $headerData['nonce'] . ':' . $headerData['cnonce']);
+        }
+
+        // Calculate h(a2). The value of this hash depends on the qop
+        // option selected by the client and the supported hash functions
+
+        /*
+        * The URI from Request-URI of the Request-Line; duplicated here
+        * because proxies are allowed to change the Request-Line in transit.
+        */
+        if (isset($headerData['uri'])) {
+            // Section 3.2.2.5 in RFC 2617 says the authenticating server must
+            // verify that the URI field in the Authorization header is for the
+            // same resource requested in the Request Line.
+            $rUri = $this->request()->getTarget();
+            $cUri = $headerData['uri'];
+
+            // Section 3.2.2.5 seems to suggest that the value of the URI
+            // Authorization field should be made into an absolute URI if the
+            // Request URI is absolute, but it's vague, and that's a bunch of
+            // code I don't want to write right now.
+
+            // Make sure the path portion of both URIs is the same
+            if (strtolower($rUri) != strtolower($cUri))
+                return false;
+        }
+
+        switch ($headerData['qop']) {
+            case 'auth':
+                $a2 = $this->request()->getMethod() . ':' . $headerData['uri'];
+                break;
+            case 'auth-int':
+                ## A2 = Method ":" digest-uri-value ":" H(entity-body)
+            default:
+                throw new \RuntimeException('Client requested an unsupported qop option');
+        }
+
+
+        // Using hash() should make parameterizing the hash algorithm
+        // easier
+        $ha2 = hash('md5', $a2);
+
+        // Calculate the server's version of the request-digest. This must
+        // match $data['response']. See RFC 2617, section 3.2.2.1
+        $message = $headerData['nonce'] . ':' . $headerData['nc'] . ':' . $headerData['cnonce']
+            . ':' . $headerData['qop'] . ':' . $ha2;
+
+        $digest  = hash('md5', $ha1 . ':' . $message);
+
+        // If Only our digest matches the client's let them in
+        if ($digest !== $headerData['response'])
+            return false;
+
+        $identity = new IdentityUsername(array('username' => $headerData['username']));
+        return $identity;
     }
 
-    /**
-     * Default Exception Issuer
-     * @return \Closure
-     */
-    protected function doIssueExceptionDefault()
-    {
-        $self = $this;
-        return function($e) use ($self) {
-            $self->_setChallengeHeaders();
-        };
-    }
 
-    /**
-     * Login Authenticated User
-     *
-     * - Sign user in environment and server
-     *   exp. store in session, store data in cache
-     *        sign user token in header, etc.
-     *
-     * - logout current user if has
-     *
-     * @throws \Exception no identity defined
-     * @return $this
-     */
-    function signIn()
-    {
-        // TODO: Implement signIn() method.
-    }
-    
-    /**
-     * Logout Authenticated User
-     *
-     * - it must destroy sign
-     *   ie. destroy session or invalidate token in storage
-     *
-     * - clear identity
-     *
-     * @return void
-     */
-    function signOut()
-    {
-        $this->_setChallengeHeaders();
-    }
-
-    
     // Options:
     
-    /**
-     * Set Digest Adapter
-     * @param iIdentityCredentialRepo $adapter
-     * @return $this
-     */
-    function setDigestCredentialAdapter(iIdentityCredentialRepo $adapter)
-    {
-        $this->digestCredentialAdapter = $adapter;
-        return $this;
-    }
-
-    /**
-     * Set Basic Adapter
-     * @param iIdentityCredentialRepo $adapter
-     * @return $this
-     */
-    function setBasicCredentialAdapter(iIdentityCredentialRepo $adapter)
-    {
-        $this->basicCrdentialAdapter = $adapter;
-        return $this;
-    }
-
-
-    /**
-     * Whether or not to do Proxy Authentication instead of origin server
-     * authentication (send 407's instead of 401's). Off by default.
-     *
-     * @param bool|true $flag
-     * @return $this
-     */
-    function setProxyAuth($flag = true)
-    {
-        $this->proxyAuth = (boolean) $flag;
-        return $this;
-    }
-
-    /**
-     * Using Proxy Authentication?
-     * @return boolean
-     */
-    function isProxyAuth()
-    {
-        return $this->proxyAuth;
-    }
-
-    function setAcceptBasic($flag = true)
-    {
-        $this->acceptBasicScheme = (boolean) $flag;
-        return $this;
-    }
-
-    function isAcceptBasic()
-    {
-        ## !! when we accept digest, basic authentication will not acceptable both.
-        return $this->acceptBasicScheme;
-    }
-
-    function setAcceptDigest($flag = true)
-    {
-        $this->acceptDigestScheme = (boolean) $flag;
-        return $this;
-    }
-
-    function isAcceptDigest()
-    {
-        return $this->acceptDigestScheme;
-    }
-
     /**
      * Space-separated list of URIs that define the protection space.
      *
@@ -297,137 +327,6 @@ class IdentifierHttpDigestAuth
         return $wwwauth;
     }
     
-    /**
-     * Assert Digest Authorization Header
-     * 
-     * @param string $headerValue
-     *
-     * @return iIdentity|\Traversable|array|null
-     * @throws \Exception
-     */
-    protected function _assertDigestAuthorization($headerValue)
-    {
-        /* TODO
-         * If a directive or its value is improper, or required directives are
-         * missing, the proper response is 400 Bad Request. If the request-
-         * digest is invalid, then a login failure should be logged, since
-         * repeated login failures from a single client may indicate an attacker
-         * attempting to guess passwords.
-         */
-        $headerData = HttpDigest\parseDigestAuthorizationHeader($headerValue);
-
-        if ($this->_generateNonce() != $headerData['nonce'])
-            ## client sent back same nonce
-            return false;
-
-
-        // If the server sent an opaque value, the client must send it back
-        if ($this->isUseOpaque()) {
-            // Validate Opaque
-            if (!isset($headerData['opaque']))
-                return false;
-            elseif ($this->_generateOpaque() != $headerData['opaque'])
-                return false;
-        }
-
-
-        // ...
-
-        /*
-         * A1 = md5(username:realm:password)
-         * A2 = md5(request-method:uri) // request method = GET, POST, etc.
-         * Hash = md5(A1:nonce:nc:cnonce:qop:A2)
-         * if (Hash == response)
-         *    //success!
-         */
-
-        /** @var IdentityHttpDigest $digestIdentity */
-        $digestCredentialAdapter = $this->digestCredentialAdapter;
-        if (!$digestCredentialAdapter instanceof iIdentityCredentialRepo)
-            throw new \RuntimeException('For digest authorization Credential Repo is need to defined!');
-        
-        $digestCredentialAdapter->import(array('username' => $headerData['username']));
-        $digestIdentity = $digestCredentialAdapter->findIdentityMatch();
-        if (!$digestIdentity)
-            // User not recognized!
-            return false;
-        
-        $digestIdentity = new IdentityHttpDigest($digestIdentity);
-
-        $ha1 = $digestIdentity->getA1();
-
-        $algorithm = (
-            array_key_exists('algorithm', $headerData)
-            && in_array($headerData['algorithm'], array('MD5' /* SUPPORTED ALGORITHMS */))
-        )
-            ? $headerData['algorithm']
-            : $this->defaultAlgorithm;
-
-        if ($algorithm == 'MD5-sess') {
-            /*
-             * then A1 is calculated only once. This creates a 'session key' for
-             * the authentication of subsequent requests and responses which is
-             * different for each "authentication session", thus limiting the amount
-             * of material hashed with any one key.
-             */
-            $ha1 = hash('md5', $ha1 . ':' . $headerData['nonce'] . ':' . $headerData['cnonce']);
-        }
-
-
-        // Calculate h(a2). The value of this hash depends on the qop
-        // option selected by the client and the supported hash functions
-
-        /*
-        * The URI from Request-URI of the Request-Line; duplicated here
-        * because proxies are allowed to change the Request-Line in transit.
-        */
-        if (isset($headerData['uri'])) {
-            // Section 3.2.2.5 in RFC 2617 says the authenticating server must
-            // verify that the URI field in the Authorization header is for the
-            // same resource requested in the Request Line.
-            $rUri = $this->request()->getTarget();
-            $cUri = $headerData['uri'];
-
-            // Section 3.2.2.5 seems to suggest that the value of the URI
-            // Authorization field should be made into an absolute URI if the
-            // Request URI is absolute, but it's vague, and that's a bunch of
-            // code I don't want to write right now.
-
-            // Make sure the path portion of both URIs is the same
-            if (strtolower($rUri) != strtolower($cUri))
-                return false;
-        }
-
-        switch ($headerData['qop']) {
-            case 'auth':
-                $a2 = $this->request()->getMethod() . ':' . $headerData['uri'];
-                break;
-            case 'auth-int':
-                ## A2 = Method ":" digest-uri-value ":" H(entity-body)
-            default:
-                throw new \RuntimeException('Client requested an unsupported qop option');
-        }
-
-
-        // Using hash() should make parameterizing the hash algorithm
-        // easier
-        $ha2 = hash('md5', $a2);
-
-        // Calculate the server's version of the request-digest. This must
-        // match $data['response']. See RFC 2617, section 3.2.2.1
-        $message = $headerData['nonce'] . ':' . $headerData['nc'] . ':' . $headerData['cnonce'] 
-                   . ':' . $headerData['qop'] . ':' . $ha2;
-        
-        $digest  = hash('md5', $ha1 . ':' . $message);
-
-        // If Only our digest matches the client's let them in
-        if ($digest !== $headerData['response'])
-            return false;
-        
-        $identity = new IdentityUsername(array('username' => $headerData['username']));
-        return $identity;
-    }
-
     /**
      * Calculate Nonce
      *
