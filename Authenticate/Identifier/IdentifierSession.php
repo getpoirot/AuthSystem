@@ -1,8 +1,44 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Identifier;
 
+use Poirot\AuthSystem\Authenticate\Identity\IdentityOpen;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Storage\Gateway\DataStorageSession;
+
+/*
+$adapter = new P\AuthSystem\Authenticate\RepoIdentityCredential\IdentityCredentialDigestFile();
+$authenticator = new P\AuthSystem\Authenticate\Authenticator(
+    new P\AuthSystem\Authenticate\Identifier\IdentifierSession('Default_Auth', [
+        'issuer_exception' => function($e) {
+            // echo '<h1>ACCESS Denied. <a href="/login">Login Here</a>';
+            // die;
+
+            // ISSUER TO LOGIN USER AUTOMATICALLY!
+            if (!$authenticator = $e->getAuthenticator())
+                throw new \Exception('Authenticator not present.');
+
+            $identifier = $authenticator->authenticate(['username' => 'admin', 'password' => '123456']);
+            $identifier->signIn();
+        }
+    ])
+    ## identity credential repository
+    ,  $adapter
+);
+
+try {
+    if (!$authenticator->hasAuthenticated())
+        throw new P\AuthSystem\Authenticate\Exceptions\exAuthentication($authenticator);
+
+    echo 'program continue run..';
+
+    // signout
+    $authenticator->identifier()->signOut();
+
+} catch (P\AuthSystem\Authenticate\Exceptions\exAuthentication $e)
+{
+    $e->issueException();
+}
+*/
 
 class IdentifierSession 
     extends aIdentifier
@@ -111,5 +147,16 @@ class IdentifierSession
         }
 
         return $this->_session;
+    }
+
+    /**
+     * Get Default Identity Instance
+     * that Signed data load into
+     *
+     * @return iIdentity
+     */
+    protected function _newDefaultIdentity()
+    {
+        return new IdentityOpen;
     }
 }
