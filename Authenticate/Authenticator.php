@@ -20,6 +20,9 @@ class Authenticator
 
 
     /**
+     * // TODO identityMap can removed and apply on first param combined with identifier 
+     * // new IdentifierWrapIdentityMap($identifier, $identityMap);
+     * 
      * iAuthenticator constructor.
      *
      * @param iIdentifier             $identifier

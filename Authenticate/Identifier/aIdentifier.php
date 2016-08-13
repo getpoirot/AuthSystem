@@ -49,8 +49,15 @@ abstract class aIdentifier
      */
     function __construct($realm = self::DEFAULT_REALM, $options = null)
     {
+        if (self::isConfigurableWith($realm)) {
+            $options = $realm;
+            $realm = null;
+        }
+        
         parent::__construct($options);
-        $this->setRealm($realm);
+        
+        if (!empty($realm))
+            $this->setRealm($realm);
     }
 
     

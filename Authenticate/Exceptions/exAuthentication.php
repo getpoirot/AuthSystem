@@ -17,7 +17,7 @@ class exAuthentication
      * 
      * @param iAuthenticator|null $authenticator
      */
-    function __construct(iAuthenticator $authenticator = null)
+    final function __construct(iAuthenticator $authenticator = null)
     {
         $this->authenticator = $authenticator;
         parent::__construct(self::EXCEPTION_DEFAULT_MESSAGE, self::EXCEPTION_DEFAULT_CODE);
