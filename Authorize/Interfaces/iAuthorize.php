@@ -3,7 +3,7 @@ namespace Poirot\AuthSystem\Authorize\Interfaces;
 
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 
-interface iAuthPermission
+interface iAuthorize
 {
     /**
      * Is allowed to features?
@@ -14,10 +14,10 @@ interface iAuthPermission
      *   on other route names, and only AdminUser has access on
      *   admin route
      *
-     * @param null|iAuthResource $resource
-     * @param null|iIdentity     $role
+     * @param iIdentity          $role
+     * @param iAuthorizeResource $resource
      *
      * @return boolean
      */
-    public function isAllowed(/*iAuthResource*/ $resource = null, /*iIdentity*/ $role = null);
+    function isAllowed(/*iIdentity*/ $role = null, /*iAuthResource*/ $resource = null);
 }
