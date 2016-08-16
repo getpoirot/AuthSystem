@@ -3,14 +3,21 @@ namespace Poirot\AuthSystem\Authenticate\Exceptions;
 
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator;
 
-class exAuthentication 
+use Poirot\Std\Interfaces\Pact\ipMetaProvider;
+use Poirot\Std\Interfaces\Struct\iDataMean;
+use Poirot\Std\Struct\DataMean;
+
+class exAuthentication
     extends \RuntimeException
+    implements ipMetaProvider
 {
     const EXCEPTION_DEFAULT_MESSAGE = 'Authentication Failed.';
     const EXCEPTION_DEFAULT_CODE    = 400;
 
     /** @var iAuthenticator */
     protected $authenticator;
+    /** @var iDataMean */
+    protected $meta;
 
     /**
      * exAuthentication constructor.
@@ -67,5 +74,16 @@ class exAuthentication
             throw $this;
 
         $authenticator->identifier()->issueException($this);
+    }
+
+    /**
+     * @return iDataMean
+     */
+    function meta()
+    {
+        if (!$this->meta)
+            $this->meta = new DataMean();
+        
+        return $this->meta;
     }
 }
