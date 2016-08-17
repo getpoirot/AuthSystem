@@ -12,6 +12,6 @@ use Poirot\Std\Interfaces\Struct\iDataOptions;
  * combination
  *
  */
-interface iAuthorizeResource 
+interface iResourceAuthorize 
     extends iDataOptions
 { }

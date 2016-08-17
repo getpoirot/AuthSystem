@@ -15,9 +15,9 @@ interface iAuthorize
      *   admin route
      *
      * @param iIdentity          $role
-     * @param iAuthorizeResource $resource
+     * @param iResourceAuthorize $resource
      *
      * @return boolean
      */
-    function isAllowed(/*iIdentity*/ $role = null, /*iAuthResource*/ $resource = null);
+    function isAllowed(iIdentity $role = null, iResourceAuthorize $resource = null);
 }
