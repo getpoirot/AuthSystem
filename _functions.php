@@ -87,7 +87,7 @@ namespace Poirot\AuthSystem\Authenticate\Identifier\HttpDigest
         if (count($creds) != 2)
             throw new \Exception('Invalid Authorization Credential; Missing username or password.');
 
-        $credential = array('username' => $creds[0], 'password' => $creds[1]);
+        $credential = array('username' => $creds[0], 'password' => $creds[1], 0=>$creds[0], 1=>$creds[1]);
         return $credential;
     }
 
