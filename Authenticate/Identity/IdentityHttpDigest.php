@@ -37,6 +37,8 @@ class IdentityHttpDigest
         }
 
     /**
+     * A1 = md5(username:realm:password)
+     * 
      * @param string $a1hash
      * @return $this
      */
