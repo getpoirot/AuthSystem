@@ -4,7 +4,6 @@ namespace Poirot\AuthSystem\Authenticate\Authenticator;
 use Poirot\AuthSystem\Authenticate\Identifier\IdentifierSession;
 use Poirot\Http\Interfaces\iHeader;
 use Poirot\Storage\Gateway\DataStorageSession;
-use Poirot\Stream\Streamable;
 
 
 /**

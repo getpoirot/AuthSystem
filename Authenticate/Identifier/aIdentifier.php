@@ -3,7 +3,6 @@ namespace Poirot\AuthSystem\Authenticate\Identifier;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 use Poirot\AuthSystem\Authenticate\Exceptions\exNotAuthenticated;
-use Poirot\AuthSystem\Authenticate\Identity\IdentityOpen;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 
