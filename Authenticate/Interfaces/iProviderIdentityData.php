@@ -56,5 +56,5 @@ interface iProviderIdentityData
      * @return iData
      * @throws \Exception
      */
-    function findBy($property, $value);
+    function findMatchBy($property, $value);
 }

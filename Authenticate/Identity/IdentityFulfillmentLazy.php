@@ -143,7 +143,7 @@ class IdentityFulfillmentLazy
         if (!$this->_data_provider)
             throw new \Exception('Data Provider not defined.');
 
-        $this->_c__loaded_data = $this->_data_provider->findBy(
+        $this->_c__loaded_data = $this->_data_provider->findMatchBy(
             $this->fulfillment_property
             , parent::__get($this->fulfillment_property)
         );
