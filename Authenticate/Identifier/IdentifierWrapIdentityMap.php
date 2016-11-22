@@ -4,6 +4,7 @@ namespace Poirot\AuthSystem\Authenticate\Identifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 
+
 /**
  * Used To Change Default Identity of Identifier
  * Usually when we need some extra data against default identifier
@@ -14,6 +15,7 @@ class IdentifierWrapIdentityMap
 {
     /** @var iIdentity */
     protected $identity_map;
+
 
     /**
      * IdentifierWrapIdentityMap constructor.
