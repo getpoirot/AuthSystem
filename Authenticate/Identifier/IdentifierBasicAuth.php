@@ -4,7 +4,6 @@ namespace Poirot\AuthSystem\Authenticate\Identifier;
 use Poirot\AuthSystem\Authenticate\Identity\IdentityUsername;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentityCredentialRepo;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\AuthSystem\Authenticate\Identifier\HttpDigest;
 
 /*
 $adapter = new P\AuthSystem\Authenticate\RepoIdentityCredential\IdentityCredentialDigestFile();
