@@ -42,8 +42,8 @@ abstract class aIdentityCredentialAdapter
 {
     const DEFAULT_REALM = aIdentifier::DEFAULT_REALM;
 
-    protected $credential;
     protected $realm;
+
 
     /**
      * Get Identity Match By Credential as Options
@@ -54,7 +54,11 @@ abstract class aIdentityCredentialAdapter
     final function findIdentityMatch()
     {
         if (!$this->isFulfilled())
-            throw new \Exception('Adapter Options Not Fulfilled To Retrieve Identity Match.');
+            return false;
+            /*throw new \Exception(sprintf(
+                'Credential Adapter Options Not Fulfilled By Given Options: (%s).'
+                , serialize(\Poirot\Std\cast($this)->toArray())
+            ));*/
 
         return $this->doFindIdentityMatch(\Poirot\Std\cast($this)->toArray());
     }
