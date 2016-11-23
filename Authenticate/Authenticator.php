@@ -10,6 +10,7 @@ use Poirot\AuthSystem\Authenticate\Interfaces\iIdentityCredentialRepo;
 use Poirot\AuthSystem\Authenticate\Interfaces\iAuthenticator;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 
+
 class Authenticator
     implements iAuthenticator
 {
