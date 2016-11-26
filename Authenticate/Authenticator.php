@@ -3,7 +3,6 @@ namespace Poirot\AuthSystem\Authenticate;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 use Poirot\AuthSystem\Authenticate\Exceptions\exNotAuthenticated;
-use Poirot\AuthSystem\Authenticate\Identifier\IdentifierWrapIdentityMap;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentityCredentialRepo;
@@ -17,28 +16,22 @@ class Authenticator
     /** @var iIdentifier */
     protected $identifier;
     /** @var iIdentityCredentialRepo */
-    protected $identityCredential;
+    protected $repoIdentityCredential;
 
 
     /**
-     * // TODO identityMap can removed and apply on first param combined with identifier 
-     * // new IdentifierWrapIdentityMap($identifier, $identityMap);
-     * 
      * iAuthenticator constructor.
      *
      * @param iIdentifier             $identifier
      * @param iIdentityCredentialRepo $adapter     Identity Credential repository
-     * @param iIdentity               $identityMap Default identity to map lazy load extra data
      */
-    function __construct(iIdentifier $identifier, iIdentityCredentialRepo $adapter = null, iIdentity $identityMap = null)
+    function __construct(iIdentifier $identifier, iIdentityCredentialRepo $adapter = null)
     {
-        if ($identityMap)
-            $identifier = new IdentifierWrapIdentityMap($identifier, $identityMap);
         $this->identifier = $identifier;
         
         if ($adapter === null)
             throw new \InvalidArgumentException('Identity Credential Adapter Required.');
-        $this->identityCredential = $adapter;
+        $this->repoIdentityCredential = $adapter;
     }
 
     /**
@@ -65,9 +58,9 @@ class Authenticator
             goto f_authenticate_done;
         }
 
-        $credentialRepo = $credential;
-        if (!$credentialRepo instanceof iIdentityCredentialRepo) {
-            $credentialRepo = $this->identityCredential;
+        $repoCredential = $credential;
+        if (!$repoCredential instanceof iIdentityCredentialRepo) {
+            $repoCredential = $this->repoIdentityCredential;
         } else {
             $credential = null;
         }
@@ -78,14 +71,14 @@ class Authenticator
                 , \Poirot\Std\flatten($credential)
             ));
 
-        $credentialRepo->import($credential);
-        if (!$credentialRepo->isFulfilled())
+        $repoCredential->import($credential);
+        if (!$repoCredential->isFulfilled())
             throw new \Exception(sprintf(
                 'These credential (%s) not fulfillment the CredentialRepo(%s).'
-                , \Poirot\Std\flatten($credential), \Poirot\Std\flatten($credentialRepo)
+                , \Poirot\Std\flatten($credential), \Poirot\Std\flatten($repoCredential)
             ));
 
-        $identity = $credentialRepo->findIdentityMatch();
+        $identity = $repoCredential->findIdentityMatch();
 
 
 f_authenticate_done:
@@ -94,7 +87,7 @@ f_authenticate_done:
             throw new exAuthentication;
 
         $identifier = $this->identifier();
-        $identifier->exactIdentity($identity);
+        $identifier->giveIdentity($identity);
         return $identifier;
     }
 

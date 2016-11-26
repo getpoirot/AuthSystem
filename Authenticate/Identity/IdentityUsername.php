@@ -9,17 +9,19 @@ class IdentityUsername
     /**
      * @return mixed
      */
-    public function getUsername()
+    function getUsername()
     {
         return $this->username;
     }
 
     /**
      * @param mixed $username
+     * @return $this
      */
-    public function setUsername($username)
+    function setUsername($username)
     {
         $this->username = $username;
+        return $this;
     }
 
     /**

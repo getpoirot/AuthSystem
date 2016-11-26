@@ -92,7 +92,7 @@ abstract class aIdentifier
      * @return $this
      * @throws \Exception immutable error; identity not met requirement
      */
-    final function exactIdentity(iIdentity $identity)
+    final function giveIdentity(iIdentity $identity)
     {
         if ($this->identity)
             throw new \Exception('Identity is immutable.');
@@ -128,7 +128,7 @@ abstract class aIdentifier
             $identity = $this->doRecognizedIdentity();
             if ($identity)
                 ## update identity
-                $this->exactIdentity($identity);
+                $this->giveIdentity($identity);
         }
         
         if (!$this->identity)
@@ -145,7 +145,7 @@ abstract class aIdentifier
      *
      * @param exAuthentication $exception Maybe support for specific error
      *
-     * @return void
+     * @return mixed Result Handle in Dispatch Listener Events
      */
     final function issueException(exAuthentication $exception = null)
     {
@@ -153,7 +153,7 @@ abstract class aIdentifier
             ? $this->issuer_exception
             : $this->doIssueExceptionDefault();
         
-        call_user_func($callable, $exception);
+        return call_user_func($callable, $exception);
     }
 
     /**

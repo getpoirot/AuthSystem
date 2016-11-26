@@ -4,7 +4,6 @@ namespace Poirot\AuthSystem\Authenticate\RepoIdentityCredential;
 use Poirot\AuthSystem\Authenticate\Identifier\aIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentityCredentialRepo;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\Std\Struct\aDataOptions;
 use Poirot\Std\Struct\DataOptionsOpen;
 
 /*

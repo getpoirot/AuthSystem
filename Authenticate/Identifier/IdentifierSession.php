@@ -140,7 +140,7 @@ class IdentifierSession
     function _storage()
     {
         if(!$this->_session) {
-            $session = new DataStorageSession();
+            $session = new DataStorageSession;
             // Store in session by realm defined with this authentication domain
             $session->setRealm(self::STORAGE_IDENTITY_KEY.'_'.$this->getRealm());
             $this->_session = $session;

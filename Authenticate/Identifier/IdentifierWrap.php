@@ -106,9 +106,9 @@ class IdentifierWrap
      * @return $this
      * @throws \Exception immutable error; identity not met requirement
      */
-    function exactIdentity(iIdentity $identity)
+    function giveIdentity(iIdentity $identity)
     {
-        $this->identifier->exactIdentity($identity);
+        $this->identifier->giveIdentity($identity);
         return $this;
     }
     
@@ -146,11 +146,11 @@ class IdentifierWrap
      *
      * @param exAuthentication $exception Maybe support for specific error
      *
-     * @return void
+     * @return mixed Result Handle in Dispatch Listener Events
      */
     function issueException(exAuthentication $exception = null)
     {
-        $this->identifier->issueException($exception);
+        return $this->identifier->issueException($exception);
     }
 
     // ..

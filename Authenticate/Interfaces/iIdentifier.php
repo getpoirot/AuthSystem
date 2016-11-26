@@ -47,7 +47,7 @@ interface iIdentifier
      * @return $this
      * @throws \Exception immutable error; identity not met requirement
      */
-    function exactIdentity(iIdentity $identity);
+    function giveIdentity(iIdentity $identity);
 
     /**
      * Get Authenticated User Data Copy
@@ -117,7 +117,7 @@ interface iIdentifier
      * 
      * @param exAuthentication $exception Maybe support for specific error
      * 
-     * @return void
+     * @return mixed Result Handle in Dispatch Listener Events
      */
     function issueException(exAuthentication $exception = null);
 }
