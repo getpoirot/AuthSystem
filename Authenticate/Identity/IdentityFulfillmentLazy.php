@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Identity;
 
+use Poirot\AuthSystem\Authenticate\Exceptions\exLoadUserFailed;
 use Poirot\AuthSystem\Authenticate\Interfaces\iProviderIdentityData;
 use Poirot\Std\Interfaces\Struct\iData;
 
@@ -148,7 +149,7 @@ class IdentityFulfillmentLazy
             , parent::__get($this->fulfillment_property)
         );
         if (!$userData)
-            throw new \Exception(sprintf(
+            throw new exLoadUserFailed(sprintf(
                 'Failed To Loaded User Data'
             ));
 

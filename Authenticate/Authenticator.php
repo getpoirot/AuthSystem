@@ -2,6 +2,7 @@
 namespace Poirot\AuthSystem\Authenticate;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
+use Poirot\AuthSystem\Authenticate\Exceptions\exLoadUserFailed;
 use Poirot\AuthSystem\Authenticate\Exceptions\exNotAuthenticated;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
@@ -106,6 +107,10 @@ f_authenticate_done:
             // it will rise exception
             if (!$this->identifier()->withIdentity()->isFulfilled())
                 return false;
+        } catch (exLoadUserFailed $e) {
+            // User not found any more !!
+            // clear from identity storage (session/cookie)
+            $this->identifier()->signOut();
         } catch (exNotAuthenticated $e) {
             return false;
         }
