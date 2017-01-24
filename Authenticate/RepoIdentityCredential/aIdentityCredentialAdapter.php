@@ -59,7 +59,8 @@ abstract class aIdentityCredentialAdapter
                 , serialize(\Poirot\Std\cast($this)->toArray())
             ));*/
 
-        return $this->doFindIdentityMatch(\Poirot\Std\cast($this)->toArray());
+        $credential = \Poirot\Std\cast($this)->toArray();
+        return $this->doFindIdentityMatch($credential);
     }
 
     /**
