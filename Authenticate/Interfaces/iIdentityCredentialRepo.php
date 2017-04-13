@@ -1,8 +1,8 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
-use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 use Poirot\Std\Interfaces\Struct\iDataOptions;
+
 
 /**
  * Match Identity Against Options as Credential.
