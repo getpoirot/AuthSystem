@@ -3,6 +3,7 @@ namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
 use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 
+
 Interface iAuthenticator 
 {
     /**
