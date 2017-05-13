@@ -2,6 +2,7 @@
 namespace Poirot\AuthSystem\Authenticate\Identifier;
 
 use Poirot\Http\HttpMessage\Request\DataParseRequestPhp;
+use Poirot\Http\HttpMessage\Response\BuildHttpResponse;
 use Poirot\Http\HttpMessage\Response\DataParseResponsePhp;
 use Poirot\Http\HttpRequest;
 use Poirot\Http\HttpResponse;
@@ -97,7 +98,11 @@ abstract class aIdentifierHttp
     function response()
     {
         if (!$this->response) {
-            $response = new HttpResponse(new DataParseResponsePhp);
+            $settings = new DataParseResponsePhp;
+            $response = new HttpResponse(
+                new BuildHttpResponse( BuildHttpResponse::parseWith($settings) )
+            );
+
             $this->response = $response;
         }
 
