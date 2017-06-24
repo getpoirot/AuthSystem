@@ -8,7 +8,7 @@ class UserData implements iIdentityDataProvider
     #
     # Finds a user by the given user Identity.
     #
-    # @param string $property ie. 'user_name'
+    # @param string $property ie. 'name'
     # @param mixed $value ie. 'payam@mail.com'
     #
     # @throws \Exception
@@ -50,7 +50,7 @@ interface iProviderIdentityData
     /**
      * Finds a user by the given user Identity.
      *
-     * @param string $property  ie. 'user_name'
+     * @param string $property  ie. 'name'
      * @param mixed  $value     ie. 'payam@mail.com'
      *
      * @return iData
