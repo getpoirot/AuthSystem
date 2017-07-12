@@ -3,7 +3,7 @@ namespace Poirot\AuthSystem\Authenticate\Identifier;
 
 use Poirot\AuthSystem\Authenticate\Identity\IdentityOpen;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
-use Poirot\Storage\Gateway\DataStorageSession;
+use Poirot\Storage\Http\SessionStore;
 
 /*
 $adapter = new P\AuthSystem\Authenticate\RepoIdentityCredential\IdentityCredentialDigestFile();
@@ -43,7 +43,7 @@ try {
 class IdentifierSession 
     extends aIdentifier
 {
-    /** @var DataStorageSession */
+    /** @var SessionStore */
     protected $_session;
 
     
@@ -135,14 +135,13 @@ class IdentifierSession
 
     /**
      * Get Session Storage
-     * @return DataStorageSession
+     * @return SessionStore
      */
     function _storage()
     {
         if(!$this->_session) {
-            $session = new DataStorageSession;
             // Store in session by realm defined with this authentication domain
-            $session->setRealm(self::STORAGE_IDENTITY_KEY.'_'.$this->getRealm());
+            $session = new SessionStore(self::STORAGE_IDENTITY_KEY.'_'.$this->getRealm());
             $this->_session = $session;
         }
 
