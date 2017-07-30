@@ -148,7 +148,7 @@ class IdentityFulfillmentLazy
             $this->fulfillment_property
             , parent::__get($this->fulfillment_property)
         );
-        if (!$userData)
+        if (false === $userData || null === $userData)
             throw new exLoadUserFailed(sprintf(
                 'Failed To Loaded User Data'
             ));
