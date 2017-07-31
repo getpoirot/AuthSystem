@@ -29,9 +29,6 @@ class Authenticator
     function __construct(iIdentifier $identifier, iIdentityCredentialRepo $adapter = null)
     {
         $this->identifier = $identifier;
-        
-        if ($adapter === null)
-            throw new \InvalidArgumentException('Identity Credential Adapter Required.');
         $this->repoIdentityCredential = $adapter;
     }
 
@@ -54,19 +51,23 @@ class Authenticator
      */
     function authenticate($credential = null)
     {
+        if ($this->repoIdentityCredential === null)
+            throw new \InvalidArgumentException('Identity Credential Adapter Required.');
+
+
         if ($credential instanceof iIdentity) {
             $identity = $credential;
             goto f_authenticate_done;
         }
 
         $repoCredential = $credential;
-        if (!$repoCredential instanceof iIdentityCredentialRepo) {
+        if (! $repoCredential instanceof iIdentityCredentialRepo ) {
             $repoCredential = $this->repoIdentityCredential;
         } else {
             $credential = null;
         }
 
-        if (!($credential instanceof \Traversable || is_array($credential)))
+        if (! ($credential instanceof \Traversable || is_array($credential)) )
             throw new \InvalidArgumentException(sprintf(
                 'Credential must instanceof iCredential(\Traversbale) or Array; given: (%s).'
                 , \Poirot\Std\flatten($credential)
@@ -84,7 +85,7 @@ class Authenticator
 
 f_authenticate_done:
 
-        if (!$identity instanceof iIdentity || ($identity instanceof iIdentity && !$identity->isFulfilled()))
+        if ( !$identity instanceof iIdentity || ($identity instanceof iIdentity && !$identity->isFulfilled()) )
             throw new exAuthentication;
 
         $identifier = $this->identifier();

@@ -124,14 +124,14 @@ abstract class aIdentifier
      */
     final function withIdentity()
     {
-        if (!$this->identity && $this->canRecognizeIdentity()) { 
+        if ( !$this->identity && $this->canRecognizeIdentity() ) {
             $identity = $this->doRecognizedIdentity();
             if ($identity)
                 ## update identity
                 $this->giveIdentity($identity);
         }
         
-        if (!$this->identity)
+        if (! $this->identity )
             throw new exNotAuthenticated;
 
         return clone $this->identity;
