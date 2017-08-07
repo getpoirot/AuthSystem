@@ -12,7 +12,7 @@ class exAuthentication
     implements ipMetaProvider
 {
     const EXCEPTION_DEFAULT_MESSAGE = 'Authentication Failed.';
-    const EXCEPTION_DEFAULT_CODE    = 400;
+    const EXCEPTION_DEFAULT_CODE    = 401;
 
     /** @var iAuthenticator */
     protected $authenticator;
