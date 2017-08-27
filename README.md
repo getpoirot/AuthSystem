@@ -1,6 +1,12 @@
 # Poirot\AuthSystem
 
-authentication & authorization system.
+HTTP authentication using PSR-7 interfaces.
+
+It uses PSR-7 interface implementation for request and response classes that will read the authentication request values and generates the necessary responses.
+
+Separate classes implement the authentication of users from a file based database of user and password records.
+
+It provides classes to check if the user is already logged in an authenticate him in case he isn't.
 
 ## Overview usage sample
 
