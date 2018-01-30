@@ -45,6 +45,7 @@ class IdentifierWrapIdentityMap
         // TODO improved if we use Identity Map To Lazy Get Data
         $identity = clone $this->identity_map;
         $identity->import($this->identifier->withIdentity());
+        $identity->import(['_identity' => $this->identifier->withIdentity()]); // also have origin identity
         return $identity;
     }
 }
