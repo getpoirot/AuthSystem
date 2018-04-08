@@ -87,8 +87,18 @@ class IdentifierSession
         $storedIdentity = $this->_storage()->get(self::STORAGE_IDENTITY_KEY);
         $storedIdentity = unserialize($storedIdentity);
 
-        $identity = $this->_newDefaultIdentity();
-        $identity->import($storedIdentity);
+
+        try {
+            $identity = $this->_newDefaultIdentity();
+            $identity->import($storedIdentity);
+
+        } catch (\Exception $e) {
+            // storage may change so clear it
+            $this->_storage()->del(self::STORAGE_IDENTITY_KEY);
+            $identity = null;
+        }
+
+
         return $identity;
     }
 

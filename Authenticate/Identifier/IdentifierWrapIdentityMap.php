@@ -42,10 +42,22 @@ class IdentifierWrapIdentityMap
      */
     function withIdentity()
     {
-        // TODO improved if we use Identity Map To Lazy Get Data
-        $identity = clone $this->identity_map;
-        $identity->import($this->identifier->withIdentity());
-        $identity->import(['_identity' => $this->identifier->withIdentity()]); // also have origin identity
+        $identity     = clone $this->identity_map;
+        $wrapIdentity = $this->identifier->withIdentity();
+
+        try {
+            $identity->import($wrapIdentity);
+            $identity->import(['_identity' => $wrapIdentity]); // also have origin identity
+
+        } catch (\Exception $e) {
+            // identity may change so clear it
+            throw new \RuntimeException(sprintf(
+                'Previous Data Stored In Session cant import to Identifier (%s); Err: (%s).'
+                , get_class($identity), $e->getMessage()
+            ));
+        }
+
+
         return $identity;
     }
 }
