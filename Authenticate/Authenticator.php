@@ -96,6 +96,9 @@ f_authenticate_done:
     /**
      * Has Authenticated And Identifier Exists
      *
+     * note: In case you want to detect user authority and catch reated exceptions
+     *       exp. in token authorization middleware use ->identifier()->withIdentity()
+     *
      * - it mean that Identifier identity has fulfilled
      *   otherwise return false
      *
@@ -106,7 +109,7 @@ f_authenticate_done:
         try {
             // if identifier cant detect identity and identity not set manually-
             // it will rise exception
-            if (!$this->identifier()->withIdentity()->isFulfilled())
+            if (! $this->identifier()->withIdentity()->isFulfilled() )
                 return false;
         } catch (exLoadUserFailed $e) {
             // User not found any more !!
