@@ -1,8 +1,8 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Identity;
 
-use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\Std\Struct\DataOptionsOpen;
+use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 
 
 /**

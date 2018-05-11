@@ -1,32 +1,37 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Identity;
 
+
 class IdentityHttpDigest
     extends aIdentity
 {
+    /** @var string */
     protected $username;
     protected $hash;     ## A1 = md5(username:realm:password)
 
+
     /**
-     * @return mixed
+     * @return string
      */
-    public function getUsername()
+    function getUsername()
     {
         return $this->username;
     }
 
     /**
-     * @param mixed $username
+     * @param string $username
+     * @return $this
      */
-    public function setUsername($username)
+    function setUsername($username)
     {
-        $this->username = $username;
+        $this->username = (string) $username;
+        return $this;
     }
 
     /**
      * @return string
      */
-    public function getHash()
+    function getHash()
     {
         return $this->hash;
     }
@@ -42,7 +47,7 @@ class IdentityHttpDigest
      * @param string $a1hash
      * @return $this
      */
-    public function setHash($a1hash)
+    function setHash($a1hash)
     {
         $a1hash = (string) $a1hash;
         if (strlen($a1hash) !== 32)

@@ -1,13 +1,16 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Identity;
 
+
 class IdentityUsername
     extends aIdentity
 {
+    /** @var string */
     protected $username;
 
+
     /**
-     * @return mixed
+     * @return string
      */
     function getUsername()
     {
@@ -15,12 +18,12 @@ class IdentityUsername
     }
 
     /**
-     * @param mixed $username
+     * @param string $username
      * @return $this
      */
     function setUsername($username)
     {
-        $this->username = $username;
+        $this->username = (string) $username;
         return $this;
     }
 

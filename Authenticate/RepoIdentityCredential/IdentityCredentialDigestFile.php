@@ -20,7 +20,7 @@ if (!$match)
 
 echo "Hello {$match->getUsername()}.";
 */
-
+// TODO better name for CredentialRepo
 class IdentityCredentialDigestFile
     extends aIdentityCredentialAdapter
 {

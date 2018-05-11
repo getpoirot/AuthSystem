@@ -1,9 +1,9 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Identity;
 
+use Poirot\Std\Interfaces\Struct\iData;
 use Poirot\AuthSystem\Authenticate\Exceptions\exLoadUserFailed;
 use Poirot\AuthSystem\Authenticate\Interfaces\iProviderIdentityData;
-use Poirot\Std\Interfaces\Struct\iData;
 
 /*
 class UserData implements iIdentityDataProvider
@@ -89,6 +89,7 @@ class IdentityFulfillmentLazy
         $this->_c__loaded_data = false;
         return $this;
     }
+
 
     // ...
 

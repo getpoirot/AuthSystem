@@ -5,6 +5,7 @@ use Poirot\AuthSystem\Authenticate\Identity\IdentityFulfillmentLazy;
 use Poirot\AuthSystem\Authenticate\Interfaces\iProviderIdentityData;
 use Poirot\Std\Interfaces\Struct\iData;
 
+
 class ProviderNothing
     implements iProviderIdentityData
 {

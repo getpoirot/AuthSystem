@@ -5,6 +5,7 @@ use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 
+
 class IdentifierWrap 
     implements iIdentifier
 {

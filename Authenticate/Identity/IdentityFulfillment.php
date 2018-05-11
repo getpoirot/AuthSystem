@@ -6,7 +6,10 @@ namespace Poirot\AuthSystem\Authenticate\Identity;
 new Authenticator(['identity' => new IdentityFulfillment(['fulfillment_by' => 'username'])]);
 */
 
-class IdentityFulfillment 
+use Poirot\Std\Type\StdString;
+
+
+class IdentityFulfillment
     extends aIdentity
 {
     /** @var string 'property_underscore_format' */
@@ -38,7 +41,7 @@ class IdentityFulfillment
      */
     function setFulfillmentBy($property)
     {
-        $this->fulfillment_property = (string) \Poirot\Std\cast((string)$property)->under_score();
+        $this->fulfillment_property = (string) StdString::of((string)$property)->under_score();
         return $this;
     }
 
