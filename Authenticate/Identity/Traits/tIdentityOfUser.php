@@ -38,7 +38,7 @@ trait tIdentityOfUser
      *
      * @return $this
      */
-    function setData(array $data)
+    function setMetaData(array $data = null)
     {
         $this->data = $data;
         return $this;
@@ -47,10 +47,17 @@ trait tIdentityOfUser
     /**
      * Data Embed With User Identity
      *
+     * @param string $key
+     *
      * @return array
      */
-    function getData()
+    function getMetaData($key = null)
     {
-        return $this->data;
+        $data = $this->data;
+        if ($key !== null)
+            $data = ( isset($data[$key]) ) ? $data[$key] : null;
+
+
+        return $data;
     }
 }
