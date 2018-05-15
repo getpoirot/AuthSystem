@@ -42,7 +42,7 @@ class IdentityOfUser
      *
      * @return $this
      */
-    function setData(array $data)
+    function setMetaData(array $data = null)
     {
         $this->data = $data;
         return $this;
@@ -51,10 +51,17 @@ class IdentityOfUser
     /**
      * Data Embed With User Identity
      *
+     * @param string $key
+     *
      * @return array
      */
-    function getMetaData()
+    function getMetaData($key = null)
     {
-        return $this->data;
+        $data = $this->data;
+        if ($key !== null)
+            $data = ( isset($data[$key]) ) ? $data[$key] : null;
+
+
+        return $data;
     }
 }

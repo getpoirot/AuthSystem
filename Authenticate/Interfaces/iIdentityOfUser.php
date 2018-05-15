@@ -15,7 +15,9 @@ interface iIdentityOfUser
     /**
      * Data Embed With User Identity
      *
+     * @param string $key
+     *
      * @return array
      */
-    function getMetaData();
+    function getMetaData($key = null);
 }

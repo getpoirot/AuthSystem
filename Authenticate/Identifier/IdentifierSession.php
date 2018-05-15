@@ -63,7 +63,7 @@ class IdentifierSession
      */
     function canRecognizeIdentity()
     {
-        if($this->_storage()->has(self::STORAGE_IDENTITY_KEY))
+        if ($this->_storage()->has(self::STORAGE_IDENTITY_KEY))
             return true;
 
         return false;
