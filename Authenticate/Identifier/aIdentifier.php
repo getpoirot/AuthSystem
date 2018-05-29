@@ -92,7 +92,7 @@ abstract class aIdentifier
      * @return $this
      * @throws \Exception immutable error; identity not met requirement
      */
-    final function giveIdentity(iIdentity $identity)
+    function giveIdentity(iIdentity $identity)
     {
         if ($this->identity)
             throw new \Exception('Identity is immutable.');
