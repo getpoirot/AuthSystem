@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Identifier;
 
-use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
+use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationError;
 use Poirot\AuthSystem\Authenticate\Exceptions\exNotAuthenticated;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
@@ -143,11 +143,11 @@ abstract class aIdentifier
      * usually called when authentication exception rise
      * to challenge client to login form or something.
      *
-     * @param exAuthentication $exception Maybe support for specific error
+     * @param AuthenticationError $exception Maybe support for specific error
      *
      * @return mixed Result Handle in Dispatch Listener Events
      */
-    final function issueException(exAuthentication $exception = null)
+    final function issueException(AuthenticationError $exception = null)
     {
         $callable = ($this->issuer_exception)
             ? $this->issuer_exception

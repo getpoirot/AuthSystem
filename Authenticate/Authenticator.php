@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate;
 
-use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
+use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationError;
 use Poirot\AuthSystem\Authenticate\Exceptions\exLoadUserFailed;
 use Poirot\AuthSystem\Authenticate\Exceptions\exNotAuthenticated;
 use Poirot\AuthSystem\Authenticate\Interfaces\iCredential;
@@ -47,7 +47,7 @@ class Authenticator
      * @param array|\Traversable|iCredential| iIdentityCredentialRepo| iIdentity $credential
      *
      * @return iIdentifier Fulfilled Identifier also
-     * @throws exAuthentication|\Exception
+     * @throws AuthenticationError|\Exception
      */
     function authenticate($credential = null)
     {
@@ -86,7 +86,7 @@ class Authenticator
 f_authenticate_done:
 
         if ( !$identity instanceof iIdentity || ($identity instanceof iIdentity && !$identity->isFulfilled()) )
-            throw new exAuthentication;
+            throw new AuthenticationError;
 
         $identifier = $this->identifier();
         $identifier->giveIdentity($identity);

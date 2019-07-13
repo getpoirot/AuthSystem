@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
-use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
+use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationError;
 use Poirot\AuthSystem\Authenticate\Exceptions\exNotAuthenticated;
 
 /**
@@ -115,9 +115,9 @@ interface iIdentifier
      * }
      * [code]
      * 
-     * @param exAuthentication $exception Maybe support for specific error
+     * @param AuthenticationError $exception Maybe support for specific error
      * 
      * @return mixed Result Handle in Dispatch Listener Events
      */
-    function issueException(exAuthentication $exception = null);
+    function issueException(AuthenticationError $exception = null);
 }

@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Interfaces;
 
-use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
+use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationError;
 
 
 Interface iAuthenticator 
@@ -21,7 +21,7 @@ Interface iAuthenticator
      * @param iCredential|iIdentityCredentialRepo $credential
      *
      * @return iIdentifier Fulfilled Identifier also
-     * @throws exAuthentication Authentication failed
+     * @throws AuthenticationError Authentication failed
      */
     function authenticate($credential = null);
 

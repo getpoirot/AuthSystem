@@ -2,7 +2,7 @@
 namespace Poirot\AuthSystem\Authenticate\Exceptions;
 
 class exUserNotActivated
-    extends exAuthentication
+    extends AuthenticationError
 {
     const EXCEPTION_DEFAULT_MESSAGE = 'User Not Activated';
 }

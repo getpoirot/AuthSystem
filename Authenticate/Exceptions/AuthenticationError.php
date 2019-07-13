@@ -7,7 +7,7 @@ use Poirot\Std\Interfaces\Pact\ipMetaProvider;
 use Poirot\Std\Interfaces\Struct\iDataMean;
 use Poirot\Std\Struct\DataMean;
 
-class exAuthentication
+class AuthenticationError
     extends \RuntimeException
     implements ipMetaProvider
 {

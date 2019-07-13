@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\Identifier;
 
-use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
+use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationError;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 
@@ -145,11 +145,11 @@ class IdentifierWrap
      * }
      * [code]
      *
-     * @param exAuthentication $exception Maybe support for specific error
+     * @param AuthenticationError $exception Maybe support for specific error
      *
      * @return mixed Result Handle in Dispatch Listener Events
      */
-    function issueException(exAuthentication $exception = null)
+    function issueException(AuthenticationError $exception = null)
     {
         return $this->identifier->issueException($exception);
     }

@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\RepoIdentityCredential;
 
-use Poirot\AuthSystem\Authenticate\Exceptions\exAuthentication;
+use Poirot\AuthSystem\Authenticate\Exceptions\AuthenticationError;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentity;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentityCredentialRepo;
 
@@ -26,7 +26,7 @@ class IdentityCredentialWrap
      * Get Identity Match By Credential as Options
      *
      * @return iIdentity
-     * @throws exAuthentication
+     * @throws AuthenticationError
      * @throws \Exception credential not fulfilled, etc..
      */
     function findIdentityMatch()
