@@ -1,6 +1,7 @@
 <?php
 namespace Poirot\AuthSystem\Authenticate\RepoIdentityCredential;
 
+use Poirot\Std\Exceptions\UnexpectedInputValueError;
 use Poirot\Std\Struct\DataOptionsOpen;
 use Poirot\AuthSystem\Authenticate\Identifier\aIdentifier;
 use Poirot\AuthSystem\Authenticate\Interfaces\iIdentityCredentialRepo;
@@ -69,6 +70,7 @@ abstract class aIdentityCredentialAdapter
      * @param array $credentials Include Credential Data
      *
      * @return iIdentity|false
+     * @throws UnexpectedInputValueError
      */
     abstract protected function doFindIdentityMatch(array $credentials);
 
